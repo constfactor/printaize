@@ -1,0 +1,14 @@
+{
+  "buildCommand": "remix build",
+  "devCommand": "remix dev --manual",
+  "installCommand": "npm install",
+  "framework": null,
+  "outputDirectory": "public",
+  "regions": ["hnd1"],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  }
+}

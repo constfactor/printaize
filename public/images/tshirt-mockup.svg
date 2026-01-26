@@ -1,0 +1,34 @@
+<!-- シンプルなTシャツモックアップSVG画像 -->
+<svg width="600" height="700" viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="600" height="700" fill="#f0f0f0"/>
+  
+  <!-- Tシャツの影 -->
+  <ellipse cx="300" cy="680" rx="150" ry="20" fill="#cccccc" opacity="0.3"/>
+  
+  <!-- Tシャツ本体 -->
+  <g>
+    <!-- 左袖 -->
+    <path d="M 120 150 L 80 180 L 100 280 L 150 250 Z" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+    
+    <!-- 右袖 -->
+    <path d="M 480 150 L 520 180 L 500 280 L 450 250 Z" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+    
+    <!-- 胴体 -->
+    <rect x="150" y="150" width="300" height="450" rx="20" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+    
+    <!-- 首元 -->
+    <ellipse cx="300" cy="150" rx="50" ry="30" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+    <ellipse cx="300" cy="150" rx="40" ry="20" fill="#f0f0f0"/>
+    
+    <!-- プリント可能エリアの目印 (点線) -->
+    <rect x="200" y="250" width="200" height="250" fill="none" stroke="#cccccc" stroke-width="2" stroke-dasharray="10,5" opacity="0.5"/>
+    <text x="300" y="380" text-anchor="middle" font-family="Arial" font-size="16" fill="#999999" opacity="0.7">
+      プリントエリア
+    </text>
+  </g>
+  
+  <!-- Tシャツのディテール（縫い目） -->
+  <line x1="150" y1="200" x2="150" y2="580" stroke="#d0d0d0" stroke-width="1"/>
+  <line x1="450" y1="200" x2="450" y2="580" stroke="#d0d0d0" stroke-width="1"/>
+</svg>
