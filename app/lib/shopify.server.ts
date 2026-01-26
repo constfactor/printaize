@@ -115,7 +115,7 @@ export async function createCart(lineItems: Array<{
 export async function addCustomTshirtToCart(
   designImageUrl: string,
   designImageUrlHD: string,
-  productVariantId: string = "gid://shopify/ProductVariant/47732817756414"
+  productVariantId: string = "gid://shopify/ProductVariant/48602131661024"
 ) {
   return await createCart([
     {
@@ -136,7 +136,7 @@ export async function addAIGeneratedTshirtToCart(
   designImageUrl: string,
   designImageUrlHD: string,
   prompt: string,
-  productVariantId: string = "gid://shopify/ProductVariant/47732817756414"
+  productVariantId: string = "gid://shopify/ProductVariant/48602131661024"
 ) {
   return await createCart([
     {

@@ -2029,22 +2029,22 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
   const getVariantId = (color: string, size: string): string => {
     const variantMap: { [key: string]: { [size: string]: string } } = {
       'ホワイト': {
-        'S': '47732817723646',
-        'M': '47732817756414',
-        'L': '47732817789182',
-        'XL': '47732817821950',
-        'XXL': '47732817854718',
+        'S': '48602131628256',
+        'M': '48602131661024',
+        'L': '48602131693792',
+        'XL': '48602131726560',
+        'XXL': '48602131759328',
       },
       'ブラック': {
-        'S': '47732817887486',
-        'M': '47732817920254',
-        'L': '47732817953022',
-        'XL': '47732817985790',
-        'XXL': '47732818018558',
+        'S': '48602131792096',
+        'M': '48602131824864',
+        'L': '48602131857632',
+        'XL': '48602131890400',
+        'XXL': '48602131923168',
       },
     };
 
-    const numericId = variantMap[color]?.[size] || '47732817756414'; // デフォルト: ホワイト/M
+    const numericId = variantMap[color]?.[size] || '48602131661024'; // デフォルト: ホワイト/M
     return `gid://shopify/ProductVariant/${numericId}`;
   };
 
@@ -2156,24 +2156,24 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
       // ステップ8: カラー×サイズに応じた商品バリアントIDを取得
       const variantMapping: { [key: string]: { [key: string]: string } } = {
         "ホワイト": {
-          "S": "47732817723646",
-          "M": "47732817756414",
-          "L": "47732817789182",
-          "XL": "47732817821950",
-          "XXL": "47732817854718",
+          "S": "48602131628256",
+          "M": "48602131661024",
+          "L": "48602131693792",
+          "XL": "48602131726560",
+          "XXL": "48602131759328",
         },
         "ブラック": {
-          "S": "47732817887486",
-          "M": "47732817920254",
-          "L": "47732817953022",
-          "XL": "47732817985790",
-          "XXL": "47732818018558",
+          "S": "48602131792096",
+          "M": "48602131824864",
+          "L": "48602131857632",
+          "XL": "48602131890400",
+          "XXL": "48602131923168",
         },
       };
 
       // 選択されたカラーとサイズから正しいバリアントIDを取得
       const colorKey = selectedColor.name.includes("ホワイト") || selectedColor.name.includes("White") ? "ホワイト" : "ブラック";
-      const variantId = variantMapping[colorKey]?.[selectedSize] || "47732817756414"; // デフォルト: ホワイトM
+      const variantId = variantMapping[colorKey]?.[selectedSize] || "48602131661024"; // デフォルト: ホワイトM
       const productVariantId = `gid://shopify/ProductVariant/${variantId}`;
 
       // ステップ8: カートに追加APIを呼び出す（通常版と高解像度版の両方のURLを送信）
