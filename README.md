@@ -44,7 +44,7 @@
 
 ```bash
 git clone <your-repo>
-cd tshirt-customizer-app
+cd printaize
 ```
 
 ### 2. 依存関係のインストール
@@ -103,7 +103,7 @@ npm run dev
 ## 📁 プロジェクト構造
 
 ```
-tshirt-customizer-app/
+printaize/
 ├── app/
 │   ├── components/
 │   │   └── TShirtCustomizer.tsx    # メインカスタマイザーコンポーネント
