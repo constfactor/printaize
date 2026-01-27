@@ -445,7 +445,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       stopContextMenu: true, // コンテキストメニューを無効化
       fireRightClick: false, // 右クリックイベントを無効化
       fireMiddleClick: false, // 中クリックイベントを無効化
+      enablePointerEvents: true, // ポインターイベントを有効化
     });
+    
+    // モバイルの場合、初期状態でtouchActionを設定
+    if (window.innerWidth < 768 && canvasRef.current) {
+      canvasRef.current.style.touchAction = "pan-y";
+    }
 
     fabricCanvasRef.current = canvas;
     setIsFabricReady(true);
@@ -691,8 +697,48 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
     // イベントリスナー設定
     
-    // マウス/タッチダウン時の処理（プリント範囲外なら選択をキャンセル）
+    // プリント範囲外のタッチを完全にブロック
+    let isOutsideInteraction = false;
+    
+    canvas.on("mouse:down:before", (e: any) => {
+      if (!e.e) return;
+      
+      const pointer = canvas.getPointer(e.e);
+      
+      // プリント範囲外かチェック
+      const isOutsidePrintArea = 
+        pointer.x < printArea.left ||
+        pointer.x > printArea.left + printArea.width ||
+        pointer.y < printArea.top ||
+        pointer.y > printArea.top + printArea.height;
+      
+      if (isOutsidePrintArea && window.innerWidth < 768) {
+        isOutsideInteraction = true;
+        // イベントを完全にキャンセル
+        e.e.preventDefault();
+        e.e.stopPropagation();
+        
+        if (canvasRef.current) {
+          canvasRef.current.style.touchAction = "pan-y";
+        }
+        
+        // 選択を無効化
+        canvas.selection = false;
+        canvas.discardActiveObject();
+        canvas.renderAll();
+      } else {
+        isOutsideInteraction = false;
+        canvas.selection = true;
+      }
+    });
+    
+    // マウス/タッチダウン時の処理
     canvas.on("mouse:down", (e: any) => {
+      if (isOutsideInteraction) {
+        // 範囲外インタラクション中は何もしない
+        return false;
+      }
+      
       const pointer = canvas.getPointer(e.e);
       const clickedOnObject = canvas.findTarget(e.e, false);
       
@@ -713,8 +759,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           // 選択をクリア
           canvas.discardActiveObject();
           canvas.renderAll();
-          return;
+          return false;
         }
+      }
+    });
+    
+    // マウスアップ時にフラグをリセット
+    canvas.on("mouse:up", () => {
+      if (isOutsideInteraction) {
+        isOutsideInteraction = false;
+        canvas.selection = true;
       }
     });
     
@@ -2582,18 +2636,26 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <Icon type={isZoomed ? "zoomIn" : "zoomOut"} size={20} color="#667eea" />
               </button>
               
-              <canvas 
-                ref={canvasRef} 
-                style={{ 
-                  display: "block",
+              <div
+                style={{
+                  position: "relative",
                   width: "100%",
                   height: "100%",
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                  touchAction: isMobile ? "pan-y" : "none",
-                }} 
-              />
+                }}
+              >
+                <canvas 
+                  ref={canvasRef} 
+                  style={{ 
+                    display: "block",
+                    width: "100%",
+                    height: "100%",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
+                    touchAction: isMobile ? "pan-y" : "none",
+                  }} 
+                />
+              </div>
             </div>
 
             {/* オブジェクト操作コントロール */}
