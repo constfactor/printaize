@@ -303,20 +303,17 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
   // ズーム時のESCキーハンドラー
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isZoomed) {
+      if (e.key === 'Escape' && isZoomed && fabricCanvasRef.current) {
+        // ズームをリセット
+        fabricCanvasRef.current.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        fabricCanvasRef.current.renderAll();
         setIsZoomed(false);
       }
     };
     
-    if (isZoomed) {
-      document.addEventListener('keydown', handleEscape);
-      // ズーム時はbodyのスクロールを無効化
-      document.body.style.overflow = 'hidden';
-    }
-    
+    document.addEventListener('keydown', handleEscape);
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'auto';
     };
   }, [isZoomed]);
 
@@ -438,7 +435,7 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
     const canvas = new fabricLib.Canvas(canvasRef.current, {
       width: canvasSize,
       height: canvasSize,
-      backgroundColor: "#f5f5f5",
+      backgroundColor: "#fafafa",
       selection: true,
       preserveObjectStacking: true, // 選択時にz-orderを変更しない
     });
@@ -2349,80 +2346,61 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
       margin: "0 auto", 
       padding: 0 
     }}>
-      {/* ズーム時の背景オーバーレイ */}
-      {isZoomed && (
-        <div
-          onClick={() => setIsZoomed(false)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.85)",
-            zIndex: 9998,
-            cursor: "pointer",
-          }}
-        />
-      )}
-      
       {/* 商品情報バナー */}
       <div style={{
         backgroundColor: "white",
         borderRadius: "0",
-        padding: isMobile ? "15px" : "20px",
+        padding: isMobile ? "20px" : "40px 30px",
         marginBottom: "0",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        borderBottom: "1px solid #e0e0e0",
         display: "flex",
         justifyContent: "space-between",
         alignItems: isMobile ? "flex-start" : "center",
         flexWrap: "wrap",
-        gap: "15px",
+        gap: "20px",
       }}>
         <div style={{ flex: "1 1 300px" }}>
           <h2 style={{ 
             margin: 0, 
-            fontSize: isMobile ? "18px" : "20px", 
-            color: "#333" 
+            fontSize: isMobile ? "16px" : "18px",
+            fontWeight: "400",
+            letterSpacing: "0.05em",
+            color: "#1a1a1a",
+            textTransform: "uppercase"
           }}>
             {product.name}
           </h2>
           <div style={{ 
-            marginTop: "10px", 
+            marginTop: "15px", 
             display: "flex", 
-            gap: "15px", 
+            gap: "20px", 
             alignItems: "center",
-            fontSize: "13px",
+            fontSize: "12px",
+            letterSpacing: "0.03em",
           }}>
             <div style={{ 
               display: "flex", 
               alignItems: "center", 
-              gap: "6px",
-              padding: "6px 12px",
-              backgroundColor: "#f0f4ff",
-              borderRadius: "20px",
+              gap: "8px",
             }}>
               <div
                 style={{
-                  width: "16px",
-                  height: "16px",
+                  width: "12px",
+                  height: "12px",
                   borderRadius: "50%",
                   backgroundColor: selectedColor.hex,
                   border: selectedColor.hex === '#FFFFFF' || selectedColor.hex === '#F5F5DC'
-                    ? '1.5px solid #ddd' 
-                    : 'none',
+                    ? '1px solid #d0d0d0' 
+                    : '1px solid rgba(0,0,0,0.1)',
                 }}
               />
-              <span style={{ color: "#667eea", fontWeight: "600" }}>
+              <span style={{ color: "#4a4a4a", fontWeight: "400" }}>
                 {selectedColor.name}
               </span>
             </div>
             <div style={{ 
-              padding: "6px 12px",
-              backgroundColor: "#f0f4ff",
-              borderRadius: "20px",
-              color: "#667eea",
-              fontWeight: "600",
+              color: "#4a4a4a",
+              fontWeight: "400",
             }}>
               サイズ: {selectedSize}
             </div>
@@ -2430,18 +2408,20 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ 
-            fontSize: isMobile ? "24px" : "28px", 
-            fontWeight: "bold", 
-            color: "#667eea" 
+            fontSize: isMobile ? "20px" : "24px", 
+            fontWeight: "300", 
+            letterSpacing: "0.02em",
+            color: "#1a1a1a" 
           }}>
             ¥{product.price.toLocaleString()}
           </div>
           <div style={{ 
-            fontSize: isMobile ? "11px" : "12px", 
-            color: "#999", 
-            marginTop: "5px" 
+            fontSize: "11px", 
+            color: "#888", 
+            marginTop: "6px",
+            letterSpacing: "0.05em" 
           }}>
-            税込価格
+            税込
           </div>
         </div>
       </div>
@@ -2453,20 +2433,22 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
         width: "100%", 
         margin: 0, 
         alignItems: "flex-start",
+        backgroundColor: "white",
       }}>
         {/* 左側: キャンバスエリア */}
         <div style={{ 
-          flex: isMobile ? "none" : "1 1 auto", 
+          flex: isMobile ? "none" : "1 1 65%", 
           minWidth: "0", 
-          width: isMobile ? "100%" : "auto",
-          backgroundColor: "#f5f5f5" 
+          width: isMobile ? "100%" : "65%",
+          backgroundColor: "white" 
         }}>
           <div style={{ 
             display: "flex", 
             flexDirection: "column", 
             alignItems: "center", 
-            padding: isMobile ? "15px" : "20px",
+            padding: isMobile ? "20px" : "40px",
             width: "100%",
+            boxSizing: "border-box",
           }}>
             <div
               style={{
@@ -2474,29 +2456,51 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                 borderRadius: "0",
                 overflow: "visible",
                 boxShadow: "none",
-                backgroundColor: "#f5f5f5",
+                backgroundColor: "#fafafa",
                 width: "100%",
-                maxWidth: isZoomed ? "none" : "800px",
+                maxWidth: "min(800px, 100%)",
                 margin: "0 auto",
-                position: isZoomed ? "fixed" : "relative",
-                top: isZoomed ? 0 : "auto",
-                left: isZoomed ? 0 : "auto",
-                right: isZoomed ? 0 : "auto",
-                bottom: isZoomed ? 0 : "auto",
-                zIndex: isZoomed ? 9999 : "auto",
+                position: "relative",
+                aspectRatio: "1 / 1",
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
-                padding: isZoomed ? "20px" : "0",
+                justifyContent: "center",
               }}
             >
               {/* ズームボタン */}
               <button
-                onClick={() => setIsZoomed(!isZoomed)}
+                onClick={() => {
+                  if (!fabricCanvasRef.current) return;
+                  const canvas = fabricCanvasRef.current;
+                  
+                  if (isZoomed) {
+                    // ズームアウト：元に戻す
+                    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+                    setIsZoomed(false);
+                  } else {
+                    // ズームイン：プリントエリアの中心にズーム
+                    const canvasSize = 800;
+                    const printArea = getPrintAreaInPixels(canvasSize);
+                    
+                    // プリントエリアの中心座標
+                    const centerX = printArea.left + printArea.width / 2;
+                    const centerY = printArea.top + printArea.height / 2;
+                    
+                    // ズーム倍率（2倍）
+                    const zoom = 1.7;
+                    
+                    // ズーム後の表示位置を計算（プリントエリアが中央に来るように）
+                    const point = new (window as any).fabric.Point(centerX, centerY);
+                    canvas.zoomToPoint(point, zoom);
+                    
+                    setIsZoomed(true);
+                  }
+                  canvas.renderAll();
+                }}
                 style={{
                   position: "absolute",
-                  top: isZoomed ? "20px" : "10px",
-                  right: isZoomed ? "20px" : "10px",
+                  top: "10px",
+                  right: "10px",
                   width: "40px",
                   height: "40px",
                   borderRadius: "50%",
@@ -2518,19 +2522,19 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                   e.currentTarget.style.transform = "scale(1)";
                   e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
                 }}
-                title={isZoomed ? "元のサイズに戻す" : "拡大表示"}
+                title={isZoomed ? "元のサイズに戻す" : "プリントエリアを拡大"}
               >
-                <Icon type={isZoomed ? "zoomOut" : "zoomIn"} size={20} color="#667eea" />
+                <Icon type={isZoomed ? "zoomIn" : "zoomOut"} size={20} color="#667eea" />
               </button>
               
               <canvas 
                 ref={canvasRef} 
                 style={{ 
                   display: "block",
-                  width: isZoomed ? "auto" : "100%",
-                  height: isZoomed ? "90vh" : "auto",
-                  maxWidth: isZoomed ? "90vw" : "none",
-                  maxHeight: isZoomed ? "90vh" : "none",
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "100%",
+                  maxHeight: "100%",
                   objectFit: "contain",
                 }} 
               />
@@ -2748,10 +2752,10 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
 
         {/* 右側: コントロールパネル */}
         <div style={{ 
-          width: isMobile ? "100%" : "min(380px, 30vw)", 
-          minWidth: isMobile ? "auto" : "300px",
-          maxWidth: isMobile ? "100%" : "400px",
-          flex: isMobile ? "none" : "0 0 auto",
+          width: isMobile ? "100%" : "35%", 
+          minWidth: "0",
+          maxWidth: isMobile ? "100%" : "35%",
+          flex: isMobile ? "none" : "1 1 35%",
           backgroundColor: "#ffffff",
           overflowY: "auto",
           overflowX: "hidden",
@@ -2761,15 +2765,18 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
         }}>
           <div style={{
             ...panelStyle,
-            padding: isMobile ? "20px 15px" : "24px",
+            padding: isMobile ? "25px 20px" : "40px 30px",
             wordWrap: "break-word",
             overflowWrap: "break-word",
           }}>
             <h2 style={{ 
               marginTop: 0, 
-              color: "#333", 
-              marginBottom: isMobile ? "15px" : "20px",
-              fontSize: isMobile ? "18px" : "20px"
+              color: "#1a1a1a", 
+              marginBottom: isMobile ? "20px" : "30px",
+              fontSize: isMobile ? "14px" : "16px",
+              fontWeight: "400",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
             }}>
               商品詳細
             </h2>
@@ -2777,17 +2784,18 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
             {/* 商品説明セクション */}
             <div style={sectionStyle}>
               <div style={{
-                padding: "15px",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "8px",
+                padding: "0",
+                backgroundColor: "transparent",
+                borderRadius: "0",
                 marginBottom: "20px",
               }}>
-                <h3 style={{ ...sectionTitleStyle, marginTop: 0 }}>📝 商品説明</h3>
+                <h3 style={{ ...sectionTitleStyle, marginTop: 0 }}>商品説明</h3>
                 <p style={{ 
-                  fontSize: "14px", 
+                  fontSize: "13px", 
                   color: "#666", 
-                  lineHeight: "1.6",
+                  lineHeight: "1.8",
                   margin: 0,
+                  letterSpacing: "0.02em",
                 }}>
                   {product.description}
                 </p>
@@ -2796,22 +2804,22 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
 
             {/* 本体カラー選択セクション */}
             <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>🎨 本体カラー</h3>
-              <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+              <h3 style={sectionTitleStyle}>本体カラー</h3>
+              <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
                 {product.colors.map((color) => (
                   <button
                     key={color.name}
                     onClick={() => setSelectedColor(color)}
                     style={{
                       flex: 1,
-                      padding: "12px",
+                      padding: "14px 10px",
                       border: selectedColor.name === color.name 
-                        ? "3px solid #667eea" 
-                        : "2px solid #ddd",
-                      borderRadius: "8px",
-                      backgroundColor: "white",
+                        ? "1px solid #1a1a1a" 
+                        : "1px solid #d0d0d0",
+                      borderRadius: "0",
+                      backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
                       cursor: "pointer",
-                      transition: "all 0.2s",
+                      transition: "all 0.3s ease",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
@@ -2819,12 +2827,12 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                     }}
                     onMouseEnter={(e) => {
                       if (selectedColor.name !== color.name) {
-                        e.currentTarget.style.borderColor = "#999";
+                        e.currentTarget.style.borderColor = "#888";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (selectedColor.name !== color.name) {
-                        e.currentTarget.style.borderColor = "#ddd";
+                        e.currentTarget.style.borderColor = "#d0d0d0";
                       }
                     }}
                   >
@@ -2854,7 +2862,7 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
 
             {/* サイズ選択セクション */}
             <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>📏 サイズ</h3>
+              <h3 style={sectionTitleStyle}>サイズ</h3>
               <div style={{ 
                 display: "grid", 
                 gridTemplateColumns: "repeat(5, 1fr)", 
@@ -2866,26 +2874,29 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     style={{
-                      padding: "12px 8px",
+                      padding: "14px 8px",
                       border: selectedSize === size 
-                        ? "3px solid #667eea" 
-                        : "2px solid #ddd",
-                      borderRadius: "8px",
-                      backgroundColor: selectedSize === size ? "#f0f4ff" : "white",
+                        ? "1px solid #1a1a1a" 
+                        : "1px solid #d0d0d0",
+                      borderRadius: "0",
+                      backgroundColor: selectedSize === size ? "#1a1a1a" : "white",
                       cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: selectedSize === size ? "bold" : "normal",
-                      color: selectedSize === size ? "#667eea" : "#666",
-                      transition: "all 0.2s",
+                      fontSize: "12px",
+                      fontWeight: "400",
+                      letterSpacing: "0.05em",
+                      color: selectedSize === size ? "white" : "#666",
+                      transition: "all 0.3s ease",
                     }}
                     onMouseEnter={(e) => {
                       if (selectedSize !== size) {
-                        e.currentTarget.style.backgroundColor = "#f5f5f5";
+                        e.currentTarget.style.backgroundColor = "#fafafa";
+                        e.currentTarget.style.borderColor = "#888";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (selectedSize !== size) {
                         e.currentTarget.style.backgroundColor = "white";
+                        e.currentTarget.style.borderColor = "#d0d0d0";
                       }
                     }}
                   >
@@ -3591,79 +3602,94 @@ const panelStyle: React.CSSProperties = {
 };
 
 const sectionStyle: React.CSSProperties = {
-  marginBottom: "8px",
+  marginBottom: "30px",
 };
 
 const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "16px",
-  marginBottom: "12px",
-  color: "#333",
-  fontWeight: "600",
+  fontSize: "11px",
+  marginBottom: "16px",
+  color: "#666",
+  fontWeight: "400",
+  letterSpacing: "0.15em",
+  textTransform: "uppercase",
 };
 
 const dividerStyle: React.CSSProperties = {
-  margin: "24px 0",
-  border: "1px solid #eee",
+  margin: "30px 0",
+  border: "none",
+  borderTop: "1px solid #e5e5e5",
 };
 
 const buttonStyle = (bgColor: string, enabled: boolean): React.CSSProperties => ({
   width: "100%",
-  padding: "12px",
+  padding: "14px 20px",
   marginBottom: "10px",
-  backgroundColor: enabled ? bgColor : "#ccc",
-  color: "white",
+  backgroundColor: enabled ? "#1a1a1a" : "#e0e0e0",
+  color: enabled ? "white" : "#999",
   border: "none",
-  borderRadius: "8px",
-  fontSize: "15px",
+  borderRadius: "0",
+  fontSize: "12px",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
   cursor: enabled ? "pointer" : "not-allowed",
-  fontWeight: "500",
-  transition: "all 0.2s",
+  fontWeight: "400",
+  transition: "all 0.3s ease",
 });
 
 const primaryButtonStyle = (disabled: boolean): React.CSSProperties => ({
   width: "100%",
-  padding: "14px",
-  backgroundColor: disabled ? "#ccc" : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  background: disabled ? "#ccc" : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  color: "white",
+  padding: "16px 20px",
+  backgroundColor: disabled ? "#e0e0e0" : "#1a1a1a",
+  color: disabled ? "#999" : "white",
   border: "none",
-  borderRadius: "8px",
-  fontSize: "16px",
+  borderRadius: "0",
+  fontSize: "13px",
+  letterSpacing: "0.15em",
+  textTransform: "uppercase",
   cursor: disabled ? "not-allowed" : "pointer",
-  fontWeight: "bold",
+  fontWeight: "400",
+  transition: "all 0.3s ease",
 });
 
 const smallButtonStyle = (bgColor: string, enabled: boolean): React.CSSProperties => ({
-  padding: "10px",
-  backgroundColor: enabled ? bgColor : "#ccc",
-  color: "white",
+  padding: "12px 16px",
+  backgroundColor: enabled ? "#1a1a1a" : "#e0e0e0",
+  color: enabled ? "white" : "#999",
   border: "none",
-  borderRadius: "6px",
-  fontSize: "13px",
+  borderRadius: "0",
+  fontSize: "11px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
   cursor: enabled ? "pointer" : "not-allowed",
   width: "100%",
+  fontWeight: "400",
+  transition: "all 0.3s ease",
 });
 
 const historyButtonStyle = (enabled: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "12px",
-  backgroundColor: enabled ? "#6c757d" : "#ccc",
-  color: "white",
+  backgroundColor: enabled ? "#4a4a4a" : "#e0e0e0",
+  color: enabled ? "white" : "#999",
   border: "none",
-  borderRadius: "8px",
-  fontSize: "15px",
+  borderRadius: "0",
+  fontSize: "11px",
+  letterSpacing: "0.05em",
   cursor: enabled ? "pointer" : "not-allowed",
-  fontWeight: "600",
+  fontWeight: "400",
+  transition: "all 0.3s ease",
 });
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: "10px",
+  padding: "12px 16px",
   marginBottom: "10px",
-  border: "1px solid #ddd",
-  borderRadius: "6px",
-  fontSize: "14px",
+  border: "1px solid #d0d0d0",
+  borderRadius: "0",
+  fontSize: "13px",
+  letterSpacing: "0.02em",
   boxSizing: "border-box",
+  transition: "border-color 0.2s ease",
 };
 
 const textareaStyle: React.CSSProperties = {
