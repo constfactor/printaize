@@ -136,6 +136,18 @@ const Icon = ({ type, size = 20, color = "currentColor" }: { type: string; size?
         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14-7l-5-5-5 5m5-5v12"/>
       </svg>
     ),
+    zoomIn: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+        <path d="M21 3l-9 9m0 0v-6m0 6h6"/>
+        <path d="M3 21l9-9m0 0v6m0-6H6"/>
+      </svg>
+    ),
+    zoomOut: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+        <path d="M15 9l6-6m0 0h-6m6 0v6"/>
+        <path d="M9 15l-6 6m0 0h6m-6 0v-6"/>
+      </svg>
+    ),
   };
   
   return <span style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>{icons[type] || null}</span>;
@@ -284,6 +296,29 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
 
   // レスポンシブ対応
   const [isMobile, setIsMobile] = useState(false);
+  
+  // ズーム表示状態
+  const [isZoomed, setIsZoomed] = useState(false);
+  
+  // ズーム時のESCキーハンドラー
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isZoomed) {
+        setIsZoomed(false);
+      }
+    };
+    
+    if (isZoomed) {
+      document.addEventListener('keydown', handleEscape);
+      // ズーム時はbodyのスクロールを無効化
+      document.body.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'auto';
+    };
+  }, [isZoomed]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -2314,6 +2349,23 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
       margin: "0 auto", 
       padding: 0 
     }}>
+      {/* ズーム時の背景オーバーレイ */}
+      {isZoomed && (
+        <div
+          onClick={() => setIsZoomed(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            zIndex: 9998,
+            cursor: "pointer",
+          }}
+        />
+      )}
+      
       {/* 商品情報バナー */}
       <div style={{
         backgroundColor: "white",
@@ -2424,17 +2476,62 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                 boxShadow: "none",
                 backgroundColor: "#f5f5f5",
                 width: "100%",
-                maxWidth: "800px",
+                maxWidth: isZoomed ? "none" : "800px",
                 margin: "0 auto",
-                position: "relative",
+                position: isZoomed ? "fixed" : "relative",
+                top: isZoomed ? 0 : "auto",
+                left: isZoomed ? 0 : "auto",
+                right: isZoomed ? 0 : "auto",
+                bottom: isZoomed ? 0 : "auto",
+                zIndex: isZoomed ? 9999 : "auto",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: isZoomed ? "20px" : "0",
               }}
             >
+              {/* ズームボタン */}
+              <button
+                onClick={() => setIsZoomed(!isZoomed)}
+                style={{
+                  position: "absolute",
+                  top: isZoomed ? "20px" : "10px",
+                  right: isZoomed ? "20px" : "10px",
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  border: "none",
+                  backgroundColor: "white",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 10,
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.1)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+                }}
+                title={isZoomed ? "元のサイズに戻す" : "拡大表示"}
+              >
+                <Icon type={isZoomed ? "zoomOut" : "zoomIn"} size={20} color="#667eea" />
+              </button>
+              
               <canvas 
                 ref={canvasRef} 
                 style={{ 
                   display: "block",
-                  width: "100%",
-                  height: "auto",
+                  width: isZoomed ? "auto" : "100%",
+                  height: isZoomed ? "90vh" : "auto",
+                  maxWidth: isZoomed ? "90vw" : "none",
+                  maxHeight: isZoomed ? "90vh" : "none",
+                  objectFit: "contain",
                 }} 
               />
             </div>
