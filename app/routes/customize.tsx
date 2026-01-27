@@ -5,7 +5,7 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import PrintAIzeCustomizer from "~/components/PrintAIzeCustomizer";
+import PrintAIze from "~/components/PrintAIze";
 import { getProductById } from "~/lib/products";
 
 export const meta: MetaFunction = () => {
@@ -91,7 +91,7 @@ export default function Customize() {
 
       {/* メインコンテンツ */}
       <main style={{ padding: "20px 0" }}>
-        <PrintAIzeCustomizer product={product} />
+        <PrintAIze product={product} />
       </main>
 
       {/* フッター */}

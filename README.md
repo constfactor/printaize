@@ -81,7 +81,7 @@ SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token_here
 
 ### 4. 商品バリアントIDの設定
 
-`app/lib/shopify.server.ts` と `app/components/PrintAIzeCustomizer.tsx` で、実際の商品のバリアントIDに変更してください：
+`app/lib/shopify.server.ts` と `app/components/PrintAIze.tsx` で、実際の商品のバリアントIDに変更してください：
 
 ```typescript
 // 現在: "gid://shopify/ProductVariant/YOUR_VARIANT_ID"
@@ -106,7 +106,7 @@ npm run dev
 printaize/
 ├── app/
 │   ├── components/
-│   │   └── PrintAIzeCustomizer.tsx    # メインカスタマイザーコンポーネント
+│   │   └── PrintAIze.tsx    # メインカスタマイザーコンポーネント
 │   ├── lib/
 │   │   ├── replicate.server.ts     # Replicate AI統合
 │   │   └── shopify.server.ts       # Shopify API統合
@@ -190,7 +190,7 @@ const output = await replicate.run(
 
 ### UIカラーの変更
 
-`app/routes/_index.tsx` と `app/components/PrintAIzeCustomizer.tsx` でスタイルを変更できます。
+`app/routes/_index.tsx` と `app/components/PrintAIze.tsx` でスタイルを変更できます。
 
 ---
 

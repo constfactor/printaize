@@ -14,7 +14,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "~/lib/products";
 
-interface PrintAIzeCustomizerProps {
+interface PrintAIzeProps {
   product: Product;
 }
 
@@ -229,7 +229,7 @@ const FONT_LIST = [
   { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" },
 ];
 
-export default function PrintAIzeCustomizer({ product }: PrintAIzeCustomizerProps) {
+export default function PrintAIze({ product }: PrintAIzeProps) {
   // ========== ステップ1: 状態管理 ==========
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<any>(null);
