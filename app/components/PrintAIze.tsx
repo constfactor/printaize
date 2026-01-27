@@ -442,6 +442,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       selection: true,
       preserveObjectStacking: true, // 選択時にz-orderを変更しない
       allowTouchScrolling: true, // モバイルでスクロールを許可
+      stopContextMenu: true, // コンテキストメニューを無効化
+      fireRightClick: false, // 右クリックイベントを無効化
+      fireMiddleClick: false, // 中クリックイベントを無効化
     });
 
     fabricCanvasRef.current = canvas;
@@ -687,6 +690,34 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     });
 
     // イベントリスナー設定
+    
+    // マウス/タッチダウン時の処理（プリント範囲外なら選択をキャンセル）
+    canvas.on("mouse:down", (e: any) => {
+      const pointer = canvas.getPointer(e.e);
+      const clickedOnObject = canvas.findTarget(e.e, false);
+      
+      // オブジェクトをクリックしていない場合
+      if (!clickedOnObject || clickedOnObject.name === 'printArea') {
+        // プリント範囲外をクリック/タッチした場合
+        const isOutsidePrintArea = 
+          pointer.x < printArea.left ||
+          pointer.x > printArea.left + printArea.width ||
+          pointer.y < printArea.top ||
+          pointer.y > printArea.top + printArea.height;
+        
+        if (isOutsidePrintArea && window.innerWidth < 768) {
+          // モバイルでプリント範囲外の場合、スクロールを許可
+          if (canvasRef.current) {
+            canvasRef.current.style.touchAction = "pan-y";
+          }
+          // 選択をクリア
+          canvas.discardActiveObject();
+          canvas.renderAll();
+          return;
+        }
+      }
+    });
+    
     canvas.on("selection:created", (e: any) => {
       setSelectedObject(e.selected?.[0] || null);
       // オブジェクト選択時は通常のタッチ操作を許可
