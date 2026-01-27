@@ -243,9 +243,6 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
   const [fontFamily, setFontFamily] = useState("Noto Sans JP");
   const firstTextObjectRef = useRef<any>(null); // 初回のテキストオブジェクトを追跡
   const [isFontDropdownOpen, setIsFontDropdownOpen] = useState(false);
-  
-  // フィルター関連
-  const [brightness, setBrightness] = useState(0);
   const [selectedObject, setSelectedObject] = useState<any>(null);
   const [activeFontTab, setActiveFontTab] = useState<"japanese" | "english">("japanese"); // フォントタブの状態
   
@@ -1439,87 +1436,6 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
   // フォントリストをフィルタリング
   const getFilteredFonts = () => {
     return FONT_LIST.filter(font => font.type === activeFontTab);
-  };
-
-  // ========== ステップ7: フィルター機能 ==========
-  const applyGrayscaleFilter = () => {
-    if (!selectedObject || selectedObject.type !== "image" || typeof (window as any).fabric === 'undefined') {
-      alert("画像を選択してください");
-      return;
-    }
-
-    const fabricLib = (window as any).fabric;
-    const img = selectedObject as any;
-    const grayscaleFilter = new fabricLib.Image.filters.Grayscale();
-    img.filters = img.filters || [];
-    const hasGrayscale = img.filters.some(f => f.type === "Grayscale");
-    
-    if (hasGrayscale) {
-      img.filters = img.filters.filter(f => f.type !== "Grayscale");
-    } else {
-      img.filters.push(grayscaleFilter);
-    }
-    
-    img.applyFilters();
-    fabricCanvasRef.current?.renderAll();
-    saveHistory();
-  };
-
-  const applySepiaFilter = () => {
-    if (!selectedObject || selectedObject.type !== "image" || typeof (window as any).fabric === 'undefined') {
-      alert("画像を選択してください");
-      return;
-    }
-
-    const fabricLib = (window as any).fabric;
-    const img = selectedObject as any;
-    const sepiaFilter = new fabricLib.Image.filters.Sepia();
-    img.filters = img.filters || [];
-    const hasSepia = img.filters.some(f => f.type === "Sepia");
-    
-    if (hasSepia) {
-      img.filters = img.filters.filter(f => f.type !== "Sepia");
-    } else {
-      img.filters.push(sepiaFilter);
-    }
-    
-    img.applyFilters();
-    fabricCanvasRef.current?.renderAll();
-    saveHistory();
-  };
-
-  const applyBrightnessFilter = (value: number) => {
-    setBrightness(value);
-    if (!selectedObject || selectedObject.type !== "image" || typeof (window as any).fabric === 'undefined') return;
-
-    const fabricLib = (window as any).fabric;
-    const img = selectedObject as any;
-    img.filters = img.filters || [];
-    img.filters = img.filters.filter(f => f.type !== "Brightness");
-    
-    if (value !== 0) {
-      const brightnessFilter = new fabricLib.Image.filters.Brightness({
-        brightness: value / 100,
-      });
-      img.filters.push(brightnessFilter);
-    }
-    
-    img.applyFilters();
-    fabricCanvasRef.current?.renderAll();
-  };
-
-  const resetFilters = () => {
-    if (!selectedObject || selectedObject.type !== "image" || typeof (window as any).fabric === 'undefined') {
-      alert("画像を選択してください");
-      return;
-    }
-
-    const img = selectedObject as any;
-    img.filters = [];
-    img.applyFilters();
-    fabricCanvasRef.current?.renderAll();
-    setBrightness(0);
-    saveHistory();
   };
 
   // ========== Cloudinaryに直接アップロード（お客さんの生データをそのまま保存）==========
@@ -3138,59 +3054,6 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                   </div>
                 )}
               </div>
-            </div>
-
-            <hr style={dividerStyle} />
-
-            {/* フィルターセクション */}
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>🎨 画像フィルター</h3>
-              <p style={{ fontSize: "12px", color: "#666", marginBottom: "10px" }}>
-                {selectedObject && selectedObject.type === "image" 
-                  ? "✅ 画像が選択されています" 
-                  : "画像を選択してください"}
-              </p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" }}>
-                <button
-                  onClick={applyGrayscaleFilter}
-                  disabled={!selectedObject || selectedObject.type !== "image"}
-                  style={smallButtonStyle("#95a5a6", selectedObject?.type === "image")}
-                >
-                  ⬜ グレー
-                </button>
-                <button
-                  onClick={applySepiaFilter}
-                  disabled={!selectedObject || selectedObject.type !== "image"}
-                  style={smallButtonStyle("#d4a574", selectedObject?.type === "image")}
-                >
-                  🟤 セピア
-                </button>
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label style={labelStyle}>明るさ: {brightness > 0 ? '+' : ''}{brightness}</label>
-                <input
-                  type="range"
-                  min="-100"
-                  max="100"
-                  value={brightness}
-                  onChange={(e) => applyBrightnessFilter(Number(e.target.value))}
-                  disabled={!selectedObject || selectedObject.type !== "image"}
-                  style={{ width: "100%" }}
-                />
-              </div>
-              <button
-                onClick={resetFilters}
-                disabled={!selectedObject || selectedObject.type !== "image"}
-                style={{
-                  ...smallButtonStyle("#e74c3c", selectedObject?.type === "image"),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px"
-                }}
-              >
-                <Icon type="refresh" size={16} color="white" /> フィルターをリセット
-              </button>
             </div>
 
             <hr style={dividerStyle} />
