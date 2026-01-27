@@ -647,6 +647,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       
       const handleTouchStart = (e: TouchEvent) => {
         console.log('🔵 Touch start - fingers:', e.touches.length, 'target:', e.target);
+        console.log('🔵 Canvas objects count:', canvas.getObjects().length);
         
         if (e.touches.length === 2) {
           // 2本指タッチ時はページズームを無効化
@@ -655,7 +656,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           isGesture = true;
           let activeObject = canvas.getActiveObject();
           
-          console.log('🔵 2 fingers detected, activeObject:', activeObject?.type);
+          console.log('🔵 2 fingers detected!');
+          console.log('🔵 Active object:', activeObject?.type, activeObject?.name);
+          console.log('🔵 All objects:', canvas.getObjects().map((o: any) => ({ type: o.type, name: o.name })));
           
           // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
           if (!activeObject || activeObject.name === 'printArea') {
@@ -667,14 +670,18 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               y: (touch1.clientY - rect.top) * canvasScale,
             };
             
+            console.log('🔵 Touch position:', pointer);
+            
             // タッチ位置にあるオブジェクトを検索
             const target = canvas.findTarget(e as any, false);
-            console.log('🔵 Found target:', target?.type);
+            console.log('🔵 Found target:', target?.type, target?.name);
             
             if (target && target.name !== 'printArea') {
               canvas.setActiveObject(target);
               activeObject = target;
-              console.log('🔵 Auto-selected object:', activeObject.type);
+              console.log('✅ Auto-selected object:', activeObject.type);
+            } else {
+              console.log('❌ No target found at touch position');
             }
           }
           
@@ -683,7 +690,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             e.stopPropagation();
             e.stopImmediatePropagation();
             
-            console.log('✅ Starting pinch gesture');
+            console.log('✅ Starting pinch gesture on:', activeObject.type);
             
             lastDistance = getTouchDistance(e.touches[0], e.touches[1]);
             lastAngle = getTouchAngle(e.touches[0], e.touches[1]);
@@ -705,7 +712,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             }
             canvas.renderAll();
           } else {
-            console.log('❌ No valid object to pinch');
+            console.log('❌ No valid object to pinch (activeObject:', activeObject?.name, ')');
           }
         }
       };
@@ -815,13 +822,34 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         }
       };
       
+      // デバッグ用：全てのタッチイベントをログ
+      const debugTouchStart = (e: TouchEvent) => {
+        console.log('🟡 DEBUG: touchstart on canvas, fingers:', e.touches.length, 'element:', e.currentTarget);
+      };
+      
       // キャプチャフェーズで処理（Fabric.jsより先に実行される）
+      canvasElement.addEventListener('touchstart', debugTouchStart, { passive: false, capture: true });
       canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
       canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
       canvasElement.addEventListener('touchend', handleTouchEnd, { capture: true });
       touchListenersAdded = true;
       
       console.log('✅ Touch event listeners added for pinch gestures (with capture phase)');
+      console.log('📍 Canvas element:', canvasElement);
+      console.log('📍 Canvas element ID:', canvasElement.id);
+      
+      // デバッグ用：ウィンドウ全体でタッチイベントを監視
+      const windowTouchDebug = (e: TouchEvent) => {
+        if (e.touches.length === 2) {
+          console.log('🟠 Window detected 2 fingers!');
+          console.log('🟠 Touch target:', e.target);
+          console.log('🟠 Is canvas?', e.target === canvasElement);
+        }
+      };
+      window.addEventListener('touchstart', windowTouchDebug, { passive: false, capture: true });
+      
+      // クリーンアップ時にwindowのリスナーも削除
+      (canvas as any)._windowTouchDebug = windowTouchDebug;
       
       // クリーンアップ用の参照を保存
       (canvas as any)._touchHandlers = {
@@ -1195,6 +1223,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         handlers.element.removeEventListener('touchstart', handlers.start, { capture: true });
         handlers.element.removeEventListener('touchmove', handlers.move, { capture: true });
         handlers.element.removeEventListener('touchend', handlers.end, { capture: true });
+      }
+      
+      // windowのデバッグリスナーも削除
+      if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._windowTouchDebug) {
+        window.removeEventListener('touchstart', (fabricCanvasRef.current as any)._windowTouchDebug, { capture: true });
       }
       
       if (fabricCanvasRef.current) {
