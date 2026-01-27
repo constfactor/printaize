@@ -438,6 +438,7 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
       backgroundColor: "#fafafa",
       selection: true,
       preserveObjectStacking: true, // 選択時にz-orderを変更しない
+      allowTouchScrolling: true, // モバイルでスクロールを許可
     });
 
     fabricCanvasRef.current = canvas;
@@ -683,9 +684,26 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
     });
 
     // イベントリスナー設定
-    canvas.on("selection:created", (e: any) => setSelectedObject(e.selected?.[0] || null));
-    canvas.on("selection:updated", (e: any) => setSelectedObject(e.selected?.[0] || null));
-    canvas.on("selection:cleared", () => setSelectedObject(null));
+    canvas.on("selection:created", (e: any) => {
+      setSelectedObject(e.selected?.[0] || null);
+      // オブジェクト選択時は通常のタッチ操作を許可
+      if (canvasRef.current) {
+        canvasRef.current.style.touchAction = "none";
+      }
+    });
+    canvas.on("selection:updated", (e: any) => {
+      setSelectedObject(e.selected?.[0] || null);
+      if (canvasRef.current) {
+        canvasRef.current.style.touchAction = "none";
+      }
+    });
+    canvas.on("selection:cleared", () => {
+      setSelectedObject(null);
+      // オブジェクト未選択時はスクロールを許可（モバイルのみ）
+      if (canvasRef.current && window.innerWidth < 768) {
+        canvasRef.current.style.touchAction = "pan-y";
+      }
+    });
     canvas.on("object:modified", (e: any) => {
       const obj = e.target;
       
@@ -2434,6 +2452,8 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
         margin: 0, 
         alignItems: "flex-start",
         backgroundColor: "white",
+        overflowX: "hidden",
+        overflowY: "auto",
       }}>
         {/* 左側: キャンバスエリア */}
         <div style={{ 
@@ -2465,6 +2485,7 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                touchAction: isMobile ? "pan-y" : "auto",
               }}
             >
               {/* ズームボタン */}
@@ -2536,6 +2557,7 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
                   maxWidth: "100%",
                   maxHeight: "100%",
                   objectFit: "contain",
+                  touchAction: isMobile ? "pan-y" : "none",
                 }} 
               />
             </div>
