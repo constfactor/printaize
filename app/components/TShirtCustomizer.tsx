@@ -813,7 +813,7 @@ export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
         fabricCanvasRef.current.dispose();
       }
     };
-  }, [fabricLoaded, isMobile]);
+  }, [fabricLoaded]);
 
   // 本体カラー変更時に背景画像と点線の色だけを更新（カスタマイズ内容を保持）
   useEffect(() => {
