@@ -1,6 +1,5 @@
 {
-  "buildCommand": "remix build",
-  "devCommand": "remix dev --manual",
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
   "regions": ["hnd1"]
 }
