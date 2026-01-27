@@ -2554,7 +2554,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             display: "flex", 
             flexDirection: "column", 
             alignItems: "center", 
-            padding: isMobile ? "20px" : "40px",
+            padding: isMobile ? "10px" : "40px",
             width: "100%",
             boxSizing: "border-box",
           }}>
@@ -2562,11 +2562,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               style={{
                 border: "none",
                 borderRadius: "0",
-                overflow: "visible",
+                overflow: "hidden",
                 boxShadow: "none",
                 backgroundColor: "#fafafa",
                 width: "100%",
-                maxWidth: "min(800px, 100%)",
+                maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
                 margin: "0 auto",
                 position: "relative",
                 aspectRatio: "1 / 1",
@@ -2636,26 +2636,18 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <Icon type={isZoomed ? "zoomIn" : "zoomOut"} size={20} color="#667eea" />
               </button>
               
-              <div
-                style={{
-                  position: "relative",
+              <canvas 
+                ref={canvasRef} 
+                style={{ 
+                  display: "block",
                   width: "100%",
                   height: "100%",
-                }}
-              >
-                <canvas 
-                  ref={canvasRef} 
-                  style={{ 
-                    display: "block",
-                    width: "100%",
-                    height: "100%",
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "contain",
-                    touchAction: isMobile ? "pan-y" : "none",
-                  }} 
-                />
-              </div>
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                  objectFit: "contain",
+                  touchAction: isMobile ? "pan-y" : "none",
+                }} 
+              />
             </div>
 
             {/* オブジェクト操作コントロール */}
