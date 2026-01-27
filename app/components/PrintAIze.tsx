@@ -637,9 +637,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       };
       
       const handleTouchStart = (e: TouchEvent) => {
+        console.log('🔵 Touch start - fingers:', e.touches.length);
+        
         if (e.touches.length === 2) {
           isGesture = true;
           let activeObject = canvas.getActiveObject();
+          
+          console.log('🔵 2 fingers detected, activeObject:', activeObject?.type);
           
           // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
           if (!activeObject || activeObject.name === 'printArea') {
@@ -653,31 +657,42 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             
             // タッチ位置にあるオブジェクトを検索
             const target = canvas.findTarget(e as any, false);
+            console.log('🔵 Found target:', target?.type);
+            
             if (target && target.name !== 'printArea') {
               canvas.setActiveObject(target);
               activeObject = target;
+              console.log('🔵 Auto-selected object:', activeObject.type);
             }
           }
           
           if (activeObject && activeObject.name !== 'printArea') {
             e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('✅ Starting pinch gesture');
+            
             lastDistance = getTouchDistance(e.touches[0], e.touches[1]);
             lastAngle = getTouchAngle(e.touches[0], e.touches[1]);
             lastCenter = getTouchCenter(e.touches[0], e.touches[1]);
             
-            // 四隅のコントロールを非表示にして、ピンチ操作に集中
-            activeObject.setControlsVisibility({
-              mt: false,
-              mb: false,
-              ml: false,
-              mr: false,
-              tl: false,
-              tr: false,
-              bl: false,
-              br: false,
-              mtr: false,
-            });
+            // PCの場合のみコントロールを一時非表示（スマホは最初から非表示）
+            if (activeObject.hasControls) {
+              activeObject.setControlsVisibility({
+                mt: false,
+                mb: false,
+                ml: false,
+                mr: false,
+                tl: false,
+                tr: false,
+                bl: false,
+                br: false,
+                mtr: false,
+              });
+            }
             canvas.renderAll();
+          } else {
+            console.log('❌ No valid object to pinch');
           }
         }
       };
@@ -687,6 +702,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           const activeObject = canvas.getActiveObject();
           if (activeObject && activeObject.name !== 'printArea') {
             e.preventDefault();
+            e.stopPropagation();
             
             // 中心点の移動を計算
             const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
@@ -707,6 +723,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               const scale = currentDistance / lastDistance;
               const newScaleX = (activeObject.scaleX || 1) * scale;
               const newScaleY = (activeObject.scaleY || 1) * scale;
+              
+              console.log('🟢 Pinching - scale:', scale.toFixed(2), 'newScale:', newScaleX.toFixed(2));
               
               // 最小・最大サイズ制限
               if (newScaleX > 0.1 && newScaleX < 10 && newScaleY > 0.1 && newScaleY < 10) {
@@ -750,14 +768,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       
       const handleTouchEnd = (e: TouchEvent) => {
         if (e.touches.length < 2) {
+          console.log('🔵 Touch end - gesture complete');
+          
           isGesture = false;
           lastDistance = 0;
           lastAngle = 0;
           lastCenter = { x: 0, y: 0 };
           
-          // コントロールを再表示
+          // PCの場合のみコントロールを再表示（スマホは最初から非表示）
           const activeObject = canvas.getActiveObject();
-          if (activeObject && activeObject.name !== 'printArea') {
+          if (activeObject && activeObject.name !== 'printArea' && activeObject.hasControls) {
             activeObject.setControlsVisibility({
               mt: false,
               mb: false,
@@ -771,6 +791,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               deleteControl: true,
             });
             canvas.renderAll();
+          }
+          
+          if (activeObject && activeObject.name !== 'printArea') {
             saveHistory();
           }
         }
@@ -780,6 +803,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
       canvasElement.addEventListener('touchend', handleTouchEnd);
       touchListenersAdded = true;
+      
+      console.log('✅ Touch event listeners added for pinch gestures');
       
       // クリーンアップ用の参照を保存
       (canvas as any)._touchHandlers = {
@@ -1455,14 +1480,17 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             );
             
             fabricImg.scale(scale);
+            
+            // スマホではコントロール非表示（Instagram風）
+            const isMobileView = window.innerWidth < 768;
             fabricImg.set({
               left: printArea.left + printArea.width / 2,
               top: printArea.top + printArea.height / 2,
               originX: "center",
               originY: "center",
               selectable: true,
-              hasControls: true,
-              hasBorders: true,
+              hasControls: !isMobileView, // スマホではコントロール非表示
+              hasBorders: !isMobileView,   // スマホでは枠線も非表示
             });
             
             // 元の高解像度画像データを保存（重要！）
@@ -1584,14 +1612,17 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             );
 
             img.scale(scale);
+            
+            // スマホではコントロール非表示（Instagram風）
+            const isMobileView = window.innerWidth < 768;
             img.set({
               left: printArea.left + printArea.width / 2,
               top: printArea.top + printArea.height / 2,
               originX: "center",
               originY: "center",
               selectable: true,
-              hasControls: true,
-              hasBorders: true,
+              hasControls: !isMobileView, // スマホではコントロール非表示
+              hasBorders: !isMobileView,   // スマホでは枠線も非表示
             });
 
             // 元の高解像度画像データを保存（AI生成画像）
