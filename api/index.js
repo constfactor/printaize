@@ -1,0 +1,5131 @@
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: !0 });
+};
+
+// server.js
+import { createRequestHandler } from "@remix-run/vercel";
+
+// server-entry-module:@remix-run/dev/server-build
+var server_build_exports = {};
+__export(server_build_exports, {
+  assets: () => assets_manifest_default,
+  assetsBuildDirectory: () => assetsBuildDirectory,
+  entry: () => entry,
+  future: () => future,
+  mode: () => mode,
+  publicPath: () => publicPath,
+  routes: () => routes
+});
+
+// app/entry.server.tsx
+var entry_server_exports = {};
+__export(entry_server_exports, {
+  default: () => handleRequest
+});
+import { PassThrough } from "node:stream";
+import { createReadableStreamFromReadable } from "@remix-run/node";
+import { RemixServer } from "@remix-run/react";
+import { isbot } from "isbot";
+import { renderToPipeableStream } from "react-dom/server";
+import { jsxDEV } from "react/jsx-dev-runtime";
+var ABORT_DELAY = 5e3;
+function handleRequest(request, responseStatusCode, responseHeaders, remixContext, loadContext) {
+  return isbot(request.headers.get("user-agent") || "") ? handleBotRequest(
+    request,
+    responseStatusCode,
+    responseHeaders,
+    remixContext
+  ) : handleBrowserRequest(
+    request,
+    responseStatusCode,
+    responseHeaders,
+    remixContext
+  );
+}
+function handleBotRequest(request, responseStatusCode, responseHeaders, remixContext) {
+  return new Promise((resolve, reject) => {
+    let shellRendered = !1, { pipe, abort } = renderToPipeableStream(
+      /* @__PURE__ */ jsxDEV(
+        RemixServer,
+        {
+          context: remixContext,
+          url: request.url,
+          abortDelay: ABORT_DELAY
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/entry.server.tsx",
+          lineNumber: 45,
+          columnNumber: 7
+        },
+        this
+      ),
+      {
+        onAllReady() {
+          shellRendered = !0;
+          let body = new PassThrough(), stream = createReadableStreamFromReadable(body);
+          responseHeaders.set("Content-Type", "text/html"), resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode
+            })
+          ), pipe(body);
+        },
+        onShellError(error) {
+          reject(error);
+        },
+        onError(error) {
+          responseStatusCode = 500, shellRendered && console.error(error);
+        }
+      }
+    );
+    setTimeout(abort, ABORT_DELAY);
+  });
+}
+function handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext) {
+  return new Promise((resolve, reject) => {
+    let shellRendered = !1, { pipe, abort } = renderToPipeableStream(
+      /* @__PURE__ */ jsxDEV(
+        RemixServer,
+        {
+          context: remixContext,
+          url: request.url,
+          abortDelay: ABORT_DELAY
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/entry.server.tsx",
+          lineNumber: 92,
+          columnNumber: 7
+        },
+        this
+      ),
+      {
+        onShellReady() {
+          shellRendered = !0;
+          let body = new PassThrough(), stream = createReadableStreamFromReadable(body);
+          responseHeaders.set("Content-Type", "text/html"), resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode
+            })
+          ), pipe(body);
+        },
+        onShellError(error) {
+          reject(error);
+        },
+        onError(error) {
+          responseStatusCode = 500, shellRendered && console.error(error);
+        }
+      }
+    );
+    setTimeout(abort, ABORT_DELAY);
+  });
+}
+
+// app/root.tsx
+var root_exports = {};
+__export(root_exports, {
+  default: () => App,
+  loader: () => loader
+});
+import {
+  Links,
+  LiveReload,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData
+} from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { jsxDEV as jsxDEV2 } from "react/jsx-dev-runtime";
+async function loader({ request }) {
+  return json({
+    ENV: {
+      SUPABASE_URL: process.env.SUPABASE_URL,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
+    }
+  });
+}
+function App() {
+  let data = useLoaderData();
+  return /* @__PURE__ */ jsxDEV2("html", { lang: "ja", children: [
+    /* @__PURE__ */ jsxDEV2("head", { children: [
+      /* @__PURE__ */ jsxDEV2("meta", { charSet: "utf-8" }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 31,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 32,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2(Meta, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 33,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2(Links, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 34,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("link", { rel: "preconnect", href: "https://fonts.googleapis.com" }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 37,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 38,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("link", { href: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;700&family=M+PLUS+1p:wght@400;700&family=M+PLUS+2:wght@400;700&family=Murecho:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&family=Zen+Kaku+Gothic+Antique:wght@400;700&family=Zen+Old+Mincho:wght@400;700&family=Zen+Kurenaido&family=Zen+Antique&family=Zen+Antique+Soft&family=Kosugi+Maru&family=Kosugi&family=Sawarabi+Mincho&family=Sawarabi+Gothic&family=Klee+One:wght@400;600&family=Shippori+Mincho:wght@400;700&family=Shippori+Antique&family=Shippori+Antique+B1&family=Yusei+Magic&family=Yomogi&family=BIZ+UDPGothic:wght@400;700&family=BIZ+UDPMincho:wght@400;700&family=Dela+Gothic+One&family=DotGothic16&family=Hina+Mincho&family=Kiwi+Maru:wght@400;500&family=Reggae+One&family=RocknRoll+One&family=Potta+One&family=Train+One&family=Rampart+One&family=Kaisei+Decol:wght@400;700&family=Kaisei+HarunoUmi:wght@400;700&family=Kaisei+Tokumin:wght@400;700&family=Kaisei+Opti:wght@400;700&family=Stick&family=Mochiy+Pop+One&family=Mochiy+Pop+P+One&family=New+Tegomin&family=Hachi+Maru+Pop&family=Otomanopee+One&family=Shirokuma&family=Slackkey&family=Cherry+Bomb+One&family=Monomaniac+One&family=Palette+Mosaic&family=Yuji+Syuku&family=Yuji+Boku&family=Yuji+Mai&display=swap", rel: "stylesheet" }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 39,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("script", { src: "https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js" }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 42,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("style", { children: `
+          * {
+            box-sizing: border-box;
+          }
+          
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
+                         'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 
+                         'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f5f5f5;
+          }
+          
+          canvas {
+            display: block;
+          }
+        ` }, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 44,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/root.tsx",
+      lineNumber: 30,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV2("body", { children: [
+      /* @__PURE__ */ jsxDEV2(Outlet, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 66,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2(ScrollRestoration, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 67,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2(
+        "script",
+        {
+          dangerouslySetInnerHTML: {
+            __html: `window.ENV = ${JSON.stringify(data.ENV)}`
+          }
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/root.tsx",
+          lineNumber: 68,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV2(Scripts, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 73,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2(LiveReload, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 74,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/root.tsx",
+      lineNumber: 65,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/root.tsx",
+    lineNumber: 29,
+    columnNumber: 5
+  }, this);
+}
+
+// app/routes/api.add-to-cart-multiple.tsx
+var api_add_to_cart_multiple_exports = {};
+__export(api_add_to_cart_multiple_exports, {
+  action: () => action
+});
+import { json as json2 } from "@remix-run/node";
+
+// app/lib/shopify.server.ts
+var SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || "", SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || "", STOREFRONT_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`;
+async function shopifyFetch({
+  query,
+  variables = {}
+}) {
+  try {
+    let response = await fetch(STOREFRONT_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_ACCESS_TOKEN
+      },
+      body: JSON.stringify({ query, variables })
+    });
+    if (!response.ok)
+      throw new Error(`Shopify API Error: ${response.statusText}`);
+    let json8 = await response.json();
+    if (json8.errors)
+      throw new Error(`GraphQL Errors: ${JSON.stringify(json8.errors)}`);
+    return json8.data;
+  } catch (error) {
+    throw console.error("Shopify API Error:", error), error;
+  }
+}
+async function createCart(lineItems) {
+  let mutation = `
+    mutation createCart($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+          estimatedCost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+          lines(first: 10) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    product {
+                      title
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `, variables = {
+    input: {
+      lines: lineItems.map((item) => ({
+        merchandiseId: item.variantId,
+        quantity: item.quantity,
+        attributes: item.customAttributes
+      }))
+    }
+  };
+  return (await shopifyFetch({ query: mutation, variables })).cartCreate;
+}
+async function addCustomTshirtToCart(designImageUrl, designImageUrlHD, productVariantId = "gid://shopify/ProductVariant/48602131661024") {
+  return await createCart([
+    {
+      variantId: productVariantId,
+      quantity: 1,
+      customAttributes: [
+        { key: "design_image", value: designImageUrl },
+        { key: "design_image_hd", value: designImageUrlHD }
+      ]
+    }
+  ]);
+}
+async function addAIGeneratedTshirtToCart(designImageUrl, designImageUrlHD, prompt, productVariantId = "gid://shopify/ProductVariant/48602131661024") {
+  return await createCart([
+    {
+      variantId: productVariantId,
+      quantity: 1,
+      customAttributes: [
+        { key: "design_image", value: designImageUrl },
+        { key: "design_image_hd", value: designImageUrlHD },
+        { key: "ai_prompt", value: prompt }
+      ]
+    }
+  ]);
+}
+
+// app/routes/api.add-to-cart-multiple.tsx
+async function action({ request }) {
+  if (request.method === "OPTIONS")
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
+    });
+  try {
+    let body = await request.json(), { items } = body;
+    if (!items || !Array.isArray(items) || items.length === 0)
+      return json2(
+        { error: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3059\u308B\u30A2\u30A4\u30C6\u30E0\u304C\u6307\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093" },
+        { status: 400 }
+      );
+    console.log("\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3059\u308B\u30A2\u30A4\u30C6\u30E0\u6570:", items.length);
+    let result = await createCart(items);
+    return result.userErrors && result.userErrors.length > 0 ? (console.error("Shopify userErrors:", result.userErrors), json2(
+      {
+        success: !1,
+        error: result.userErrors[0].message,
+        details: result.userErrors
+      },
+      { status: 400 }
+    )) : json2({
+      success: !0,
+      checkoutUrl: result.cart.checkoutUrl,
+      cartId: result.cart.id
+    });
+  } catch (error) {
+    return console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error), json2(
+      {
+        success: !1,
+        error: error instanceof Error ? error.message : "\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// app/routes/api.cloudinary-signature.tsx
+var api_cloudinary_signature_exports = {};
+__export(api_cloudinary_signature_exports, {
+  action: () => action2
+});
+import { json as json3 } from "@remix-run/node";
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+async function action2({ request }) {
+  if (request.method === "OPTIONS")
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
+    });
+  try {
+    let body = await request.json(), { folder = "tshirt-designs" } = body;
+    console.log("Cloudinary\u8A2D\u5B9A\u78BA\u8A8D:", {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKeyExists: !!process.env.CLOUDINARY_API_KEY,
+      apiSecretExists: !!process.env.CLOUDINARY_API_SECRET
+    });
+    let timestamp = Math.round((/* @__PURE__ */ new Date()).getTime() / 1e3), params = {
+      timestamp,
+      folder
+    };
+    console.log("\u7F72\u540D\u751F\u6210\u30D1\u30E9\u30E1\u30FC\u30BF:", params);
+    let signature = cloudinary.utils.api_sign_request(
+      params,
+      process.env.CLOUDINARY_API_SECRET
+    );
+    return console.log("\u7F72\u540D\u751F\u6210\u6210\u529F"), json3({
+      success: !0,
+      signature,
+      timestamp,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      folder
+    });
+  } catch (error) {
+    return console.error("\u7F72\u540D\u751F\u6210\u30A8\u30E9\u30FC:", error), json3(
+      {
+        success: !1,
+        error: error instanceof Error ? error.message : "\u7F72\u540D\u306E\u751F\u6210\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// app/routes/api.generate-image.tsx
+var api_generate_image_exports = {};
+__export(api_generate_image_exports, {
+  action: () => action3
+});
+import { json as json4 } from "@remix-run/node";
+
+// app/lib/replicate.server.ts
+import Replicate from "replicate";
+var replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN || ""
+});
+async function generateImage(prompt, options = {}) {
+  try {
+    let {
+      width = 1024,
+      height = 1024,
+      negativePrompt = "blurry, low quality, distorted, ugly",
+      numOutputs = 1
+    } = options;
+    console.log("AI\u753B\u50CF\u751F\u6210\u3092\u958B\u59CB:", prompt);
+    let output = await replicate.run(
+      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      {
+        input: {
+          prompt,
+          negative_prompt: negativePrompt,
+          width,
+          height,
+          num_outputs: numOutputs,
+          scheduler: "K_EULER",
+          num_inference_steps: 50,
+          guidance_scale: 7.5
+        }
+      }
+    );
+    return console.log("AI\u753B\u50CF\u751F\u6210\u304C\u5B8C\u4E86\u3057\u307E\u3057\u305F"), Array.isArray(output) ? output[0] : output;
+  } catch (error) {
+    throw console.error("Replicate AI Error:", error), new Error("AI\u753B\u50CF\u751F\u6210\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+  }
+}
+
+// app/routes/api.generate-image.tsx
+async function action3({ request }) {
+  if (request.method === "OPTIONS")
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
+    });
+  try {
+    let body = await request.json(), { prompt, width, height, negativePrompt } = body;
+    if (!prompt || prompt.trim().length === 0)
+      return json4(
+        { error: "\u30D7\u30ED\u30F3\u30D7\u30C8\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044" },
+        { status: 400 }
+      );
+    let imageUrl = await generateImage(prompt, {
+      width: width || 1024,
+      height: height || 1024,
+      negativePrompt: negativePrompt || "blurry, low quality, distorted"
+    });
+    return json4({
+      success: !0,
+      imageUrl,
+      prompt
+    });
+  } catch (error) {
+    return console.error("AI\u753B\u50CF\u751F\u6210\u30A8\u30E9\u30FC:", error), json4(
+      {
+        success: !1,
+        error: error instanceof Error ? error.message : "\u753B\u50CF\u751F\u6210\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// app/routes/api.upload-image.tsx
+var api_upload_image_exports = {};
+__export(api_upload_image_exports, {
+  action: () => action4
+});
+import { json as json5 } from "@remix-run/node";
+import { v2 as cloudinary2 } from "cloudinary";
+cloudinary2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+async function action4({ request }) {
+  if (request.method === "OPTIONS")
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
+    });
+  try {
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return console.error("JSON\u30D1\u30FC\u30B9\u30A8\u30E9\u30FC:", parseError), json5(
+        {
+          success: !1,
+          error: "\u30EA\u30AF\u30A8\u30B9\u30C8\u30DC\u30C7\u30A3\u306E\u89E3\u6790\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u753B\u50CF\u30B5\u30A4\u30BA\u304C\u5927\u304D\u3059\u304E\u308B\u53EF\u80FD\u6027\u304C\u3042\u308A\u307E\u3059\u3002"
+        },
+        { status: 413 }
+        // Payload Too Large
+      );
+    }
+    let { imageData } = body;
+    if (!imageData)
+      return json5(
+        { success: !1, error: "\u753B\u50CF\u30C7\u30FC\u30BF\u304C\u6307\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093" },
+        { status: 400 }
+      );
+    let sizeInMB = (imageData.length / (1024 * 1024)).toFixed(2);
+    if (console.log(`\u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u958B\u59CB - \u30B5\u30A4\u30BA: ${sizeInMB}MB`), parseFloat(sizeInMB) > 15)
+      return console.error("\u30D5\u30A1\u30A4\u30EB\u30B5\u30A4\u30BA\u304C\u5927\u304D\u3059\u304E\u307E\u3059:", sizeInMB, "MB"), json5(
+        {
+          success: !1,
+          error: `\u753B\u50CF\u30B5\u30A4\u30BA\u304C\u5927\u304D\u3059\u304E\u307E\u3059 (${sizeInMB}MB)\u300210MB\u4EE5\u4E0B\u306B\u3057\u3066\u304F\u3060\u3055\u3044\u3002`
+        },
+        { status: 413 }
+      );
+    let uploadResult = await cloudinary2.uploader.upload(imageData, {
+      folder: "tshirt-designs",
+      // Cloudinaryのフォルダ名
+      resource_type: "image",
+      format: "png",
+      // PNG形式を維持（背景透過のため）
+      transformation: [
+        { quality: "auto:best" },
+        // 自動品質最適化
+        { fetch_format: "auto" }
+        // 最適なフォーマットを自動選択（透過保持）
+      ],
+      timeout: 12e4
+      // タイムアウトを120秒に延長
+    });
+    return console.log("\u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", uploadResult.secure_url), json5({
+      success: !0,
+      imageUrl: uploadResult.secure_url,
+      publicId: uploadResult.public_id
+    });
+  } catch (error) {
+    return console.error("\u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", error), error instanceof Error && (console.error("\u30A8\u30E9\u30FC\u30E1\u30C3\u30BB\u30FC\u30B8:", error.message), console.error("\u30A8\u30E9\u30FC\u30B9\u30BF\u30C3\u30AF:", error.stack)), json5(
+      {
+        success: !1,
+        error: error instanceof Error ? error.message : "\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// app/routes/api.add-to-cart.tsx
+var api_add_to_cart_exports = {};
+__export(api_add_to_cart_exports, {
+  action: () => action5
+});
+import { json as json6 } from "@remix-run/node";
+async function action5({ request }) {
+  if (request.method === "OPTIONS")
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
+    });
+  try {
+    let body = await request.json(), { variantId, quantity, customAttributes, designImageUrl, designImageUrlHD, isAIGenerated, aiPrompt, productVariantId } = body, finalDesignImageUrl = designImageUrl, finalDesignImageUrlHD = designImageUrlHD, finalVariantId = productVariantId || variantId;
+    if (customAttributes && Array.isArray(customAttributes)) {
+      let designImageAttr = customAttributes.find((attr) => attr.key === "design_image"), designImageHDAttr = customAttributes.find((attr) => attr.key === "design_image_hd");
+      designImageAttr && (finalDesignImageUrl = designImageAttr.value), designImageHDAttr && (finalDesignImageUrlHD = designImageHDAttr.value);
+    }
+    if (!finalDesignImageUrl)
+      return json6(
+        { error: "\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u304C\u6307\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093" },
+        { status: 400 }
+      );
+    if (console.log("Design Image URL length:", finalDesignImageUrl.length), finalDesignImageUrlHD && console.log("Design Image HD URL length:", finalDesignImageUrlHD.length), finalDesignImageUrl.length > 255)
+      return json6(
+        { error: `\u30C7\u30B6\u30A4\u30F3\u753B\u50CFURL\u304C\u9577\u3059\u304E\u307E\u3059\uFF08${finalDesignImageUrl.length}\u6587\u5B57\u3001\u6700\u5927255\u6587\u5B57\uFF09` },
+        { status: 400 }
+      );
+    if (finalDesignImageUrlHD && finalDesignImageUrlHD.length > 255)
+      return json6(
+        { error: `HD\u753B\u50CFURL\u304C\u9577\u3059\u304E\u307E\u3059\uFF08${finalDesignImageUrlHD.length}\u6587\u5B57\u3001\u6700\u5927255\u6587\u5B57\uFF09` },
+        { status: 400 }
+      );
+    let result;
+    return isAIGenerated && aiPrompt ? result = await addAIGeneratedTshirtToCart(
+      finalDesignImageUrl,
+      finalDesignImageUrlHD,
+      aiPrompt,
+      finalVariantId
+    ) : result = await addCustomTshirtToCart(finalDesignImageUrl, finalDesignImageUrlHD, finalVariantId), result.userErrors && result.userErrors.length > 0 ? (console.error("Shopify userErrors:", result.userErrors), json6(
+      {
+        success: !1,
+        error: result.userErrors[0].message,
+        details: result.userErrors
+      },
+      { status: 400 }
+    )) : json6({
+      success: !0,
+      checkoutUrl: result.cart.checkoutUrl,
+      cartId: result.cart.id
+    });
+  } catch (error) {
+    return console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error), json6(
+      {
+        success: !1,
+        error: error instanceof Error ? error.message : "\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// app/routes/customize.tsx
+var customize_exports = {};
+__export(customize_exports, {
+  default: () => Customize,
+  loader: () => loader2,
+  meta: () => meta
+});
+import { json as json7 } from "@remix-run/node";
+import { useLoaderData as useLoaderData2, Link } from "@remix-run/react";
+
+// app/components/TShirtCustomizer.tsx
+import { useEffect, useRef, useState } from "react";
+import { Fragment, jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
+var Icon = ({ type, size = 20, color = "currentColor" }) => /* @__PURE__ */ jsxDEV3("span", { style: { display: "inline-flex", alignItems: "center", verticalAlign: "middle" }, children: {
+  clipboard: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 23,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 22,
+    columnNumber: 7
+  }, this),
+  check: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M5 13l4 4L19 7" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 28,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 27,
+    columnNumber: 7
+  }, this),
+  warning: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 33,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 32,
+    columnNumber: 7
+  }, this),
+  info: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "12", cy: "12", r: "10" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 38,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M12 16v-4m0-4h.01" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 38,
+      columnNumber: 41
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 37,
+    columnNumber: 7
+  }, this),
+  lightbulb: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M9 21h6m-6 0v-2m6 2v-2m-9-7a6 6 0 1112 0c0 3.31-2.31 6-5 8H9c-2.69-2-5-4.69-5-8z" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 43,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 42,
+    columnNumber: 7
+  }, this),
+  cart: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "9", cy: "21", r: "1" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 48,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "20", cy: "21", r: "1" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 48,
+      columnNumber: 39
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 49,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 47,
+    columnNumber: 7
+  }, this),
+  save: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("path", { d: "M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 54,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M17 21v-8H7v8M7 3v5h8" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 55,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 53,
+    columnNumber: 7
+  }, this),
+  refresh: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 60,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 59,
+    columnNumber: 7
+  }, this),
+  loading: /* @__PURE__ */ jsxDEV3(
+    "svg",
+    {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: color,
+      strokeWidth: "2",
+      style: {
+        animation: "spin 1s linear infinite"
+      },
+      children: [
+        /* @__PURE__ */ jsxDEV3(
+          "circle",
+          {
+            cx: "12",
+            cy: "12",
+            r: "10",
+            strokeDasharray: "60",
+            strokeDashoffset: "40"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 75,
+            columnNumber: 9
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV3("style", { children: `
+          @keyframes spin {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        ` }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 82,
+          columnNumber: 9
+        }, this)
+      ]
+    },
+    void 0,
+    !0,
+    {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 64,
+      columnNumber: 7
+    },
+    this
+  ),
+  image: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("rect", { x: "3", y: "3", width: "18", height: "18", rx: "2", ry: "2" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 96,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "8.5", cy: "8.5", r: "1.5" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 97,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M21 15l-5-5L5 21" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 97,
+      columnNumber: 44
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 95,
+    columnNumber: 7
+  }, this),
+  text: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M4 7V4h16v3M9 20h6M12 4v16" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 102,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 101,
+    columnNumber: 7
+  }, this),
+  palette: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "13.5", cy: "6.5", r: ".5" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 107,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "17.5", cy: "10.5", r: ".5" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 107,
+      columnNumber: 44
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "8.5", cy: "7.5", r: ".5" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 108,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "6.5", cy: "12.5", r: ".5" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 108,
+      columnNumber: 43
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 109,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 106,
+    columnNumber: 7
+  }, this),
+  trash: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M3 6h18m-2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 114,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 113,
+    columnNumber: 7
+  }, this),
+  plus: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M12 5v14m-7-7h14" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 119,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 118,
+    columnNumber: 7
+  }, this),
+  robot: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("rect", { x: "3", y: "11", width: "18", height: "10", rx: "2" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 124,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "12", cy: "5", r: "2" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 124,
+      columnNumber: 59
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M12 7v4m-4 5h.01M16 16h.01" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 125,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 123,
+    columnNumber: 7
+  }, this),
+  camera: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("path", { d: "M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 130,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("circle", { cx: "12", cy: "13", r: "4" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 131,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 129,
+    columnNumber: 7
+  }, this),
+  upload: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsxDEV3("path", { d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14-7l-5-5-5 5m5-5v12" }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 136,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 135,
+    columnNumber: 7
+  }, this),
+  zoomIn: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("path", { d: "M21 3l-9 9m0 0v-6m0 6h6" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 141,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M3 21l9-9m0 0v6m0-6H6" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 142,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 140,
+    columnNumber: 7
+  }, this),
+  zoomOut: /* @__PURE__ */ jsxDEV3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: [
+    /* @__PURE__ */ jsxDEV3("path", { d: "M15 9l6-6m0 0h-6m6 0v6" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 147,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("path", { d: "M9 15l-6 6m0 0h6m-6 0v-6" }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 148,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 146,
+    columnNumber: 7
+  }, this)
+}[type] || null }, void 0, !1, {
+  fileName: "app/components/TShirtCustomizer.tsx",
+  lineNumber: 153,
+  columnNumber: 10
+}, this), FONT_LIST = [
+  // 日本語フォント - Google Fonts
+  { value: "Noto Sans JP", label: "Noto Sans JP", family: "'Noto Sans JP', sans-serif", type: "japanese" },
+  { value: "Noto Serif JP", label: "Noto Serif JP", family: "'Noto Serif JP', serif", type: "japanese" },
+  { value: "BIZ UDPGothic", label: "BIZ UDP\u30B4\u30B7\u30C3\u30AF", family: "'BIZ UDPGothic', sans-serif", type: "japanese" },
+  { value: "BIZ UDPMincho", label: "BIZ UDP\u660E\u671D", family: "'BIZ UDPMincho', serif", type: "japanese" },
+  { value: "M PLUS 1p", label: "M PLUS 1p", family: "'M PLUS 1p', sans-serif", type: "japanese" },
+  { value: "M PLUS 2", label: "M PLUS 2", family: "'M PLUS 2', sans-serif", type: "japanese" },
+  { value: "M PLUS Rounded 1c", label: "M PLUS Rounded 1c", family: "'M PLUS Rounded 1c', sans-serif", type: "japanese" },
+  { value: "Murecho", label: "Murecho", family: "'Murecho', sans-serif", type: "japanese" },
+  { value: "Zen Maru Gothic", label: "Zen Maru Gothic", family: "'Zen Maru Gothic', sans-serif", type: "japanese" },
+  { value: "Zen Kaku Gothic New", label: "Zen Kaku Gothic New", family: "'Zen Kaku Gothic New', sans-serif", type: "japanese" },
+  { value: "Zen Kaku Gothic Antique", label: "Zen Kaku Gothic Antique", family: "'Zen Kaku Gothic Antique', sans-serif", type: "japanese" },
+  { value: "Zen Old Mincho", label: "Zen Old Mincho", family: "'Zen Old Mincho', serif", type: "japanese" },
+  { value: "Zen Kurenaido", label: "Zen Kurenaido", family: "'Zen Kurenaido', sans-serif", type: "japanese" },
+  { value: "Zen Antique", label: "Zen Antique", family: "'Zen Antique', serif", type: "japanese" },
+  { value: "Zen Antique Soft", label: "Zen Antique Soft", family: "'Zen Antique Soft', serif", type: "japanese" },
+  { value: "Kosugi", label: "Kosugi", family: "'Kosugi', sans-serif", type: "japanese" },
+  { value: "Kosugi Maru", label: "Kosugi Maru", family: "'Kosugi Maru', sans-serif", type: "japanese" },
+  { value: "Sawarabi Mincho", label: "Sawarabi Mincho", family: "'Sawarabi Mincho', serif", type: "japanese" },
+  { value: "Sawarabi Gothic", label: "Sawarabi Gothic", family: "'Sawarabi Gothic', sans-serif", type: "japanese" },
+  { value: "Klee One", label: "Klee One", family: "'Klee One', cursive", type: "japanese" },
+  { value: "Shippori Mincho", label: "Shippori Mincho", family: "'Shippori Mincho', serif", type: "japanese" },
+  { value: "Shippori Antique", label: "Shippori Antique", family: "'Shippori Antique', sans-serif", type: "japanese" },
+  { value: "Shippori Antique B1", label: "Shippori Antique B1", family: "'Shippori Antique B1', sans-serif", type: "japanese" },
+  { value: "Yusei Magic", label: "Yusei Magic", family: "'Yusei Magic', sans-serif", type: "japanese" },
+  { value: "Yomogi", label: "Yomogi", family: "'Yomogi', cursive", type: "japanese" },
+  { value: "Dela Gothic One", label: "\u30C7\u30E9\u30B4\u30B7\u30C3\u30AF", family: "'Dela Gothic One', sans-serif", type: "japanese" },
+  { value: "DotGothic16", label: "\u30C9\u30C3\u30C8\u30B4\u30B7\u30C3\u30AF16", family: "'DotGothic16', sans-serif", type: "japanese" },
+  { value: "Hina Mincho", label: "\u3072\u306A\u660E\u671D", family: "'Hina Mincho', serif", type: "japanese" },
+  { value: "Kaisei Decol", label: "\u89E3\u661F\u30C7\u30B3\u30FC\u30EB", family: "'Kaisei Decol', serif", type: "japanese" },
+  { value: "Kaisei HarunoUmi", label: "Kaisei HarunoUmi", family: "'Kaisei HarunoUmi', serif", type: "japanese" },
+  { value: "Kaisei Tokumin", label: "Kaisei Tokumin", family: "'Kaisei Tokumin', serif", type: "japanese" },
+  { value: "Kaisei Opti", label: "Kaisei Opti", family: "'Kaisei Opti', serif", type: "japanese" },
+  { value: "Kiwi Maru", label: "\u30AD\u30A6\u30A4\u4E38", family: "'Kiwi Maru', sans-serif", type: "japanese" },
+  { value: "Reggae One", label: "Reggae One", family: "'Reggae One', cursive", type: "japanese" },
+  { value: "RocknRoll One", label: "RocknRoll One", family: "'RocknRoll One', sans-serif", type: "japanese" },
+  { value: "Potta One", label: "Potta One", family: "'Potta One', cursive", type: "japanese" },
+  { value: "Train One", label: "Train One", family: "'Train One', cursive", type: "japanese" },
+  { value: "Rampart One", label: "Rampart One", family: "'Rampart One', cursive", type: "japanese" },
+  { value: "Stick", label: "Stick", family: "'Stick', sans-serif", type: "japanese" },
+  { value: "Mochiy Pop One", label: "Mochiy Pop One", family: "'Mochiy Pop One', sans-serif", type: "japanese" },
+  { value: "Mochiy Pop P One", label: "Mochiy Pop P One", family: "'Mochiy Pop P One', sans-serif", type: "japanese" },
+  { value: "New Tegomin", label: "New Tegomin", family: "'New Tegomin', serif", type: "japanese" },
+  { value: "Hachi Maru Pop", label: "Hachi Maru Pop", family: "'Hachi Maru Pop', sans-serif", type: "japanese" },
+  { value: "Otomanopee One", label: "Otomanopee One", family: "'Otomanopee One', sans-serif", type: "japanese" },
+  { value: "Shirokuma", label: "Shirokuma", family: "'Shirokuma', cursive", type: "japanese" },
+  { value: "Slackkey", label: "Slackkey", family: "'Slackkey', cursive", type: "japanese" },
+  { value: "Cherry Bomb One", label: "Cherry Bomb One", family: "'Cherry Bomb One', cursive", type: "japanese" },
+  { value: "Monomaniac One", label: "Monomaniac One", family: "'Monomaniac One', sans-serif", type: "japanese" },
+  { value: "Palette Mosaic", label: "Palette Mosaic", family: "'Palette Mosaic', cursive", type: "japanese" },
+  { value: "Yuji Syuku", label: "Yuji Syuku", family: "'Yuji Syuku', serif", type: "japanese" },
+  { value: "Yuji Boku", label: "Yuji Boku", family: "'Yuji Boku', serif", type: "japanese" },
+  { value: "Yuji Mai", label: "Yuji Mai", family: "'Yuji Mai', serif", type: "japanese" },
+  // システムフォント（日本語）
+  { value: "Hiragino Kaku Gothic ProN", label: "\u30D2\u30E9\u30AE\u30CE\u89D2\u30B4\u30B7\u30C3\u30AF", family: "'Hiragino Kaku Gothic ProN', sans-serif", type: "japanese" },
+  { value: "Yu Gothic", label: "\u6E38\u30B4\u30B7\u30C3\u30AF", family: "'Yu Gothic', sans-serif", type: "japanese" },
+  { value: "Meiryo", label: "\u30E1\u30A4\u30EA\u30AA", family: "Meiryo, sans-serif", type: "japanese" },
+  // 英語フォント
+  { value: "Arial", label: "Arial", family: "Arial, sans-serif", type: "english" },
+  { value: "Helvetica", label: "Helvetica", family: "Helvetica, sans-serif", type: "english" },
+  { value: "Times New Roman", label: "Times New Roman", family: "'Times New Roman', serif", type: "english" },
+  { value: "Georgia", label: "Georgia", family: "Georgia, serif", type: "english" },
+  { value: "Courier New", label: "Courier New", family: "'Courier New', monospace", type: "english" },
+  { value: "Verdana", label: "Verdana", family: "Verdana, sans-serif", type: "english" },
+  { value: "Trebuchet MS", label: "Trebuchet MS", family: "'Trebuchet MS', sans-serif", type: "english" },
+  { value: "Comic Sans MS", label: "Comic Sans MS", family: "'Comic Sans MS', cursive", type: "english" },
+  { value: "Impact", label: "Impact", family: "Impact, sans-serif", type: "english" },
+  { value: "Palatino", label: "Palatino", family: "Palatino, serif", type: "english" },
+  { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" }
+];
+function TShirtCustomizer({ product }) {
+  let canvasRef = useRef(null), fabricCanvasRef = useRef(null), fileInputRef = useRef(null), [uploadedImages, setUploadedImages] = useState([]), [isLoading, setIsLoading] = useState(!1), [isFabricReady, setIsFabricReady] = useState(!1), [showCopyrightModal, setShowCopyrightModal] = useState(!1), [copyrightAgreed, setCopyrightAgreed] = useState(!1), [imageQualityWarning, setImageQualityWarning] = useState(null), pendingImageRef = useRef(null), [fabricLoaded, setFabricLoaded] = useState(!1), [aiPrompt, setAiPrompt] = useState(""), [isGenerating, setIsGenerating] = useState(!1), [lastAIPrompt, setLastAIPrompt] = useState(""), [generatedImageUrl, setGeneratedImageUrl] = useState(""), [textInput, setTextInput] = useState(""), [textColor, setTextColor] = useState("#000000"), [fontSize, setFontSize] = useState(40), [fontFamily, setFontFamily] = useState("Noto Sans JP"), firstTextObjectRef = useRef(null), [isFontDropdownOpen, setIsFontDropdownOpen] = useState(!1), [selectedObject, setSelectedObject] = useState(null), [activeFontTab, setActiveFontTab] = useState("japanese"), historyRef = useRef([]), historyStepRef = useRef(0), [canUndo, setCanUndo] = useState(!1), [canRedo, setCanRedo] = useState(!1), isHistoryInitializedRef = useRef(!1), isLoadingHistoryRef = useRef(!1), [isAddingToCart, setIsAddingToCart] = useState(!1), [loadingMessage, setLoadingMessage] = useState(""), [isModalOpen, setIsModalOpen] = useState(!1), [modalColor, setModalColor] = useState(product.colors[0].name), [modalQuantities, setModalQuantities] = useState(() => {
+    let initial = {};
+    return product.colors.forEach((color) => {
+      initial[color.name] = {
+        S: 0,
+        M: color.name === product.colors[0].name ? 1 : 0,
+        // 最初のカラーのみMを1に
+        L: 0,
+        XL: 0,
+        XXL: 0
+      };
+    }), initial;
+  }), [selectedColor, setSelectedColor] = useState(product.colors[0]), [selectedSize, setSelectedSize] = useState("M"), sizes = ["S", "M", "L", "XL", "XXL"], [isMobile, setIsMobile] = useState(!1), [isZoomed, setIsZoomed] = useState(!1);
+  useEffect(() => {
+    let handleEscape = (e) => {
+      e.key === "Escape" && isZoomed && setIsZoomed(!1);
+    };
+    return isZoomed && (document.addEventListener("keydown", handleEscape), document.body.style.overflow = "hidden"), () => {
+      document.removeEventListener("keydown", handleEscape), document.body.style.overflow = "auto";
+    };
+  }, [isZoomed]), useEffect(() => {
+    let checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    return checkMobile(), window.addEventListener("resize", checkMobile), () => window.removeEventListener("resize", checkMobile);
+  }, []);
+  let fontDropdownRef = useRef(null);
+  useEffect(() => {
+    let handleClickOutside = (e) => {
+      isFontDropdownOpen && fontDropdownRef.current && !fontDropdownRef.current.contains(e.target) && setIsFontDropdownOpen(!1);
+    };
+    return isFontDropdownOpen && document.addEventListener("click", handleClickOutside), () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isFontDropdownOpen]);
+  let getCurrentMockupImage = () => {
+    let colorSlug = selectedColor.name === "\u30DB\u30EF\u30A4\u30C8" || selectedColor.name === "\u30AA\u30D5\u30DB\u30EF\u30A4\u30C8" ? "white" : "black";
+    return `/images/products/${product.id}-${colorSlug}.png`;
+  }, getPrintAreaInPixels = (canvasSize) => {
+    let baseScale = 0.6, topOffset = 0;
+    product.id === "box-tshirt-short" || product.id === "box-tshirt-long" || product.id === "sweatshirt" ? (baseScale = 0.36, topOffset = -20) : product.id === "hoodie" && (baseScale = 0.24, topOffset = 0);
+    let scale = canvasSize * baseScale, ratio = product.printAreaWidth / product.printAreaHeight, width, height;
+    return ratio > 1 ? (width = scale, height = scale / ratio) : (height = scale, width = scale * ratio), {
+      width: Math.round(width),
+      height: Math.round(height),
+      left: Math.round((canvasSize - width) / 2),
+      top: Math.round((canvasSize - height) / 2) + topOffset
+    };
+  };
+  useEffect(() => {
+    let checkFabric = setInterval(() => {
+      typeof window < "u" && typeof window.fabric < "u" && (setFabricLoaded(!0), clearInterval(checkFabric));
+    }, 100), timeout = setTimeout(() => {
+      clearInterval(checkFabric), fabricLoaded || console.error("Fabric.js\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+    }, 1e4);
+    return () => {
+      clearInterval(checkFabric), clearTimeout(timeout);
+    };
+  }, []), useEffect(() => {
+    if (!canvasRef.current || !fabricLoaded || typeof window.fabric > "u")
+      return;
+    let fabricLib = window.fabric, canvasSize = 800, canvas = new fabricLib.Canvas(canvasRef.current, {
+      width: canvasSize,
+      height: canvasSize,
+      backgroundColor: "#f5f5f5",
+      selection: !0,
+      preserveObjectStacking: !0
+      // 選択時にz-orderを変更しない
+    });
+    fabricCanvasRef.current = canvas, setIsFabricReady(!0);
+    let deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E", deleteControl = new fabricLib.Control({
+      x: 0.5,
+      y: -0.5,
+      offsetY: -16,
+      offsetX: 16,
+      cursorStyle: "pointer",
+      mouseUpHandler: (eventData, transform) => {
+        let target = transform.target;
+        if (target && target.name !== "printArea") {
+          firstTextObjectRef.current === target && (firstTextObjectRef.current = null, setTextInput("")), canvas.remove(target), canvas.renderAll(), setSelectedObject(null), setIsLoading(!1);
+          let initialState = historyRef.current[0];
+          historyRef.current = [initialState], historyStepRef.current = 0, updateHistoryButtons();
+        }
+        return !0;
+      },
+      render: (ctx, left, top, styleOverride, fabricObject) => {
+        ctx.save(), ctx.translate(left, top), ctx.rotate(fabricLib.util.degreesToRadians(fabricObject.angle || 0)), ctx.drawImage(deleteImg, -24 / 2, -24 / 2, 24, 24), ctx.restore();
+      },
+      cornerSize: 24
+    }), deleteImg = document.createElement("img");
+    deleteImg.src = deleteIcon, fabricLib.Object.prototype.controls.deleteControl = deleteControl;
+    let mockupImageUrl = getCurrentMockupImage();
+    fabricLib.Image.fromURL(
+      mockupImageUrl,
+      (img) => {
+        if (!img || !img.width) {
+          console.error("Failed to load image:", mockupImageUrl);
+          return;
+        }
+        let scaleX = canvas.width / (img.width || 1), scaleY = canvas.height / (img.height || 1), scale = Math.min(scaleX, scaleY) * 0.95;
+        img.scale(scale), img.set({
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          originX: "center",
+          originY: "center",
+          selectable: !1,
+          evented: !1
+        }), img.setControlsVisibility({
+          deleteControl: !1
+        }), canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+        let printArea2 = getPrintAreaInPixels(canvasSize), getPrintAreaStrokeColor = () => {
+          let colorName = selectedColor.name.toLowerCase();
+          return colorName.includes("\u30D6\u30E9\u30C3\u30AF") || colorName.includes("black") ? "white" : "#000000";
+        }, printRect = new fabricLib.Rect({
+          left: printArea2.left,
+          top: printArea2.top,
+          width: printArea2.width,
+          height: printArea2.height,
+          fill: "transparent",
+          stroke: getPrintAreaStrokeColor(),
+          strokeWidth: 0.25,
+          strokeDashArray: [2, 2],
+          // 2pt線分の破線
+          selectable: !1,
+          evented: !1,
+          name: "printArea"
+          // 識別用
+        });
+        printRect.setControlsVisibility({
+          deleteControl: !1
+        }), canvas.add(printRect), setTimeout(() => {
+          if (!isHistoryInitializedRef.current) {
+            let json8 = JSON.stringify(canvas.toJSON(["selectable", "evented", "name"]));
+            historyRef.current = [json8], historyStepRef.current = 0, isHistoryInitializedRef.current = !0, updateHistoryButtons(), console.log("\u521D\u671F\u5316\u5B8C\u4E86 - \u5C65\u6B74\u4FDD\u5B58\u304C\u6709\u52B9\u306B\u306A\u308A\u307E\u3057\u305F");
+          }
+        }, 100);
+      },
+      { crossOrigin: "anonymous" }
+    );
+    let printArea = getPrintAreaInPixels(canvasSize);
+    canvas.on("object:moving", (e) => {
+      let obj = e.target;
+      if (!obj || obj.name === "printArea")
+        return;
+      if (e.e && e.e.shiftKey) {
+        obj._movingStart || (obj._movingStart = { x: obj.left, y: obj.top });
+        let dx = Math.abs(obj.left - obj._movingStart.x), dy = Math.abs(obj.top - obj._movingStart.y);
+        dx > dy ? obj.top = obj._movingStart.y : obj.left = obj._movingStart.x;
+      } else
+        obj._movingStart = null;
+      obj.setCoords();
+      let objBounds = obj.getBoundingRect(!0);
+      objBounds.left < printArea.left && (obj.left += printArea.left - objBounds.left), objBounds.left + objBounds.width > printArea.left + printArea.width && (obj.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top < printArea.top && (obj.top += printArea.top - objBounds.top), objBounds.top + objBounds.height > printArea.top + printArea.height && (obj.top -= objBounds.top + objBounds.height - (printArea.top + printArea.height));
+    }), canvas.on("object:scaling", (e) => {
+      let obj = e.target;
+      if (!obj || obj.name === "printArea")
+        return;
+      obj.setCoords();
+      let objBounds = obj.getBoundingRect(!0);
+      objBounds.left < printArea.left && (obj.left += printArea.left - objBounds.left), objBounds.top < printArea.top && (obj.top += printArea.top - objBounds.top), objBounds.left + objBounds.width > printArea.left + printArea.width && (obj.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top + objBounds.height > printArea.top + printArea.height && (obj.top -= objBounds.top + objBounds.height - (printArea.top + printArea.height));
+    }), canvas.on("object:rotating", (e) => {
+      let obj = e.target;
+      if (!obj || obj.name === "printArea")
+        return;
+      e.e && e.e.shiftKey && (obj.angle = Math.round(obj.angle / 15) * 15), obj.setCoords();
+      let objBounds = obj.getBoundingRect(!0);
+      objBounds.left < printArea.left && (obj.left += printArea.left - objBounds.left), objBounds.top < printArea.top && (obj.top += printArea.top - objBounds.top), objBounds.left + objBounds.width > printArea.left + printArea.width && (obj.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top + objBounds.height > printArea.top + printArea.height && (obj.top -= objBounds.top + objBounds.height - (printArea.top + printArea.height));
+    }), canvas.on("selection:created", (e) => setSelectedObject(e.selected?.[0] || null)), canvas.on("selection:updated", (e) => setSelectedObject(e.selected?.[0] || null)), canvas.on("selection:cleared", () => setSelectedObject(null)), canvas.on("object:modified", (e) => {
+      let obj = e.target;
+      if (obj && obj._movingStart && (obj._movingStart = null), obj && obj.type === "i-text" && adjustTextSizeToFitPrintArea(obj), obj && obj.name !== "printArea") {
+        obj.setCoords();
+        let objBounds = obj.getBoundingRect(!0), needsAdjustment = !1;
+        if (objBounds.left < printArea.left || objBounds.top < printArea.top || objBounds.left + objBounds.width > printArea.left + printArea.width || objBounds.top + objBounds.height > printArea.top + printArea.height) {
+          let maxWidth = printArea.width, maxHeight = printArea.height;
+          if (objBounds.width > maxWidth || objBounds.height > maxHeight) {
+            let scaleX = maxWidth / objBounds.width, scaleY = maxHeight / objBounds.height, scale = Math.min(scaleX, scaleY);
+            obj.scaleX *= scale, obj.scaleY *= scale, needsAdjustment = !0;
+          }
+          obj.setCoords();
+          let newBounds = obj.getBoundingRect(!0);
+          newBounds.left < printArea.left && (obj.left += printArea.left - newBounds.left, needsAdjustment = !0), newBounds.top < printArea.top && (obj.top += printArea.top - newBounds.top, needsAdjustment = !0), newBounds.left + newBounds.width > printArea.left + printArea.width && (obj.left -= newBounds.left + newBounds.width - (printArea.left + printArea.width), needsAdjustment = !0), newBounds.top + newBounds.height > printArea.top + printArea.height && (obj.top -= newBounds.top + newBounds.height - (printArea.top + printArea.height), needsAdjustment = !0), needsAdjustment && (obj.setCoords(), canvas.renderAll());
+        }
+      }
+      saveHistory();
+    }), canvas.on("object:added", () => saveHistory()), canvas.on("object:removed", () => saveHistory()), canvas.on("selection:created", (e) => {
+      let obj = e.selected[0];
+      setSelectedObject(obj), obj && obj.type === "i-text" && (setTextInput(obj.text || ""), firstTextObjectRef.current = obj);
+    }), canvas.on("selection:updated", (e) => {
+      let obj = e.selected[0];
+      setSelectedObject(obj), obj && obj.type === "i-text" ? (setTextInput(obj.text || ""), firstTextObjectRef.current = obj) : (setTextInput(""), firstTextObjectRef.current = null);
+    }), canvas.on("selection:cleared", () => {
+      setSelectedObject(null), setTextInput(""), firstTextObjectRef.current = null;
+    });
+    let handleKeyDown = (e) => {
+      let cmdOrCtrl = navigator.platform.toUpperCase().indexOf("MAC") >= 0 ? e.metaKey : e.ctrlKey;
+      if (cmdOrCtrl && e.shiftKey && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault(), handleRedo();
+        return;
+      }
+      if (cmdOrCtrl && !e.shiftKey && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault(), handleUndo();
+        return;
+      }
+      if ((e.key === "Delete" || e.key === "Backspace") && canvas.getActiveObject()) {
+        let activeObject = canvas.getActiveObject();
+        if (activeObject && activeObject.name !== "printArea") {
+          e.preventDefault(), firstTextObjectRef.current === activeObject && (firstTextObjectRef.current = null, setTextInput("")), canvas.remove(activeObject), canvas.renderAll(), setSelectedObject(null), setIsLoading(!1);
+          let initialState = historyRef.current[0];
+          historyRef.current = [initialState], historyStepRef.current = 0, updateHistoryButtons();
+        }
+      }
+    };
+    return window.addEventListener("keydown", handleKeyDown), () => {
+      window.removeEventListener("keydown", handleKeyDown), fabricCanvasRef.current && fabricCanvasRef.current.dispose();
+    };
+  }, [fabricLoaded]), useEffect(() => {
+    if (!fabricCanvasRef.current || !fabricLoaded || typeof window.fabric > "u")
+      return;
+    let fabricLib = window.fabric, canvas = fabricCanvasRef.current, mockupImageUrl = getCurrentMockupImage();
+    fabricLib.Image.fromURL(mockupImageUrl, (img) => {
+      if (!img || !img.width)
+        return;
+      let scaleX = canvas.width / (img.width || 1), scaleY = canvas.height / (img.height || 1), scale = Math.min(scaleX, scaleY) * 0.95;
+      img.scale(scale), img.set({
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+        originX: "center",
+        originY: "center",
+        selectable: !1,
+        evented: !1
+      }), img.setControlsVisibility({
+        deleteControl: !1
+      }), canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+    }, { crossOrigin: "anonymous" }), canvas.getObjects().forEach((obj) => {
+      if (obj.name === "printArea") {
+        let colorName = selectedColor.name.toLowerCase(), newColor = colorName.includes("\u30D6\u30E9\u30C3\u30AF") || colorName.includes("black") ? "white" : "#000000";
+        obj.set("stroke", newColor), canvas.renderAll();
+      }
+    });
+  }, [selectedColor, fabricLoaded, getCurrentMockupImage]);
+  let saveHistory = () => {
+    if (!fabricCanvasRef.current)
+      return;
+    if (!isHistoryInitializedRef.current) {
+      console.log("\u5C65\u6B74\u672A\u521D\u671F\u5316\u306E\u305F\u3081\u4FDD\u5B58\u3092\u30B9\u30AD\u30C3\u30D7");
+      return;
+    }
+    if (isLoadingHistoryRef.current) {
+      console.log("\u5C65\u6B74\u8AAD\u307F\u8FBC\u307F\u4E2D\u306E\u305F\u3081\u4FDD\u5B58\u3092\u30B9\u30AD\u30C3\u30D7");
+      return;
+    }
+    let json8 = JSON.stringify(fabricCanvasRef.current.toJSON(["selectable", "evented", "name"]));
+    historyRef.current = historyRef.current.slice(0, historyStepRef.current + 1), historyRef.current.push(json8), historyStepRef.current = historyRef.current.length - 1, console.log("\u5C65\u6B74\u4FDD\u5B58:", {
+      step: historyStepRef.current,
+      total: historyRef.current.length
+    }), historyRef.current.length > 50 && (historyRef.current.splice(1, 1), historyStepRef.current--), updateHistoryButtons();
+  }, updateHistoryButtons = () => {
+    let newCanUndo = historyStepRef.current > 0, newCanRedo = historyStepRef.current < historyRef.current.length - 1;
+    console.log("\u5C65\u6B74\u66F4\u65B0:", {
+      current: historyStepRef.current,
+      total: historyRef.current.length,
+      canUndo: newCanUndo,
+      canRedo: newCanRedo
+    }), setCanUndo(newCanUndo), setCanRedo(newCanRedo);
+  }, handleUndo = () => {
+    if (historyStepRef.current > 0 && fabricCanvasRef.current) {
+      isLoadingHistoryRef.current = !0, historyStepRef.current--;
+      let json8 = historyRef.current[historyStepRef.current];
+      firstTextObjectRef.current = null, setTextInput(""), fabricCanvasRef.current.loadFromJSON(json8, () => {
+        if (fabricCanvasRef.current?.discardActiveObject(), fabricCanvasRef.current?.renderAll(), requestAnimationFrame(() => {
+          let backgroundImage = fabricCanvasRef.current?.backgroundImage;
+          backgroundImage && (backgroundImage.set({
+            selectable: !1,
+            evented: !1
+          }), backgroundImage.setControlsVisibility({
+            deleteControl: !1
+          })), fabricCanvasRef.current?.getObjects()?.forEach((obj) => {
+            obj.name === "printArea" && (obj.set({
+              selectable: !1,
+              evented: !1
+            }), obj.setControlsVisibility({
+              deleteControl: !1
+            }));
+          }), fabricCanvasRef.current?.renderAll();
+        }), setSelectedObject(null), historyStepRef.current === 0) {
+          let initialState = historyRef.current[0];
+          historyRef.current = [initialState], historyStepRef.current = 0;
+        }
+        updateHistoryButtons(), isLoadingHistoryRef.current = !1;
+      });
+    }
+  }, handleRedo = () => {
+    if (historyStepRef.current < historyRef.current.length - 1 && fabricCanvasRef.current) {
+      isLoadingHistoryRef.current = !0, historyStepRef.current++;
+      let json8 = historyRef.current[historyStepRef.current];
+      firstTextObjectRef.current = null, setTextInput(""), fabricCanvasRef.current.loadFromJSON(json8, () => {
+        fabricCanvasRef.current?.discardActiveObject(), fabricCanvasRef.current?.renderAll(), requestAnimationFrame(() => {
+          let backgroundImage = fabricCanvasRef.current?.backgroundImage;
+          backgroundImage && (backgroundImage.set({
+            selectable: !1,
+            evented: !1
+          }), backgroundImage.setControlsVisibility({
+            deleteControl: !1
+          })), fabricCanvasRef.current?.getObjects()?.forEach((obj) => {
+            obj.name === "printArea" && (obj.set({
+              selectable: !1,
+              evented: !1
+            }), obj.setControlsVisibility({
+              deleteControl: !1
+            }));
+          }), fabricCanvasRef.current?.renderAll();
+        }), setSelectedObject(null), updateHistoryButtons(), isLoadingHistoryRef.current = !1;
+      });
+    }
+  }, checkImageQuality = (file, width, height) => {
+    let fileSizeMB = file.size / 1048576;
+    return fileSizeMB > 100 ? {
+      isGood: !1,
+      message: `[WARNING] \u30D5\u30A1\u30A4\u30EB\u30B5\u30A4\u30BA\u304C\u5927\u304D\u3059\u304E\u307E\u3059\uFF08${fileSizeMB.toFixed(1)}MB\uFF09
+100MB\u4EE5\u4E0B\u3092\u63A8\u5968\u3057\u307E\u3059\u3002`
+    } : width < 1182 || height < 1475 ? {
+      isGood: !1,
+      message: `[WARNING] \u753B\u50CF\u30B5\u30A4\u30BA\u304C\u5C0F\u3055\u3059\u304E\u307E\u3059
+
+\u73FE\u5728: ${width} \xD7 ${height}px
+\u6700\u4F4E: 1182 \xD7 1475px (150 DPI)
+\u63A8\u5968: 2953 \xD7 3685px (300 DPI)
+
+\u5370\u5237\u6642\u306B\u753B\u8CEA\u304C\u7C97\u304F\u306A\u308B\u53EF\u80FD\u6027\u304C\u3042\u308A\u307E\u3059\u3002`
+    } : width < 2953 || height < 3685 ? {
+      isGood: !0,
+      message: `[INFO] \u753B\u50CF\u30B5\u30A4\u30BA\u306F\u4F7F\u7528\u53EF\u80FD\u3067\u3059\u304C\u3001\u3088\u308A\u9AD8\u753B\u8CEA\u3092\u304A\u6C42\u3081\u306E\u5834\u5408\u306F\u5927\u304D\u306A\u753B\u50CF\u3092\u63A8\u5968\u3057\u307E\u3059
+
+\u73FE\u5728: ${width} \xD7 ${height}px
+\u63A8\u5968: 2953 \xD7 3685px (300 DPI)`
+    } : {
+      isGood: !0,
+      message: `[SUCCESS] \u9AD8\u54C1\u8CEA\u306A\u753B\u50CF\u3067\u3059\uFF01
+
+${width} \xD7 ${height}px
+\u5370\u5237\u306B\u6700\u9069\u306A\u30B5\u30A4\u30BA\u3067\u3059\u3002`
+    };
+  }, processImageUpload = (file, event) => {
+    setIsLoading(!0);
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      let imageUrl = e.target?.result, img = new Image();
+      img.onload = () => {
+        let qualityCheck = checkImageQuality(file, img.width, img.height);
+        if (setImageQualityWarning(qualityCheck.message), !qualityCheck.isGood && !confirm(`${qualityCheck.message}
+
+\u305D\u308C\u3067\u3082\u3053\u306E\u753B\u50CF\u3092\u4F7F\u7528\u3057\u307E\u3059\u304B\uFF1F`)) {
+          setIsLoading(!1), setImageQualityWarning(null), event.target.value = "";
+          return;
+        }
+        setUploadedImages((prev) => [...prev, imageUrl]), fabricCanvasRef.current && typeof window.fabric < "u" ? window.fabric.Image.fromURL(imageUrl, (fabricImg) => {
+          let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width), maxWidth = printArea.width * 0.8, maxHeight = printArea.height * 0.8, scale = Math.min(
+            maxWidth / (fabricImg.width || 1),
+            maxHeight / (fabricImg.height || 1),
+            1
+          );
+          fabricImg.scale(scale), fabricImg.set({
+            left: printArea.left + printArea.width / 2,
+            top: printArea.top + printArea.height / 2,
+            originX: "center",
+            originY: "center",
+            selectable: !0,
+            hasControls: !0,
+            hasBorders: !0
+          }), fabricImg.originalImageData = imageUrl, fabricImg.originalWidth = img.width, fabricImg.originalHeight = img.height, canvas.add(fabricImg), canvas.setActiveObject(fabricImg), canvas.renderAll(), setIsLoading(!1), event.target.value = "";
+        }) : (setIsLoading(!1), event.target.value = "");
+      }, img.src = imageUrl;
+    }, reader.onerror = () => {
+      setIsLoading(!1), event.target.value = "";
+    }, reader.readAsDataURL(file);
+  }, handleImageUpload = (event) => {
+    let files = event.target.files;
+    if (!files || files.length === 0) {
+      setIsLoading(!1);
+      return;
+    }
+    let file = files[0];
+    if (!file.type.startsWith("image/")) {
+      alert(`${file.name} \u306F\u753B\u50CF\u30D5\u30A1\u30A4\u30EB\u3067\u306F\u3042\u308A\u307E\u305B\u3093\uFF08PNG, JPG, GIF\u306A\u3069\u3092\u4F7F\u7528\u3057\u3066\u304F\u3060\u3055\u3044\uFF09`), event.target.value = "";
+      return;
+    }
+    if (!copyrightAgreed) {
+      pendingImageRef.current = file, setShowCopyrightModal(!0);
+      return;
+    }
+    processImageUpload(file, event);
+  }, handleCopyrightAgree = () => {
+    if (setCopyrightAgreed(!0), setShowCopyrightModal(!1), pendingImageRef.current && fileInputRef.current) {
+      let dummyEvent = {
+        target: fileInputRef.current,
+        currentTarget: fileInputRef.current
+      };
+      processImageUpload(pendingImageRef.current, dummyEvent), pendingImageRef.current = null;
+    }
+  }, handleGenerateAI = async () => {
+    if (!aiPrompt.trim()) {
+      alert("\u751F\u6210\u3057\u305F\u3044\u753B\u50CF\u306E\u8AAC\u660E\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044");
+      return;
+    }
+    setIsGenerating(!0);
+    try {
+      let data = await (await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: aiPrompt,
+          width: 1024,
+          height: 1024
+        })
+      })).json();
+      data.success && data.imageUrl ? (setGeneratedImageUrl(data.imageUrl), setLastAIPrompt(aiPrompt), fabricCanvasRef.current && typeof window.fabric < "u" && window.fabric.Image.fromURL(data.imageUrl, (img) => {
+        let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width), maxWidth = printArea.width * 0.8, maxHeight = printArea.height * 0.8, scale = Math.min(
+          maxWidth / (img.width || 1),
+          maxHeight / (img.height || 1),
+          1
+        );
+        img.scale(scale), img.set({
+          left: printArea.left + printArea.width / 2,
+          top: printArea.top + printArea.height / 2,
+          originX: "center",
+          originY: "center",
+          selectable: !0,
+          hasControls: !0,
+          hasBorders: !0
+        }), img.originalImageData = data.imageUrl, img.originalWidth = img.width, img.originalHeight = img.height, fabricCanvasRef.current?.add(img), fabricCanvasRef.current?.setActiveObject(img), fabricCanvasRef.current?.renderAll();
+      }, { crossOrigin: "anonymous" }), setAiPrompt("")) : alert(data.error || "AI\u753B\u50CF\u751F\u6210\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+    } catch (error) {
+      console.error("AI\u751F\u6210\u30A8\u30E9\u30FC:", error), alert("AI\u753B\u50CF\u751F\u6210\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+    } finally {
+      setIsGenerating(!1);
+    }
+  }, adjustTextSizeToFitPrintArea = (textObj) => {
+    if (!fabricCanvasRef.current)
+      return;
+    let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width);
+    textObj.setCoords();
+    let textBounds = textObj.getBoundingRect(!0), exceedsWidth = textBounds.width > printArea.width, exceedsHeight = textBounds.height > printArea.height;
+    if (exceedsWidth || exceedsHeight) {
+      let scaleX = printArea.width / textBounds.width, scaleY = printArea.height / textBounds.height, scale = Math.min(scaleX, scaleY) * 0.95, currentFontSize = textObj.fontSize, newFontSize = Math.floor(currentFontSize * scale);
+      textObj.set({ fontSize: newFontSize }), setFontSize(newFontSize), textObj.set({
+        left: printArea.left + printArea.width / 2,
+        top: printArea.top + printArea.height / 2
+      }), textObj.setCoords(), canvas.renderAll();
+    }
+  }, handleTextInputChange = (value) => {
+    if (setTextInput(value), !fabricCanvasRef.current || typeof window.fabric > "u")
+      return;
+    let fabricLib = window.fabric, canvas = fabricCanvasRef.current;
+    if (firstTextObjectRef.current && canvas.contains(firstTextObjectRef.current))
+      firstTextObjectRef.current.set({ text: value }), value.trim() && adjustTextSizeToFitPrintArea(firstTextObjectRef.current), canvas.renderAll(), value.trim() && saveHistory();
+    else if (value.trim() && !firstTextObjectRef.current) {
+      let printArea = getPrintAreaInPixels(canvas.width), text = new fabricLib.IText(value, {
+        left: printArea.left + printArea.width / 2,
+        top: printArea.top + printArea.height / 2,
+        originX: "center",
+        originY: "center",
+        fill: textColor,
+        fontSize,
+        fontFamily,
+        selectable: !0,
+        hasControls: !0,
+        hasBorders: !0
+      });
+      canvas.add(text), canvas.setActiveObject(text), adjustTextSizeToFitPrintArea(text), canvas.renderAll(), firstTextObjectRef.current = text, saveHistory();
+    }
+  }, handleAddText = () => {
+    if (!textInput.trim() || !fabricCanvasRef.current || typeof window.fabric > "u") {
+      alert("\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044");
+      return;
+    }
+    let fabricLib = window.fabric, canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width), text = new fabricLib.IText(textInput, {
+      left: printArea.left + printArea.width / 2,
+      top: printArea.top + printArea.height / 2,
+      originX: "center",
+      originY: "center",
+      fill: textColor,
+      fontSize,
+      fontFamily,
+      selectable: !0,
+      hasControls: !0,
+      hasBorders: !0
+    });
+    fabricCanvasRef.current.add(text), fabricCanvasRef.current.setActiveObject(text), fabricCanvasRef.current.renderAll(), firstTextObjectRef.current = null, setTextInput(""), saveHistory();
+  }, handleChangeTextColor = (color) => {
+    setTextColor(color), selectedObject && selectedObject.type === "i-text" && (selectedObject.set({ fill: color }), fabricCanvasRef.current?.renderAll(), saveHistory());
+  }, handleChangeFontSize = (size) => {
+    setFontSize(size), selectedObject && selectedObject.type === "i-text" && (selectedObject.set({ fontSize: size }), adjustTextSizeToFitPrintArea(selectedObject), fabricCanvasRef.current?.renderAll(), saveHistory());
+  }, handleChangeFontFamily = (font) => {
+    setFontFamily(font), selectedObject && selectedObject.type === "i-text" && (selectedObject.set({ fontFamily: font }), adjustTextSizeToFitPrintArea(selectedObject), fabricCanvasRef.current?.renderAll(), saveHistory());
+  }, getFilteredFonts = () => FONT_LIST.filter((font) => font.type === activeFontTab), uploadToSupabaseDirect = async (imageDataUrl) => {
+    try {
+      console.log("Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u958B\u59CB...");
+      let blob = await (await fetch(imageDataUrl)).blob(), fileSizeMB = Math.round(blob.size / 1024 / 1024 * 100) / 100;
+      console.log("\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3059\u308B\u30D5\u30A1\u30A4\u30EB\u30B5\u30A4\u30BA:", fileSizeMB, "MB");
+      let timestamp = Date.now(), randomId = Math.random().toString(36).substring(2, 15), fileName = `design-${timestamp}-${randomId}.png`, { createClient } = await import("@supabase/supabase-js"), supabaseUrl = window.ENV?.SUPABASE_URL || "", supabaseKey = window.ENV?.SUPABASE_ANON_KEY || "";
+      if (!supabaseUrl || !supabaseKey)
+        throw new Error("Supabase\u8A2D\u5B9A\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093");
+      let supabase = createClient(supabaseUrl, supabaseKey);
+      console.log("Supabase\u306B\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D:", fileName);
+      let { data, error } = await supabase.storage.from("printaize").upload(fileName, blob, {
+        contentType: "image/png",
+        cacheControl: "3600",
+        upsert: !1
+      });
+      if (error)
+        throw console.error("Supabase\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", error), new Error(`Supabase\u3078\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F: ${error.message}`);
+      let { data: urlData } = supabase.storage.from("printaize").getPublicUrl(data.path);
+      return console.log("Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", urlData.publicUrl), urlData.publicUrl;
+    } catch (error) {
+      throw console.error("Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", error), error;
+    }
+  }, generateHighResolutionOutput = async (canvas, printArea) => new Promise((resolve, reject) => {
+    try {
+      let fabricLib = window.fabric;
+      if (!fabricLib) {
+        console.error("Fabric.js not loaded"), reject(new Error("Fabric.js not loaded"));
+        return;
+      }
+      let targetWidth = 2953, targetHeight = 3685, scaleRatio = targetWidth / printArea.width;
+      console.log("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u958B\u59CB:", { targetWidth, targetHeight, scaleRatio });
+      let offscreenCanvas = new fabricLib.Canvas(null, {
+        width: targetWidth,
+        height: targetHeight,
+        backgroundColor: "transparent"
+      }), filteredObjects = canvas.getObjects().filter((obj) => obj.name !== "printArea"), totalObjects = filteredObjects.length;
+      if (console.log("\u51E6\u7406\u3059\u308B\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u6570:", totalObjects), totalObjects === 0) {
+        let dataURL = offscreenCanvas.toDataURL({ format: "png", quality: 1 });
+        resolve(dataURL);
+        return;
+      }
+      let loadedObjects = [], loadedCount = 0, timeout = setTimeout(() => {
+        console.error("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u30BF\u30A4\u30E0\u30A2\u30A6\u30C8"), reject(new Error("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u304C\u30BF\u30A4\u30E0\u30A2\u30A6\u30C8\u3057\u307E\u3057\u305F"));
+      }, 3e4), checkComplete = () => {
+        if (loadedCount++, console.log(`\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u8AAD\u307F\u8FBC\u307F: ${loadedCount}/${totalObjects}`), loadedCount === totalObjects) {
+          clearTimeout(timeout);
+          try {
+            console.log("\u5168\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u8AAD\u307F\u8FBC\u307F\u5B8C\u4E86\u3002loadedObjects\u6570:", loadedObjects.length), loadedObjects.sort((a, b) => a.index - b.index), loadedObjects.forEach((item, i) => {
+              console.log(`\u30AD\u30E3\u30F3\u30D0\u30B9\u306B\u8FFD\u52A0 [${i}]:`, item.fabricObj.type, "index:", item.index), offscreenCanvas.add(item.fabricObj);
+            }), offscreenCanvas.renderAll();
+            let dataURL = offscreenCanvas.toDataURL({
+              format: "png",
+              multiplier: 1
+            }), sizeKB = Math.round(dataURL.length / 1024), sizeMB = (sizeKB / 1024).toFixed(2);
+            console.log("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u5B8C\u4E86\uFF08PNG\u900F\u904E\u3001300DPI\uFF09 - \u30B5\u30A4\u30BA:", sizeKB, "KB (", sizeMB, "MB)"), console.log("\u{1F4A1} Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3092\u4F7F\u7528\u3059\u308B\u305F\u3081\u3001\u30D5\u30A1\u30A4\u30EB\u30B5\u30A4\u30BA\u5236\u9650\u306A\u3057"), resolve(dataURL);
+          } catch (error) {
+            console.error("Canvas render\u30A8\u30E9\u30FC:", error), reject(error);
+          }
+        }
+      };
+      filteredObjects.forEach((obj, index) => {
+        try {
+          let relativeLeft = (obj.left - printArea.left) * scaleRatio, relativeTop = (obj.top - printArea.top) * scaleRatio;
+          if (obj.type === "image" && obj.originalImageData)
+            console.log("\u753B\u50CF\u8AAD\u307F\u8FBC\u307F\u958B\u59CB:", obj.originalImageData.substring(0, 50)), fabricLib.Image.fromURL(
+              obj.originalImageData,
+              (hdImg) => {
+                if (!hdImg) {
+                  console.error("\u753B\u50CF\u8AAD\u307F\u8FBC\u307F\u5931\u6557"), checkComplete();
+                  return;
+                }
+                try {
+                  let originalWidth = obj.originalWidth, originalHeight = obj.originalHeight;
+                  if (!originalWidth || !originalHeight) {
+                    console.warn("originalWidth/Height \u304C\u672A\u8A2D\u5B9A\u3002\u73FE\u5728\u306E\u30B5\u30A4\u30BA\u3092\u4F7F\u7528\u3057\u307E\u3059\u3002");
+                    let newScaleX = obj.scaleX * scaleRatio, newScaleY = obj.scaleY * scaleRatio;
+                    hdImg.set({
+                      left: relativeLeft,
+                      top: relativeTop,
+                      scaleX: newScaleX,
+                      scaleY: newScaleY,
+                      angle: obj.angle
+                    }), loadedObjects.push({ index, fabricObj: hdImg }), checkComplete();
+                    return;
+                  }
+                  let newScale = obj.width * obj.scaleX / originalWidth * scaleRatio;
+                  hdImg.set({
+                    left: relativeLeft,
+                    top: relativeTop,
+                    scaleX: newScale,
+                    scaleY: newScale,
+                    angle: obj.angle,
+                    originX: obj.originX,
+                    originY: obj.originY,
+                    flipX: obj.flipX,
+                    flipY: obj.flipY
+                  }), obj.filters && obj.filters.length > 0 && (hdImg.filters = obj.filters.map((filter) => Object.assign(Object.create(Object.getPrototypeOf(filter)), filter)), hdImg.applyFilters()), console.log("\u753B\u50CF\u3092loadedObjects\u306B\u8FFD\u52A0:", index), loadedObjects.push({ index, fabricObj: hdImg }), checkComplete();
+                } catch (error) {
+                  console.error("\u753B\u50CF\u8A2D\u5B9A\u30A8\u30E9\u30FC:", error), checkComplete();
+                }
+              },
+              { crossOrigin: "anonymous" }
+            );
+          else if (obj.type === "text" || obj.type === "textbox" || obj.type === "i-text") {
+            let hdText = new fabricLib.Text(obj.text, {
+              left: relativeLeft,
+              top: relativeTop,
+              fontSize: obj.fontSize * scaleRatio,
+              fontFamily: obj.fontFamily,
+              fill: obj.fill,
+              angle: obj.angle,
+              originX: obj.originX,
+              originY: obj.originY,
+              scaleX: obj.scaleX,
+              scaleY: obj.scaleY
+            });
+            console.log("\u30C6\u30AD\u30B9\u30C8\u3092loadedObjects\u306B\u8FFD\u52A0:", index), loadedObjects.push({ index, fabricObj: hdText }), checkComplete();
+          } else
+            checkComplete();
+        } catch (error) {
+          console.error("\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u51E6\u7406\u30A8\u30E9\u30FC:", error), checkComplete();
+        }
+      });
+    } catch (error) {
+      console.error("generateHighResolutionOutput \u30A8\u30E9\u30FC:", error), reject(error);
+    }
+  }), openCartModal = () => {
+    setModalColor(selectedColor.name), setModalQuantities((prev) => {
+      let currentColorQuantities = prev[selectedColor.name];
+      return currentColorQuantities[selectedSize] === 0 ? {
+        ...prev,
+        [selectedColor.name]: {
+          ...currentColorQuantities,
+          [selectedSize]: 1
+        }
+      } : prev;
+    }), setIsModalOpen(!0);
+  }, closeCartModal = () => {
+    setIsModalOpen(!1);
+  }, handleAddToCartMultiple = async () => {
+    let allSelections = [];
+    if (Object.entries(modalQuantities).forEach(([color, sizes2]) => {
+      Object.entries(sizes2).forEach(([size, quantity]) => {
+        quantity > 0 && allSelections.push({ color, size, quantity });
+      });
+    }), allSelections.length === 0) {
+      alert("\u30B5\u30A4\u30BA\u3068\u500B\u6570\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044");
+      return;
+    }
+    closeCartModal(), await handleAddToCartWithOptions(allSelections);
+  }, handleAddToCartWithOptions = async (allSelections) => {
+    if (fabricCanvasRef.current) {
+      setIsAddingToCart(!0), setLoadingMessage("\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D...\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09");
+      try {
+        let canvas = fabricCanvasRef.current, printAreaObj = canvas.getObjects().find((obj) => obj.id === "printArea" || obj.name === "printArea");
+        printAreaObj ? (printAreaObj.visible = !1, canvas.renderAll()) : console.warn("\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093");
+        let dataURL = canvas.toDataURL({
+          format: "png",
+          quality: 1
+        });
+        printAreaObj && (printAreaObj.visible = !0, canvas.renderAll());
+        let printArea = printAreaObj;
+        if (!printArea) {
+          let calculatedPrintArea = getPrintAreaInPixels(canvas.width);
+          printArea = {
+            left: calculatedPrintArea.left,
+            top: calculatedPrintArea.top,
+            width: calculatedPrintArea.width,
+            height: calculatedPrintArea.height
+          };
+        }
+        let dataURLHD;
+        try {
+          if (console.log("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u3092\u751F\u6210\u4E2D..."), !printArea)
+            throw new Error("\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093");
+          dataURLHD = await generateHighResolutionOutput(canvas, printArea);
+          let sizeInKB = Math.round(dataURLHD.length * 0.75 / 1024), sizeInMB = (sizeInKB / 1024).toFixed(2);
+          console.log(`\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u5B8C\u4E86\uFF08PNG\u900F\u904E\u3001300DPI\uFF09 - \u30B5\u30A4\u30BA: ${sizeInKB} KB ( ${sizeInMB} MB)`);
+        } catch (error) {
+          console.error("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u30A8\u30E9\u30FC:", error), alert(`\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u306B\u5931\u6557\u3057\u307E\u3057\u305F
+
+\u30A8\u30E9\u30FC: ${error instanceof Error ? error.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`), setIsAddingToCart(!1), setLoadingMessage("");
+          return;
+        }
+        let designImageUrl;
+        try {
+          console.log("\u30D7\u30EC\u30D3\u30E5\u30FC\u753B\u50CF\u3092\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D..."), designImageUrl = await uploadToSupabaseDirect(dataURL), console.log("\u30D7\u30EC\u30D3\u30E5\u30FC\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", designImageUrl);
+        } catch (uploadError) {
+          console.error("\u30D7\u30EC\u30D3\u30E5\u30FC\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", uploadError), alert(`\u30D7\u30EC\u30D3\u30E5\u30FC\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F
+
+\u30A8\u30E9\u30FC: ${uploadError instanceof Error ? uploadError.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`), setIsAddingToCart(!1), setLoadingMessage("");
+          return;
+        }
+        let designImageUrlHD;
+        try {
+          console.log("\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D..."), designImageUrlHD = await uploadToSupabaseDirect(dataURLHD), console.log("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", designImageUrlHD);
+        } catch (uploadError) {
+          console.error("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", uploadError), alert(`\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F
+
+\u30A8\u30E9\u30FC: ${uploadError instanceof Error ? uploadError.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`), setIsAddingToCart(!1), setLoadingMessage("");
+          return;
+        }
+        let designImageId = null;
+        try {
+          let { createClient } = await import("@supabase/supabase-js"), supabaseUrl = window.ENV?.SUPABASE_URL || "", supabaseKey = window.ENV?.SUPABASE_ANON_KEY || "";
+          if (supabaseUrl && supabaseKey) {
+            let supabase = createClient(supabaseUrl, supabaseKey), { data: insertData, error: insertError } = await supabase.from("design_images").insert({
+              preview_url: designImageUrl,
+              hd_url: designImageUrlHD,
+              metadata: {
+                product_id: product.id,
+                selections: allSelections
+                // 全カラー・サイズの選択を保存
+              }
+            }).select().single();
+            insertError ? console.error("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u306E\u8A18\u9332\u30A8\u30E9\u30FC:", insertError) : insertData && (designImageId = insertData.id, console.log("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u3092\u8A18\u9332\u3057\u307E\u3057\u305F:", designImageId));
+          }
+        } catch (dbError) {
+          console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u5931\u6557\uFF08\u7D9A\u884C\uFF09:", dbError);
+        }
+        let cartItems = allSelections.map((selection) => ({
+          variantId: getVariantId(selection.color, selection.size),
+          quantity: selection.quantity,
+          customAttributes: [
+            { key: "design_image", value: designImageUrl },
+            { key: "design_image_hd", value: designImageUrlHD }
+          ]
+        }));
+        console.log("\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3059\u308B\u30A2\u30A4\u30C6\u30E0\u6570:", cartItems.length), console.log("\u30AB\u30FC\u30C8\u30A2\u30A4\u30C6\u30E0:", cartItems);
+        let checkoutUrl = "";
+        try {
+          let response = await fetch("/api/add-to-cart-multiple", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              items: cartItems
+            })
+          });
+          if (!response.ok)
+            throw new Error(`\u30AB\u30FC\u30C8\u8FFD\u52A0API\u30A8\u30E9\u30FC: ${response.status}`);
+          checkoutUrl = (await response.json()).checkoutUrl;
+        } catch (error) {
+          console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error), alert(`\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F
+
+\u30A8\u30E9\u30FC: ${error instanceof Error ? error.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`), setIsAddingToCart(!1), setLoadingMessage("");
+          return;
+        }
+        checkoutUrl ? (designImageId && (console.log("\u30AB\u30FC\u30C8\u8FFD\u52A0\u6210\u529F\u3002design_image_id:", designImageId), console.log("ordered \u306F false \u306E\u307E\u307E\uFF0830\u65E5\u5F8C\u306B\u81EA\u52D5\u524A\u9664\u3055\u308C\u308B\uFF09")), window.location.href = checkoutUrl) : alert("\u30C1\u30A7\u30C3\u30AF\u30A2\u30A6\u30C8URL\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+      } catch (error) {
+        console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error), alert(`\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002
+
+\u30A8\u30E9\u30FC: ${error instanceof Error ? error.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`);
+      } finally {
+        setIsAddingToCart(!1), setLoadingMessage("");
+      }
+    }
+  }, getVariantId = (color, size) => `gid://shopify/ProductVariant/${{
+    \u30DB\u30EF\u30A4\u30C8: {
+      S: "48602131628256",
+      M: "48602131661024",
+      L: "48602131693792",
+      XL: "48602131726560",
+      XXL: "48602131759328"
+    },
+    \u30D6\u30E9\u30C3\u30AF: {
+      S: "48602131792096",
+      M: "48602131824864",
+      L: "48602131857632",
+      XL: "48602131890400",
+      XXL: "48602131923168"
+    }
+  }[color]?.[size] || "48602131661024"}`, handleAddToCart = async () => {
+    if (fabricCanvasRef.current) {
+      setIsAddingToCart(!0), setLoadingMessage("\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D...\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09");
+      try {
+        let canvas = fabricCanvasRef.current, printAreaRect = canvas.getObjects().find((obj) => obj.name === "printArea");
+        printAreaRect && (printAreaRect.visible = !1, canvas.renderAll());
+        let dataURL = canvas.toDataURL({
+          format: "png",
+          quality: 1
+        });
+        console.log("\u30D7\u30EC\u30D3\u30E5\u30FC\u753B\u50CF\u30B5\u30A4\u30BA:", Math.round(dataURL.length / 1024), "KB"), printAreaRect && (printAreaRect.visible = !0, canvas.renderAll());
+        let printArea = getPrintAreaInPixels(canvas.width);
+        console.log("\u9AD8\u89E3\u50CF\u5EA6\u7248\u3092\u751F\u6210\u4E2D...");
+        let dataURLHD = await generateHighResolutionOutput(canvas, printArea);
+        console.log("\u9AD8\u89E3\u50CF\u5EA6\u7248\u751F\u6210\u5B8C\u4E86\u3002\u30B5\u30A4\u30BA:", Math.round(dataURLHD.length / 1024), "KB");
+        let uploadData = await (await fetch("/api/upload-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageData: dataURL
+          })
+        })).json();
+        if (!uploadData.success) {
+          alert(uploadData.error || "\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+          return;
+        }
+        let designImageUrlHD;
+        try {
+          console.log("\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D..."), designImageUrlHD = await uploadToSupabaseDirect(dataURLHD), console.log("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", designImageUrlHD);
+        } catch (uploadError) {
+          console.error("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", uploadError), alert(`\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F
+
+\u30A8\u30E9\u30FC: ${uploadError instanceof Error ? uploadError.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`);
+          return;
+        }
+        let designImageUrl = uploadData.imageUrl, designImageId = null;
+        try {
+          let { createClient } = await import("@supabase/supabase-js"), supabaseUrl = window.ENV?.SUPABASE_URL || "", supabaseKey = window.ENV?.SUPABASE_ANON_KEY || "";
+          if (supabaseUrl && supabaseKey) {
+            let supabase = createClient(supabaseUrl, supabaseKey), { data: insertData, error: insertError } = await supabase.from("design_images").insert({
+              preview_url: designImageUrl,
+              hd_url: designImageUrlHD,
+              metadata: {
+                product_id: product.id,
+                product_name: product.name,
+                color: selectedColor.name,
+                size: selectedSize
+              }
+            }).select("id").single();
+            !insertError && insertData ? (designImageId = insertData.id, console.log("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u3092\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u306B\u8A18\u9332:", designImageId)) : console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u30A8\u30E9\u30FC\uFF08\u7D9A\u884C\uFF09:", insertError);
+          }
+        } catch (dbError) {
+          console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u5931\u6557\uFF08\u7D9A\u884C\uFF09:", dbError);
+        }
+        let variantMapping = {
+          \u30DB\u30EF\u30A4\u30C8: {
+            S: "48602131628256",
+            M: "48602131661024",
+            L: "48602131693792",
+            XL: "48602131726560",
+            XXL: "48602131759328"
+          },
+          \u30D6\u30E9\u30C3\u30AF: {
+            S: "48602131792096",
+            M: "48602131824864",
+            L: "48602131857632",
+            XL: "48602131890400",
+            XXL: "48602131923168"
+          }
+        }, colorKey = selectedColor.name.includes("\u30DB\u30EF\u30A4\u30C8") || selectedColor.name.includes("White") ? "\u30DB\u30EF\u30A4\u30C8" : "\u30D6\u30E9\u30C3\u30AF", productVariantId = `gid://shopify/ProductVariant/${variantMapping[colorKey]?.[selectedSize] || "48602131661024"}`, data = await (await fetch("/api/add-to-cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            designImageUrl,
+            // CloudinaryのURL（プレビュー用）
+            designImageUrlHD,
+            // CloudinaryのURL（印刷用・高解像度）
+            isAIGenerated: !!lastAIPrompt,
+            aiPrompt: lastAIPrompt,
+            productId: product.id,
+            productName: product.name,
+            color: selectedColor.name,
+            size: selectedSize,
+            price: product.price,
+            productVariantId
+          })
+        })).json();
+        data.success && data.checkoutUrl ? (designImageId && (console.log("\u30AB\u30FC\u30C8\u8FFD\u52A0\u6210\u529F\u3002design_image_id:", designImageId), console.log("ordered \u306F false \u306E\u307E\u307E\uFF0830\u65E5\u5F8C\u306B\u81EA\u52D5\u524A\u9664\u3055\u308C\u308B\uFF09")), window.location.href = data.checkoutUrl) : alert(data.error || "\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+      } catch (error) {
+        console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error);
+        let errorMessage = error instanceof Error ? error.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC";
+        alert(`\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F
+
+\u30A8\u30E9\u30FC: ${errorMessage}`);
+      } finally {
+        setIsAddingToCart(!1), setLoadingMessage("");
+      }
+    }
+  }, handleUploadClick = () => fileInputRef.current?.click(), handleRemoveSelected = () => {
+    if (fabricCanvasRef.current && selectedObject) {
+      firstTextObjectRef.current === selectedObject && (firstTextObjectRef.current = null, setTextInput("")), fabricCanvasRef.current.remove(selectedObject), fabricCanvasRef.current.renderAll(), setSelectedObject(null), setIsLoading(!1);
+      let initialState = historyRef.current[0];
+      historyRef.current = [initialState], historyStepRef.current = 0, updateHistoryButtons();
+    }
+  }, handleCenterVertical = () => {
+    if (fabricCanvasRef.current && selectedObject) {
+      let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width);
+      selectedObject.set({
+        top: printArea.top + printArea.height / 2,
+        originY: "center"
+      }), selectedObject.setCoords(), canvas.renderAll(), saveHistory();
+    }
+  }, handleCenterHorizontal = () => {
+    if (fabricCanvasRef.current && selectedObject) {
+      let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width);
+      selectedObject.set({
+        left: printArea.left + printArea.width / 2,
+        originX: "center"
+      }), selectedObject.setCoords(), canvas.renderAll(), saveHistory();
+    }
+  }, handleBringForward = () => {
+    fabricCanvasRef.current && selectedObject && (fabricCanvasRef.current.bringForward(selectedObject), fabricCanvasRef.current.renderAll());
+  }, handleSendBackwards = () => {
+    fabricCanvasRef.current && selectedObject && (fabricCanvasRef.current.sendBackwards(selectedObject), fabricCanvasRef.current.renderAll());
+  }, handleFitToPrintArea = () => {
+    if (!fabricCanvasRef.current || !selectedObject)
+      return;
+    let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width), scaleX = printArea.width / selectedObject.width, scaleY = printArea.height / selectedObject.height, scale = Math.min(scaleX, scaleY);
+    selectedObject.set({
+      scaleX: scale,
+      scaleY: scale,
+      left: printArea.left + printArea.width / 2,
+      top: printArea.top + printArea.height / 2
+    }), selectedObject.setCoords(), canvas.renderAll(), saveHistory();
+  }, handleClearCanvas = () => {
+    if (fabricCanvasRef.current) {
+      fabricCanvasRef.current.getObjects().forEach((obj) => {
+        fabricCanvasRef.current?.remove(obj);
+      }), fabricCanvasRef.current.renderAll(), setUploadedImages([]), setSelectedObject(null), setIsLoading(!1), firstTextObjectRef.current = null, setTextInput("");
+      let initialState = historyRef.current[0];
+      historyRef.current = [initialState], historyStepRef.current = 0, updateHistoryButtons();
+    }
+  }, handleSaveDesign = () => {
+    if (fabricCanvasRef.current) {
+      let dataURL = fabricCanvasRef.current.toDataURL({
+        format: "png",
+        quality: 1
+      }), link = document.createElement("a");
+      link.download = "tshirt-design.png", link.href = dataURL, link.click();
+    }
+  };
+  return fabricLoaded ? /* @__PURE__ */ jsxDEV3("div", { style: {
+    width: "100%",
+    maxWidth: "1600px",
+    margin: "0 auto",
+    padding: 0
+  }, children: [
+    isZoomed && /* @__PURE__ */ jsxDEV3(
+      "div",
+      {
+        onClick: () => setIsZoomed(!1),
+        style: {
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          zIndex: 9998,
+          cursor: "pointer"
+        }
+      },
+      void 0,
+      !1,
+      {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2354,
+        columnNumber: 9
+      },
+      this
+    ),
+    /* @__PURE__ */ jsxDEV3("div", { style: {
+      backgroundColor: "white",
+      borderRadius: "0",
+      padding: isMobile ? "15px" : "20px",
+      marginBottom: "0",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: isMobile ? "flex-start" : "center",
+      flexWrap: "wrap",
+      gap: "15px"
+    }, children: [
+      /* @__PURE__ */ jsxDEV3("div", { style: { flex: "1 1 300px" }, children: [
+        /* @__PURE__ */ jsxDEV3("h2", { style: {
+          margin: 0,
+          fontSize: isMobile ? "18px" : "20px",
+          color: "#333"
+        }, children: product.name }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2383,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: {
+          marginTop: "10px",
+          display: "flex",
+          gap: "15px",
+          alignItems: "center",
+          fontSize: "13px"
+        }, children: [
+          /* @__PURE__ */ jsxDEV3("div", { style: {
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "6px 12px",
+            backgroundColor: "#f0f4ff",
+            borderRadius: "20px"
+          }, children: [
+            /* @__PURE__ */ jsxDEV3(
+              "div",
+              {
+                style: {
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "50%",
+                  backgroundColor: selectedColor.hex,
+                  border: selectedColor.hex === "#FFFFFF" || selectedColor.hex === "#F5F5DC" ? "1.5px solid #ddd" : "none"
+                }
+              },
+              void 0,
+              !1,
+              {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 2405,
+                columnNumber: 15
+              },
+              this
+            ),
+            /* @__PURE__ */ jsxDEV3("span", { style: { color: "#667eea", fontWeight: "600" }, children: selectedColor.name }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2416,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2397,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV3("div", { style: {
+            padding: "6px 12px",
+            backgroundColor: "#f0f4ff",
+            borderRadius: "20px",
+            color: "#667eea",
+            fontWeight: "600"
+          }, children: [
+            "\u30B5\u30A4\u30BA: ",
+            selectedSize
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2420,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2390,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2382,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV3("div", { style: { textAlign: "right" }, children: [
+        /* @__PURE__ */ jsxDEV3("div", { style: {
+          fontSize: isMobile ? "24px" : "28px",
+          fontWeight: "bold",
+          color: "#667eea"
+        }, children: [
+          "\xA5",
+          product.price.toLocaleString()
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2432,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: {
+          fontSize: isMobile ? "11px" : "12px",
+          color: "#999",
+          marginTop: "5px"
+        }, children: "\u7A0E\u8FBC\u4FA1\u683C" }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2439,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2431,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2370,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV3("div", { style: {
+      display: "flex",
+      flexDirection: isMobile ? "column" : "row",
+      gap: "0",
+      width: "100%",
+      margin: 0,
+      alignItems: "flex-start"
+    }, children: [
+      /* @__PURE__ */ jsxDEV3("div", { style: {
+        flex: isMobile ? "none" : "1 1 auto",
+        minWidth: "0",
+        width: isMobile ? "100%" : "auto",
+        backgroundColor: "#f5f5f5"
+      }, children: /* @__PURE__ */ jsxDEV3("div", { style: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: isMobile ? "15px" : "20px",
+        width: "100%"
+      }, children: [
+        /* @__PURE__ */ jsxDEV3(
+          "div",
+          {
+            style: {
+              border: "none",
+              borderRadius: "0",
+              overflow: "visible",
+              boxShadow: "none",
+              backgroundColor: "#f5f5f5",
+              width: "100%",
+              maxWidth: isZoomed ? "none" : "800px",
+              margin: "0 auto",
+              position: isZoomed ? "fixed" : "relative",
+              top: isZoomed ? 0 : "auto",
+              left: isZoomed ? 0 : "auto",
+              right: isZoomed ? 0 : "auto",
+              bottom: isZoomed ? 0 : "auto",
+              zIndex: isZoomed ? 9999 : "auto",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: isZoomed ? "20px" : "0"
+            },
+            children: [
+              /* @__PURE__ */ jsxDEV3(
+                "button",
+                {
+                  onClick: () => setIsZoomed(!isZoomed),
+                  style: {
+                    position: "absolute",
+                    top: isZoomed ? "20px" : "10px",
+                    right: isZoomed ? "20px" : "10px",
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    border: "none",
+                    backgroundColor: "white",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 10,
+                    transition: "all 0.2s ease"
+                  },
+                  onMouseEnter: (e) => {
+                    e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                  },
+                  onMouseLeave: (e) => {
+                    e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+                  },
+                  title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u62E1\u5927\u8868\u793A",
+                  children: /* @__PURE__ */ jsxDEV3(Icon, { type: isZoomed ? "zoomOut" : "zoomIn", size: 20, color: "#667eea" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2523,
+                    columnNumber: 17
+                  }, this)
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2494,
+                  columnNumber: 15
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV3(
+                "canvas",
+                {
+                  ref: canvasRef,
+                  style: {
+                    display: "block",
+                    width: isZoomed ? "auto" : "100%",
+                    height: isZoomed ? "90vh" : "auto",
+                    maxWidth: isZoomed ? "90vw" : "none",
+                    maxHeight: isZoomed ? "90vh" : "none",
+                    objectFit: "contain"
+                  }
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2526,
+                  columnNumber: 15
+                },
+                this
+              )
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2471,
+            columnNumber: 13
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV3("div", { style: {
+          marginTop: "15px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: isMobile ? "8px" : "10px",
+          justifyContent: "center",
+          width: "100%",
+          maxWidth: isMobile ? "100%" : "800px"
+        }, children: [
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleUndo,
+              disabled: !canUndo,
+              style: {
+                ...historyButtonStyle(canUndo),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                  /* @__PURE__ */ jsxDEV3("path", { d: "M3 7v6h6" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2565,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2566,
+                    columnNumber: 19
+                  }, this)
+                ] }, void 0, !0, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2564,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2568,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2550,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleRedo,
+              disabled: !canRedo,
+              style: {
+                ...historyButtonStyle(canRedo),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                  /* @__PURE__ */ jsxDEV3("path", { d: "M21 7v6h-6" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2585,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2586,
+                    columnNumber: 19
+                  }, this)
+                ] }, void 0, !0, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2584,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2588,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2570,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleCenterVertical,
+              disabled: !selectedObject,
+              style: {
+                ...historyButtonStyle(!!selectedObject),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u4E0A\u4E0B\u4E2D\u592E",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsxDEV3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2607,
+                  columnNumber: 19
+                }, this) }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2606,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2609,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2592,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleCenterHorizontal,
+              disabled: !selectedObject,
+              style: {
+                ...historyButtonStyle(!!selectedObject),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u5DE6\u53F3\u4E2D\u592E",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsxDEV3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2626,
+                  columnNumber: 19
+                }, this) }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2625,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2628,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2611,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleBringForward,
+              disabled: !selectedObject,
+              style: {
+                ...historyButtonStyle(!!selectedObject),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u624B\u524D\u306B\u79FB\u52D5",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                  /* @__PURE__ */ jsxDEV3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2647,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2648,
+                    columnNumber: 19
+                  }, this)
+                ] }, void 0, !0, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2646,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2650,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2632,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleSendBackwards,
+              disabled: !selectedObject,
+              style: {
+                ...historyButtonStyle(!!selectedObject),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u5965\u306B\u79FB\u52D5",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                  /* @__PURE__ */ jsxDEV3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2667,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2668,
+                    columnNumber: 19
+                  }, this)
+                ] }, void 0, !0, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2666,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2670,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2652,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleFitToPrintArea,
+              disabled: !selectedObject,
+              style: {
+                ...historyButtonStyle(!!selectedObject),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px"
+              },
+              title: "\u5370\u5237\u9762\u3092\u8986\u3046",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsxDEV3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2689,
+                  columnNumber: 19
+                }, this) }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2688,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2691,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2674,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleRemoveSelected,
+              disabled: !selectedObject,
+              style: {
+                ...historyButtonStyle(!!selectedObject),
+                padding: isMobile ? "8px 10px" : "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "4px",
+                minWidth: isMobile ? "60px" : "70px",
+                backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
+              },
+              title: "\u524A\u9664 (Delete/Backspace)",
+              children: [
+                /* @__PURE__ */ jsxDEV3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                  /* @__PURE__ */ jsxDEV3("polyline", { points: "3 6 5 6 21 6" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2709,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2710,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2711,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("line", { x1: "14", y1: "11", x2: "14", y2: "17" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2712,
+                    columnNumber: 19
+                  }, this)
+                ] }, void 0, !0, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2708,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2714,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2693,
+              columnNumber: 15
+            },
+            this
+          )
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2540,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: {
+          ...infoBoxStyle,
+          width: "100%",
+          maxWidth: isMobile ? "100%" : "800px",
+          backgroundColor: "#ffffff",
+          marginTop: isMobile ? "15px" : "20px",
+          padding: isMobile ? "15px" : "20px"
+        }, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: {
+            marginTop: 0,
+            fontSize: isMobile ? "14px" : "16px"
+          }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2727,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3("ul", { style: {
+            marginBottom: 0,
+            lineHeight: 1.6,
+            paddingLeft: isMobile ? "18px" : "20px",
+            fontSize: isMobile ? "12px" : "13px"
+          }, children: [
+            /* @__PURE__ */ jsxDEV3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2739,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2740,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2741,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2742,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2743,
+              columnNumber: 17
+            }, this)
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2733,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2719,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2464,
+        columnNumber: 11
+      }, this) }, void 0, !1, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2458,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV3("div", { style: {
+        width: isMobile ? "100%" : "min(380px, 30vw)",
+        minWidth: isMobile ? "auto" : "300px",
+        maxWidth: isMobile ? "100%" : "400px",
+        flex: isMobile ? "none" : "0 0 auto",
+        backgroundColor: "#ffffff",
+        overflowY: "auto",
+        overflowX: "hidden",
+        height: isMobile ? "auto" : "100vh",
+        position: isMobile ? "relative" : "sticky",
+        top: 0
+      }, children: /* @__PURE__ */ jsxDEV3("div", { style: {
+        ...panelStyle,
+        padding: isMobile ? "20px 15px" : "24px",
+        wordWrap: "break-word",
+        overflowWrap: "break-word"
+      }, children: [
+        /* @__PURE__ */ jsxDEV3("h2", { style: {
+          marginTop: 0,
+          color: "#333",
+          marginBottom: isMobile ? "15px" : "20px",
+          fontSize: isMobile ? "18px" : "20px"
+        }, children: "\u5546\u54C1\u8A73\u7D30" }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2768,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: sectionStyle, children: /* @__PURE__ */ jsxDEV3("div", { style: {
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "8px",
+          marginBottom: "20px"
+        }, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: { ...sectionTitleStyle, marginTop: 0 }, children: "\u{1F4DD} \u5546\u54C1\u8AAC\u660E" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2785,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV3("p", { style: {
+            fontSize: "14px",
+            color: "#666",
+            lineHeight: "1.6",
+            margin: 0
+          }, children: product.description }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2786,
+            columnNumber: 17
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2779,
+          columnNumber: 15
+        }, this) }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2778,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: sectionStyle, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: sectionTitleStyle, children: "\u{1F3A8} \u672C\u4F53\u30AB\u30E9\u30FC" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2799,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", gap: "12px", marginBottom: "20px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: () => setSelectedColor(color),
+              style: {
+                flex: 1,
+                padding: "12px",
+                border: selectedColor.name === color.name ? "3px solid #667eea" : "2px solid #ddd",
+                borderRadius: "8px",
+                backgroundColor: "white",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "8px"
+              },
+              onMouseEnter: (e) => {
+                selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#999");
+              },
+              onMouseLeave: (e) => {
+                selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#ddd");
+              },
+              children: [
+                /* @__PURE__ */ jsxDEV3(
+                  "div",
+                  {
+                    style: {
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      backgroundColor: color.hex,
+                      border: color.hex === "#FFFFFF" || color.hex === "#F5F5DC" ? "2px solid #e0e0e0" : "none",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                    }
+                  },
+                  void 0,
+                  !1,
+                  {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 2831,
+                    columnNumber: 21
+                  },
+                  this
+                ),
+                /* @__PURE__ */ jsxDEV3("span", { style: {
+                  fontSize: "12px",
+                  fontWeight: selectedColor.name === color.name ? "bold" : "normal",
+                  color: selectedColor.name === color.name ? "#667eea" : "#666"
+                }, children: color.name }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2843,
+                  columnNumber: 21
+                }, this)
+              ]
+            },
+            color.name,
+            !0,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2802,
+              columnNumber: 19
+            },
+            this
+          )) }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2800,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2798,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: sectionStyle, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: sectionTitleStyle, children: "\u{1F4CF} \u30B5\u30A4\u30BA" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2857,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3("div", { style: {
+            display: "grid",
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: "8px",
+            marginBottom: "20px"
+          }, children: sizes.map((size) => /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: () => setSelectedSize(size),
+              style: {
+                padding: "12px 8px",
+                border: selectedSize === size ? "3px solid #667eea" : "2px solid #ddd",
+                borderRadius: "8px",
+                backgroundColor: selectedSize === size ? "#f0f4ff" : "white",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: selectedSize === size ? "bold" : "normal",
+                color: selectedSize === size ? "#667eea" : "#666",
+                transition: "all 0.2s"
+              },
+              onMouseEnter: (e) => {
+                selectedSize !== size && (e.currentTarget.style.backgroundColor = "#f5f5f5");
+              },
+              onMouseLeave: (e) => {
+                selectedSize !== size && (e.currentTarget.style.backgroundColor = "white");
+              },
+              children: size
+            },
+            size,
+            !1,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2865,
+              columnNumber: 19
+            },
+            this
+          )) }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2858,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2856,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("hr", { style: dividerStyle }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2898,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3(
+          "button",
+          {
+            onClick: openCartModal,
+            disabled: isAddingToCart,
+            style: {
+              ...buttonStyle("#5c6ac4", !isAddingToCart),
+              fontSize: isMobile ? "16px" : "18px",
+              fontWeight: "bold",
+              padding: isMobile ? "14px" : "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              marginBottom: "24px"
+            },
+            children: isAddingToCart ? /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }, children: [
+              /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
+                /* @__PURE__ */ jsxDEV3(Icon, { type: "loading", size: 20, color: "white" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2919,
+                  columnNumber: 21
+                }, this),
+                "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D..."
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 2918,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: "13px" }, children: "\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09" }, void 0, !1, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 2922,
+                columnNumber: 19
+              }, this)
+            ] }, void 0, !0, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2917,
+              columnNumber: 17
+            }, this) : /* @__PURE__ */ jsxDEV3(Fragment, { children: [
+              /* @__PURE__ */ jsxDEV3(Icon, { type: "cart", size: 20, color: "white" }, void 0, !1, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 2925,
+                columnNumber: 19
+              }, this),
+              " \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+            ] }, void 0, !0, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2925,
+              columnNumber: 17
+            }, this)
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2901,
+            columnNumber: 13
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV3("hr", { style: dividerStyle }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2929,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("h2", { style: { marginTop: 0, color: "#333" }, children: "\u30C7\u30B6\u30A4\u30F3\u7DE8\u96C6" }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2931,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: sectionStyle, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: sectionTitleStyle, children: "\u{1F4F7} \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2935,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3(
+            "input",
+            {
+              ref: fileInputRef,
+              type: "file",
+              accept: "image/*",
+              multiple: !0,
+              onChange: handleImageUpload,
+              style: { display: "none" }
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2936,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleUploadClick,
+              disabled: isLoading,
+              style: {
+                ...buttonStyle("#3498db", !isLoading),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px"
+              },
+              children: isLoading ? /* @__PURE__ */ jsxDEV3(Fragment, { children: [
+                /* @__PURE__ */ jsxDEV3(Icon, { type: "loading", size: 18, color: "white" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2956,
+                  columnNumber: 21
+                }, this),
+                " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 2956,
+                columnNumber: 19
+              }, this) : /* @__PURE__ */ jsxDEV3(Fragment, { children: [
+                /* @__PURE__ */ jsxDEV3(Icon, { type: "upload", size: 18, color: "white" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 2958,
+                  columnNumber: 21
+                }, this),
+                " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 2958,
+                columnNumber: 19
+              }, this)
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2944,
+              columnNumber: 15
+            },
+            this
+          )
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2934,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("hr", { style: dividerStyle }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2965,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: sectionStyle, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: sectionTitleStyle, children: "\u{1F916} AI\u753B\u50CF\u751F\u6210" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2969,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3(
+            "textarea",
+            {
+              value: aiPrompt,
+              onChange: (e) => setAiPrompt(e.target.value),
+              placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02\u3001\u30AB\u30E9\u30D5\u30EB\u306A\u62BD\u8C61\u753B...",
+              rows: 3,
+              style: textareaStyle,
+              disabled: isGenerating
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2970,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3(
+            "button",
+            {
+              onClick: handleGenerateAI,
+              disabled: isGenerating,
+              style: primaryButtonStyle(isGenerating),
+              children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2978,
+              columnNumber: 15
+            },
+            this
+          ),
+          lastAIPrompt && /* @__PURE__ */ jsxDEV3("p", { style: { fontSize: "12px", color: "#666", marginTop: "10px" }, children: [
+            '\u6700\u5F8C\u306E\u751F\u6210: "',
+            lastAIPrompt,
+            '"'
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2986,
+            columnNumber: 17
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2968,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("hr", { style: dividerStyle }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2992,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("div", { style: sectionStyle, children: [
+          /* @__PURE__ */ jsxDEV3("h3", { style: sectionTitleStyle, children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 2996,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3(
+            "input",
+            {
+              type: "text",
+              value: textInput,
+              onChange: (e) => handleTextInputChange(e.target.value),
+              placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
+              style: inputStyle
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 2997,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", gap: "10px", marginBottom: "10px" }, children: [
+            /* @__PURE__ */ jsxDEV3("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxDEV3("label", { style: labelStyle, children: "\u8272" }, void 0, !1, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3006,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV3(
+                "input",
+                {
+                  type: "color",
+                  value: textColor,
+                  onChange: (e) => handleChangeTextColor(e.target.value),
+                  style: colorInputStyle
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3007,
+                  columnNumber: 19
+                },
+                this
+              )
+            ] }, void 0, !0, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3005,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV3("div", { style: { flex: 1 }, children: [
+              /* @__PURE__ */ jsxDEV3("label", { style: labelStyle, children: [
+                "\u30B5\u30A4\u30BA: ",
+                fontSize,
+                "px"
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3015,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV3(
+                "input",
+                {
+                  type: "range",
+                  min: "10",
+                  max: "100",
+                  value: fontSize,
+                  onChange: (e) => handleChangeFontSize(Number(e.target.value)),
+                  style: { width: "100%" }
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3016,
+                  columnNumber: 19
+                },
+                this
+              )
+            ] }, void 0, !0, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3014,
+              columnNumber: 17
+            }, this)
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3004,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3("label", { style: {
+            fontSize: isMobile ? "12px" : "13px",
+            fontWeight: "600",
+            color: "#333",
+            marginBottom: "8px",
+            display: "block"
+          }, children: "\u30D5\u30A9\u30F3\u30C8\u306E\u9078\u629E" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3026,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3("div", { ref: fontDropdownRef, style: { position: "relative", width: "100%" }, children: [
+            /* @__PURE__ */ jsxDEV3(
+              "div",
+              {
+                onClick: () => setIsFontDropdownOpen(!isFontDropdownOpen),
+                style: {
+                  ...selectStyle,
+                  cursor: "pointer",
+                  fontFamily: FONT_LIST.find((f) => f.value === fontFamily)?.family || fontFamily,
+                  fontSize: isMobile ? "14px" : "16px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                },
+                children: [
+                  /* @__PURE__ */ jsxDEV3("span", { children: FONT_LIST.find((f) => f.value === fontFamily)?.label || fontFamily }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3051,
+                    columnNumber: 19
+                  }, this),
+                  /* @__PURE__ */ jsxDEV3("span", { style: { fontSize: "12px" }, children: isFontDropdownOpen ? "\u25B2" : "\u25BC" }, void 0, !1, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3052,
+                    columnNumber: 19
+                  }, this)
+                ]
+              },
+              void 0,
+              !0,
+              {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3039,
+                columnNumber: 17
+              },
+              this
+            ),
+            isFontDropdownOpen && /* @__PURE__ */ jsxDEV3("div", { style: {
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              backgroundColor: "white",
+              border: "2px solid #4c51bf",
+              borderRadius: "8px",
+              maxHeight: "350px",
+              overflowY: "auto",
+              zIndex: 1e3,
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              marginTop: "4px"
+            }, children: [
+              /* @__PURE__ */ jsxDEV3("div", { style: {
+                display: "flex",
+                borderBottom: "2px solid #e2e8f0",
+                position: "sticky",
+                top: 0,
+                backgroundColor: "white",
+                zIndex: 1001
+              }, children: [
+                /* @__PURE__ */ jsxDEV3(
+                  "button",
+                  {
+                    onClick: (e) => {
+                      e.stopPropagation(), setActiveFontTab("japanese");
+                    },
+                    style: {
+                      flex: 1,
+                      padding: "12px",
+                      border: "none",
+                      backgroundColor: activeFontTab === "japanese" ? "#4c51bf" : "transparent",
+                      color: activeFontTab === "japanese" ? "white" : "#4a5568",
+                      fontWeight: activeFontTab === "japanese" ? "bold" : "normal",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      fontSize: isMobile ? "14px" : "16px"
+                    },
+                    children: "\u65E5\u672C\u8A9E"
+                  },
+                  void 0,
+                  !1,
+                  {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3080,
+                    columnNumber: 23
+                  },
+                  this
+                ),
+                /* @__PURE__ */ jsxDEV3(
+                  "button",
+                  {
+                    onClick: (e) => {
+                      e.stopPropagation(), setActiveFontTab("english");
+                    },
+                    style: {
+                      flex: 1,
+                      padding: "12px",
+                      border: "none",
+                      backgroundColor: activeFontTab === "english" ? "#4c51bf" : "transparent",
+                      color: activeFontTab === "english" ? "white" : "#4a5568",
+                      fontWeight: activeFontTab === "english" ? "bold" : "normal",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      fontSize: isMobile ? "14px" : "16px"
+                    },
+                    children: "English"
+                  },
+                  void 0,
+                  !1,
+                  {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3099,
+                    columnNumber: 23
+                  },
+                  this
+                )
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3072,
+                columnNumber: 21
+              }, this),
+              getFilteredFonts().map((font) => /* @__PURE__ */ jsxDEV3(
+                "div",
+                {
+                  onClick: () => {
+                    handleChangeFontFamily(font.value), setIsFontDropdownOpen(!1);
+                  },
+                  style: {
+                    padding: isMobile ? "10px 12px" : "12px 16px",
+                    cursor: "pointer",
+                    fontFamily: font.family,
+                    fontSize: isMobile ? "14px" : "16px",
+                    borderBottom: "1px solid #eee",
+                    backgroundColor: fontFamily === font.value ? "#f0f0ff" : "transparent",
+                    transition: "background-color 0.2s"
+                  },
+                  onMouseEnter: (e) => {
+                    fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "#f9f9f9");
+                  },
+                  onMouseLeave: (e) => {
+                    fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "transparent");
+                  },
+                  children: font.label
+                },
+                font.value,
+                !1,
+                {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3122,
+                  columnNumber: 23
+                },
+                this
+              ))
+            ] }, void 0, !0, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3057,
+              columnNumber: 19
+            }, this)
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3037,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 2995,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3("hr", { style: dividerStyle }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3156,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3(
+          "button",
+          {
+            onClick: handleClearCanvas,
+            style: {
+              ...buttonStyle("#ff8c42", !0),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px"
+            },
+            children: [
+              /* @__PURE__ */ jsxDEV3(Icon, { type: "refresh", size: 18, color: "white" }, void 0, !1, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3169,
+                columnNumber: 15
+              }, this),
+              " \u3059\u3079\u3066\u30AF\u30EA\u30A2"
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3159,
+            columnNumber: 13
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV3(
+          "button",
+          {
+            onClick: handleSaveDesign,
+            style: {
+              ...buttonStyle("#00b894", !0),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px"
+            },
+            children: [
+              /* @__PURE__ */ jsxDEV3(Icon, { type: "save", size: 18, color: "white" }, void 0, !1, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3181,
+                columnNumber: 15
+              }, this),
+              " \u753B\u50CF\u3068\u3057\u3066\u4FDD\u5B58"
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3171,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2762,
+        columnNumber: 11
+      }, this) }, void 0, !1, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 2750,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2449,
+      columnNumber: 7
+    }, this),
+    showCopyrightModal && /* @__PURE__ */ jsxDEV3("div", { style: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1e4,
+      padding: "20px"
+    }, children: /* @__PURE__ */ jsxDEV3("div", { style: {
+      backgroundColor: "white",
+      borderRadius: "16px",
+      padding: isMobile ? "24px" : "40px",
+      maxWidth: "600px",
+      width: "100%",
+      maxHeight: "80vh",
+      overflowY: "auto",
+      boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)"
+    }, children: [
+      /* @__PURE__ */ jsxDEV3("h2", { style: {
+        fontSize: isMobile ? "20px" : "24px",
+        marginBottom: "20px",
+        color: "#333",
+        fontWeight: "bold",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px"
+      }, children: [
+        /* @__PURE__ */ jsxDEV3(Icon, { type: "clipboard", size: 24, color: "#333" }, void 0, !1, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3221,
+          columnNumber: 15
+        }, this),
+        " \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u524D\u306E\u3054\u78BA\u8A8D"
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 3212,
+        columnNumber: 13
+      }, this),
+      /* @__PURE__ */ jsxDEV3("div", { style: {
+        marginBottom: "24px",
+        fontSize: isMobile ? "14px" : "15px",
+        lineHeight: "1.8",
+        color: "#555"
+      }, children: [
+        /* @__PURE__ */ jsxDEV3("h3", { style: { fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ jsxDEV3(Icon, { type: "check", size: 18, color: "#28a745" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3231,
+            columnNumber: 17
+          }, this),
+          " \u63A8\u5968\u753B\u50CF\u30B5\u30A4\u30BA"
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3230,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDEV3("p", { style: { marginBottom: "16px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "8px" }, children: [
+          /* @__PURE__ */ jsxDEV3("strong", { children: "300 DPI\u4EE5\u4E0A" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3234,
+            columnNumber: 17
+          }, this),
+          "\u306E\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u63A8\u5968\u3057\u307E\u3059\u3002",
+          /* @__PURE__ */ jsxDEV3("br", {}, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3234,
+            columnNumber: 57
+          }, this),
+          "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2: 250mm \xD7 312mm"
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3233,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDEV3("h3", { style: { fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ jsxDEV3(Icon, { type: "warning", size: 18, color: "#ffc107" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3239,
+            columnNumber: 17
+          }, this),
+          " \u8457\u4F5C\u6A29\u30FB\u5229\u7528\u898F\u7D04"
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3238,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDEV3("ul", { style: { paddingLeft: "20px", marginBottom: "16px" }, children: [
+          /* @__PURE__ */ jsxDEV3("li", { style: { marginBottom: "8px" }, children: [
+            /* @__PURE__ */ jsxDEV3("strong", { children: "\u7B2C\u4E09\u8005\u306E\u8457\u4F5C\u6A29\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3243,
+              columnNumber: 19
+            }, this),
+            "\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u306A\u3044\u3067\u304F\u3060\u3055\u3044"
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3242,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV3("li", { style: { marginBottom: "8px" }, children: [
+            /* @__PURE__ */ jsxDEV3("strong", { children: "\u8096\u50CF\u6A29" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3246,
+              columnNumber: 19
+            }, this),
+            "\u3084",
+            /* @__PURE__ */ jsxDEV3("strong", { children: "\u30D7\u30E9\u30A4\u30D0\u30B7\u30FC\u6A29" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3246,
+              columnNumber: 40
+            }, this),
+            "\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF\u306F\u4F7F\u7528\u3067\u304D\u307E\u305B\u3093"
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3245,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV3("li", { style: { marginBottom: "8px" }, children: [
+            /* @__PURE__ */ jsxDEV3("strong", { children: "\u5546\u6A19\u6A29" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3249,
+              columnNumber: 19
+            }, this),
+            "\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF\uFF08\u4F01\u696D\u30ED\u30B4\u306A\u3069\uFF09\u306F\u4F7F\u7528\u3067\u304D\u307E\u305B\u3093"
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3248,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV3("li", { style: { marginBottom: "8px" }, children: [
+            "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3055\u308C\u305F\u753B\u50CF\u306F",
+            /* @__PURE__ */ jsxDEV3("strong", { children: "\u304A\u5BA2\u69D8\u306E\u8CAC\u4EFB" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3252,
+              columnNumber: 31
+            }, this),
+            "\u3067\u7BA1\u7406\u3055\u308C\u307E\u3059"
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3251,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV3("li", { style: { marginBottom: "8px" }, children: [
+            "\u4E0D\u9069\u5207\u306A\u753B\u50CF\u304C\u767A\u898B\u3055\u308C\u305F\u5834\u5408\u3001",
+            /* @__PURE__ */ jsxDEV3("strong", { children: "\u4E88\u544A\u306A\u304F\u524A\u9664" }, void 0, !1, {
+              fileName: "app/components/TShirtCustomizer.tsx",
+              lineNumber: 3255,
+              columnNumber: 34
+            }, this),
+            "\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059"
+          ] }, void 0, !0, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3254,
+            columnNumber: 17
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3241,
+          columnNumber: 15
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 3224,
+        columnNumber: 13
+      }, this),
+      /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", gap: "12px", flexDirection: isMobile ? "column" : "row" }, children: [
+        /* @__PURE__ */ jsxDEV3(
+          "button",
+          {
+            onClick: () => {
+              setShowCopyrightModal(!1), pendingImageRef.current = null, fileInputRef.current && (fileInputRef.current.value = "");
+            },
+            style: {
+              flex: 1,
+              padding: "14px 24px",
+              backgroundColor: "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer"
+            },
+            children: "\u30AD\u30E3\u30F3\u30BB\u30EB"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3261,
+            columnNumber: 15
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV3(
+          "button",
+          {
+            onClick: handleCopyrightAgree,
+            style: {
+              flex: 1,
+              padding: "14px 24px",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer"
+            },
+            children: "\u540C\u610F\u3057\u3066\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3283,
+            columnNumber: 15
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 3260,
+        columnNumber: 13
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 3202,
+      columnNumber: 11
+    }, this) }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 3189,
+      columnNumber: 9
+    }, this),
+    imageQualityWarning && (() => {
+      let isWarning = imageQualityWarning.includes("[WARNING]"), isInfo = imageQualityWarning.includes("[INFO]"), isSuccess = imageQualityWarning.includes("[SUCCESS]"), message = imageQualityWarning.replace("[WARNING]", "").replace("[INFO]", "").replace("[SUCCESS]", "").trim();
+      return /* @__PURE__ */ jsxDEV3("div", { style: {
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        backgroundColor: isWarning ? "#fff3cd" : isInfo ? "#d1ecf1" : "#d4edda",
+        border: `1px solid ${isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745"}`,
+        borderRadius: "8px",
+        padding: "16px 20px",
+        maxWidth: "400px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        zIndex: 9999,
+        fontSize: "13px",
+        whiteSpace: "pre-line",
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px"
+      }, children: [
+        /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", alignItems: "flex-start", gap: "8px" }, children: [
+          /* @__PURE__ */ jsxDEV3(Icon, { type: isWarning ? "warning" : isInfo ? "info" : "check", size: 20, color: isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745" }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3334,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV3("div", { style: { flex: 1 }, children: message }, void 0, !1, {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3335,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/components/TShirtCustomizer.tsx",
+          lineNumber: 3333,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV3(
+          "button",
+          {
+            onClick: () => setImageQualityWarning(null),
+            style: {
+              padding: "8px 16px",
+              backgroundColor: "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "12px",
+              fontWeight: "600"
+            },
+            children: "\u9589\u3058\u308B"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3337,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 3316,
+        columnNumber: 11
+      }, this);
+    })(),
+    isModalOpen && /* @__PURE__ */ jsxDEV3(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1e4,
+          padding: "20px"
+        },
+        onClick: closeCartModal,
+        children: /* @__PURE__ */ jsxDEV3(
+          "div",
+          {
+            style: {
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: isMobile ? "24px" : "32px",
+              maxWidth: "500px",
+              width: "100%",
+              maxHeight: "90vh",
+              overflow: "auto",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)"
+            },
+            onClick: (e) => e.stopPropagation(),
+            children: [
+              /* @__PURE__ */ jsxDEV3("div", { style: { marginBottom: "24px" }, children: [
+                /* @__PURE__ */ jsxDEV3("h2", { style: { margin: 0, fontSize: "24px", color: "#333" }, children: "\u{1F6D2} \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3389,
+                  columnNumber: 15
+                }, this),
+                /* @__PURE__ */ jsxDEV3("p", { style: { margin: "8px 0 0 0", fontSize: "14px", color: "#666" }, children: "\u30B5\u30A4\u30BA\u3068\u500B\u6570\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3392,
+                  columnNumber: 15
+                }, this)
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3388,
+                columnNumber: 13
+              }, this),
+              /* @__PURE__ */ jsxDEV3("div", { style: { marginBottom: "24px" }, children: [
+                /* @__PURE__ */ jsxDEV3("label", { style: { display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }, children: "\u30AB\u30E9\u30FC" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3399,
+                  columnNumber: 15
+                }, this),
+                /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", gap: "12px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxDEV3(
+                  "button",
+                  {
+                    onClick: () => setModalColor(color.name),
+                    style: {
+                      flex: 1,
+                      padding: "12px",
+                      border: modalColor === color.name ? "2px solid #5c6ac4" : "2px solid #ddd",
+                      borderRadius: "8px",
+                      backgroundColor: modalColor === color.name ? "#f0f2ff" : "white",
+                      color: modalColor === color.name ? "#5c6ac4" : "#333",
+                      fontWeight: modalColor === color.name ? "bold" : "normal",
+                      cursor: "pointer",
+                      fontSize: "15px",
+                      transition: "all 0.2s"
+                    },
+                    children: color.name
+                  },
+                  color.name,
+                  !1,
+                  {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3404,
+                    columnNumber: 19
+                  },
+                  this
+                )) }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3402,
+                  columnNumber: 15
+                }, this)
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3398,
+                columnNumber: 13
+              }, this),
+              /* @__PURE__ */ jsxDEV3("div", { style: { marginBottom: "24px" }, children: [
+                /* @__PURE__ */ jsxDEV3("label", { style: { display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }, children: "\u30B5\u30A4\u30BA\u3068\u500B\u6570" }, void 0, !1, {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3428,
+                  columnNumber: 15
+                }, this),
+                ["S", "M", "L", "XL", "XXL"].map((size) => {
+                  let currentQuantity = modalQuantities[modalColor]?.[size] || 0;
+                  return /* @__PURE__ */ jsxDEV3(
+                    "div",
+                    {
+                      style: {
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px 16px",
+                        marginBottom: "8px",
+                        backgroundColor: currentQuantity > 0 ? "#f0f2ff" : "#f8f9fa",
+                        borderRadius: "8px",
+                        border: currentQuantity > 0 ? "2px solid #5c6ac4" : "2px solid transparent"
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxDEV3("span", { style: { fontWeight: "500", fontSize: "16px", color: "#333" }, children: size }, void 0, !1, {
+                          fileName: "app/components/TShirtCustomizer.tsx",
+                          lineNumber: 3447,
+                          columnNumber: 21
+                        }, this),
+                        /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+                          /* @__PURE__ */ jsxDEV3(
+                            "button",
+                            {
+                              onClick: () => {
+                                setModalQuantities((prev) => ({
+                                  ...prev,
+                                  [modalColor]: {
+                                    ...prev[modalColor],
+                                    [size]: Math.max(0, (prev[modalColor]?.[size] || 0) - 1)
+                                  }
+                                }));
+                              },
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                border: "1px solid #ddd",
+                                borderRadius: "6px",
+                                backgroundColor: "white",
+                                cursor: "pointer",
+                                fontSize: "18px",
+                                fontWeight: "bold",
+                                color: "#666"
+                              },
+                              children: "-"
+                            },
+                            void 0,
+                            !1,
+                            {
+                              fileName: "app/components/TShirtCustomizer.tsx",
+                              lineNumber: 3451,
+                              columnNumber: 23
+                            },
+                            this
+                          ),
+                          /* @__PURE__ */ jsxDEV3("span", { style: {
+                            minWidth: "24px",
+                            textAlign: "center",
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                            color: currentQuantity > 0 ? "#5c6ac4" : "#999"
+                          }, children: currentQuantity }, void 0, !1, {
+                            fileName: "app/components/TShirtCustomizer.tsx",
+                            lineNumber: 3475,
+                            columnNumber: 23
+                          }, this),
+                          /* @__PURE__ */ jsxDEV3(
+                            "button",
+                            {
+                              onClick: () => {
+                                setModalQuantities((prev) => ({
+                                  ...prev,
+                                  [modalColor]: {
+                                    ...prev[modalColor],
+                                    [size]: Math.min(99, (prev[modalColor]?.[size] || 0) + 1)
+                                  }
+                                }));
+                              },
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                border: "1px solid #ddd",
+                                borderRadius: "6px",
+                                backgroundColor: "white",
+                                cursor: "pointer",
+                                fontSize: "18px",
+                                fontWeight: "bold",
+                                color: "#666"
+                              },
+                              children: "+"
+                            },
+                            void 0,
+                            !1,
+                            {
+                              fileName: "app/components/TShirtCustomizer.tsx",
+                              lineNumber: 3484,
+                              columnNumber: 23
+                            },
+                            this
+                          )
+                        ] }, void 0, !0, {
+                          fileName: "app/components/TShirtCustomizer.tsx",
+                          lineNumber: 3450,
+                          columnNumber: 21
+                        }, this)
+                      ]
+                    },
+                    size,
+                    !0,
+                    {
+                      fileName: "app/components/TShirtCustomizer.tsx",
+                      lineNumber: 3434,
+                      columnNumber: 19
+                    },
+                    this
+                  );
+                })
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3427,
+                columnNumber: 13
+              }, this),
+              /* @__PURE__ */ jsxDEV3(
+                "div",
+                {
+                  style: {
+                    padding: "16px",
+                    backgroundColor: "#f0f2ff",
+                    borderRadius: "8px",
+                    marginBottom: "24px"
+                  },
+                  children: /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
+                    /* @__PURE__ */ jsxDEV3("span", { style: { fontWeight: "bold", fontSize: "16px", color: "#333" }, children: "\u5408\u8A08" }, void 0, !1, {
+                      fileName: "app/components/TShirtCustomizer.tsx",
+                      lineNumber: 3524,
+                      columnNumber: 17
+                    }, this),
+                    /* @__PURE__ */ jsxDEV3("span", { style: { fontWeight: "bold", fontSize: "20px", color: "#5c6ac4" }, children: [
+                      Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0),
+                      " \u70B9"
+                    ] }, void 0, !0, {
+                      fileName: "app/components/TShirtCustomizer.tsx",
+                      lineNumber: 3527,
+                      columnNumber: 17
+                    }, this)
+                  ] }, void 0, !0, {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3523,
+                    columnNumber: 15
+                  }, this)
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/components/TShirtCustomizer.tsx",
+                  lineNumber: 3515,
+                  columnNumber: 13
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV3("div", { style: { display: "flex", gap: "12px" }, children: [
+                /* @__PURE__ */ jsxDEV3(
+                  "button",
+                  {
+                    onClick: closeCartModal,
+                    style: {
+                      flex: 1,
+                      padding: "14px",
+                      border: "2px solid #ddd",
+                      borderRadius: "8px",
+                      backgroundColor: "white",
+                      color: "#666",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      cursor: "pointer"
+                    },
+                    children: "\u30AD\u30E3\u30F3\u30BB\u30EB"
+                  },
+                  void 0,
+                  !1,
+                  {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3537,
+                    columnNumber: 15
+                  },
+                  this
+                ),
+                /* @__PURE__ */ jsxDEV3(
+                  "button",
+                  {
+                    onClick: handleAddToCartMultiple,
+                    disabled: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0,
+                    style: {
+                      flex: 1,
+                      padding: "14px",
+                      border: "none",
+                      borderRadius: "8px",
+                      backgroundColor: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0 ? "#ccc" : "#5c6ac4",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      cursor: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0 ? "not-allowed" : "pointer"
+                    },
+                    children: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                  },
+                  void 0,
+                  !1,
+                  {
+                    fileName: "app/components/TShirtCustomizer.tsx",
+                    lineNumber: 3553,
+                    columnNumber: 15
+                  },
+                  this
+                )
+              ] }, void 0, !0, {
+                fileName: "app/components/TShirtCustomizer.tsx",
+                lineNumber: 3536,
+                columnNumber: 13
+              }, this)
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/components/TShirtCustomizer.tsx",
+            lineNumber: 3374,
+            columnNumber: 11
+          },
+          this
+        )
+      },
+      void 0,
+      !1,
+      {
+        fileName: "app/components/TShirtCustomizer.tsx",
+        lineNumber: 3358,
+        columnNumber: 9
+      },
+      this
+    )
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 2346,
+    columnNumber: 5
+  }, this) : /* @__PURE__ */ jsxDEV3("div", { style: { padding: "60px", textAlign: "center" }, children: [
+    /* @__PURE__ */ jsxDEV3("h2", { children: "\u23F3 \u8AAD\u307F\u8FBC\u307F\u4E2D..." }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2314,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("p", { style: { color: "#666", marginTop: "20px" }, children: "Fabric.js\u30E9\u30A4\u30D6\u30E9\u30EA\u3092\u8AAD\u307F\u8FBC\u3093\u3067\u3044\u307E\u3059..." }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2315,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("div", { style: {
+      marginTop: "30px",
+      width: "200px",
+      height: "4px",
+      backgroundColor: "#e0e0e0",
+      margin: "30px auto",
+      borderRadius: "2px",
+      overflow: "hidden"
+    }, children: /* @__PURE__ */ jsxDEV3("div", { style: {
+      width: "50%",
+      height: "100%",
+      backgroundColor: "#5c6ac4",
+      animation: "loading 1.5s ease-in-out infinite"
+    } }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2327,
+      columnNumber: 11
+    }, this) }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2318,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV3("style", { children: `
+          @keyframes loading {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(200%); }
+            100% { transform: translateX(-100%); }
+          }
+        ` }, void 0, !1, {
+      fileName: "app/components/TShirtCustomizer.tsx",
+      lineNumber: 2334,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/components/TShirtCustomizer.tsx",
+    lineNumber: 2313,
+    columnNumber: 7
+  }, this);
+}
+var panelStyle = {
+  padding: "24px",
+  backgroundColor: "#fff",
+  borderRadius: "0",
+  boxShadow: "none",
+  height: "100%"
+}, sectionStyle = {
+  marginBottom: "8px"
+}, sectionTitleStyle = {
+  fontSize: "16px",
+  marginBottom: "12px",
+  color: "#333",
+  fontWeight: "600"
+}, dividerStyle = {
+  margin: "24px 0",
+  border: "1px solid #eee"
+}, buttonStyle = (bgColor, enabled) => ({
+  width: "100%",
+  padding: "12px",
+  marginBottom: "10px",
+  backgroundColor: enabled ? bgColor : "#ccc",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "15px",
+  cursor: enabled ? "pointer" : "not-allowed",
+  fontWeight: "500",
+  transition: "all 0.2s"
+}), primaryButtonStyle = (disabled) => ({
+  width: "100%",
+  padding: "14px",
+  backgroundColor: disabled ? "#ccc" : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  background: disabled ? "#ccc" : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "16px",
+  cursor: disabled ? "not-allowed" : "pointer",
+  fontWeight: "bold"
+});
+var historyButtonStyle = (enabled) => ({
+  flex: 1,
+  padding: "12px",
+  backgroundColor: enabled ? "#6c757d" : "#ccc",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "15px",
+  cursor: enabled ? "pointer" : "not-allowed",
+  fontWeight: "600"
+}), inputStyle = {
+  width: "100%",
+  padding: "10px",
+  marginBottom: "10px",
+  border: "1px solid #ddd",
+  borderRadius: "6px",
+  fontSize: "14px",
+  boxSizing: "border-box"
+}, textareaStyle = {
+  width: "100%",
+  padding: "12px",
+  marginBottom: "12px",
+  border: "2px solid #ddd",
+  borderRadius: "8px",
+  fontSize: "14px",
+  boxSizing: "border-box",
+  fontFamily: "inherit",
+  resize: "vertical"
+}, selectStyle = {
+  width: "100%",
+  padding: "10px",
+  marginBottom: "10px",
+  border: "1px solid #ddd",
+  borderRadius: "6px",
+  fontSize: "14px",
+  boxSizing: "border-box"
+}, colorInputStyle = {
+  width: "100%",
+  height: "40px",
+  border: "1px solid #ddd",
+  borderRadius: "6px",
+  cursor: "pointer"
+}, labelStyle = {
+  fontSize: "12px",
+  display: "block",
+  marginBottom: "5px",
+  color: "#666",
+  fontWeight: "500"
+}, infoBoxStyle = {
+  marginTop: "20px",
+  padding: "20px",
+  backgroundColor: "#ffffff",
+  borderRadius: "8px",
+  fontSize: "13px",
+  border: "1px solid #e0e0e0"
+};
+
+// app/lib/products.ts
+var products = [
+  {
+    id: "box-tshirt-short",
+    name: "\u30DC\u30C3\u30AF\u30B9\u30B7\u30EB\u30A8\u30C3\u30C8 / \u534A\u8896T\u30B7\u30E3\u30C4",
+    description: "\u3086\u3063\u305F\u308A\u3068\u3057\u305F\u30DC\u30C3\u30AF\u30B9\u30B7\u30EB\u30A8\u30C3\u30C8\u306E\u534A\u8896T\u30B7\u30E3\u30C4\uFF08\u30E6\u30CB\u30BB\u30C3\u30AF\u30B9\uFF09",
+    price: 2490,
+    category: "tshirt",
+    colors: [
+      { name: "\u30DB\u30EF\u30A4\u30C8", hex: "#FFFFFF" },
+      { name: "\u30D6\u30E9\u30C3\u30AF", hex: "#000000" }
+    ],
+    mockupImage: "/images/products/box-tshirt-short-white.png",
+    printAreaWidth: 200,
+    printAreaHeight: 250
+  },
+  {
+    id: "box-tshirt-long",
+    name: "\u30DC\u30C3\u30AF\u30B9\u30B7\u30EB\u30A8\u30C3\u30C8 / \u9577\u8896T\u30B7\u30E3\u30C4",
+    description: "\u3086\u3063\u305F\u308A\u3068\u3057\u305F\u30DC\u30C3\u30AF\u30B9\u30B7\u30EB\u30A8\u30C3\u30C8\u306E\u9577\u8896T\u30B7\u30E3\u30C4\uFF08\u30E6\u30CB\u30BB\u30C3\u30AF\u30B9\uFF09",
+    price: 2990,
+    category: "longsleeve",
+    colors: [
+      { name: "\u30DB\u30EF\u30A4\u30C8", hex: "#FFFFFF" },
+      { name: "\u30D6\u30E9\u30C3\u30AF", hex: "#000000" }
+    ],
+    mockupImage: "/images/products/box-tshirt-long-white.png",
+    printAreaWidth: 200,
+    printAreaHeight: 250
+  },
+  {
+    id: "sweatshirt",
+    name: "\u30B9\u30A6\u30A7\u30C3\u30C8\u30B7\u30E3\u30C4",
+    description: "\u5FEB\u9069\u306A\u7740\u5FC3\u5730\u306E\u30B9\u30A6\u30A7\u30C3\u30C8\u30B7\u30E3\u30C4\uFF08\u30E6\u30CB\u30BB\u30C3\u30AF\u30B9\uFF09",
+    price: 3990,
+    category: "sweatshirt",
+    colors: [
+      { name: "\u30AA\u30D5\u30DB\u30EF\u30A4\u30C8", hex: "#F5F5DC" },
+      { name: "\u30D6\u30E9\u30C3\u30AF", hex: "#000000" }
+    ],
+    mockupImage: "/images/products/sweatshirt-white.png",
+    printAreaWidth: 220,
+    printAreaHeight: 280
+  },
+  {
+    id: "hoodie",
+    name: "\u30B9\u30A6\u30A7\u30C3\u30C8\u30D7\u30EB\u30D1\u30FC\u30AB",
+    description: "\u30D5\u30FC\u30C9\u4ED8\u304D\u30B9\u30A6\u30A7\u30C3\u30C8\u30D1\u30FC\u30AB\u30FC\uFF08\u30E6\u30CB\u30BB\u30C3\u30AF\u30B9\uFF09",
+    price: 4990,
+    category: "hoodie",
+    colors: [
+      { name: "\u30AA\u30D5\u30DB\u30EF\u30A4\u30C8", hex: "#F5F5DC" },
+      { name: "\u30D6\u30E9\u30C3\u30AF", hex: "#000000" }
+    ],
+    mockupImage: "/images/products/hoodie-white.png",
+    printAreaWidth: 220,
+    printAreaHeight: 280
+  }
+];
+function getProductById(id) {
+  return products.find((p) => p.id === id);
+}
+
+// app/routes/customize.tsx
+import { jsxDEV as jsxDEV4 } from "react/jsx-dev-runtime";
+var meta = () => [
+  { title: "\u30C7\u30B6\u30A4\u30F3\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA | PrintAIze" },
+  {
+    name: "description",
+    content: "AI\u3067\u753B\u50CF\u751F\u6210\u3082\u53EF\u80FD\uFF01\u81EA\u5206\u3060\u3051\u306E\u30AA\u30EA\u30B8\u30CA\u30EB\u30C7\u30B6\u30A4\u30F3\u3092\u4F5C\u6210\u3057\u3088\u3046\uFF01"
+  }
+];
+async function loader2({ request }) {
+  let productId = new URL(request.url).searchParams.get("product");
+  if (!productId)
+    throw new Response("\u5546\u54C1\u304C\u9078\u629E\u3055\u308C\u3066\u3044\u307E\u305B\u3093", { status: 400 });
+  let product = getProductById(productId);
+  if (!product)
+    throw new Response("\u5546\u54C1\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093", { status: 404 });
+  return json7({ product });
+}
+function Customize() {
+  let { product } = useLoaderData2();
+  return /* @__PURE__ */ jsxDEV4(
+    "div",
+    {
+      style: {
+        fontFamily: "system-ui, sans-serif",
+        minHeight: "100vh",
+        backgroundColor: "#f5f5f5"
+      },
+      children: [
+        /* @__PURE__ */ jsxDEV4(
+          "header",
+          {
+            style: {
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              padding: "20px",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+            },
+            children: /* @__PURE__ */ jsxDEV4("div", { style: { maxWidth: "1600px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
+              /* @__PURE__ */ jsxDEV4("div", { children: [
+                /* @__PURE__ */ jsxDEV4("h1", { style: { margin: 0, fontSize: "24px", fontWeight: "bold" }, children: [
+                  "\u{1F3A8} ",
+                  product.name
+                ] }, void 0, !0, {
+                  fileName: "app/routes/customize.tsx",
+                  lineNumber: 60,
+                  columnNumber: 13
+                }, this),
+                /* @__PURE__ */ jsxDEV4("p", { style: { margin: "5px 0 0", opacity: 0.95, fontSize: "14px" }, children: product.description }, void 0, !1, {
+                  fileName: "app/routes/customize.tsx",
+                  lineNumber: 63,
+                  columnNumber: 13
+                }, this)
+              ] }, void 0, !0, {
+                fileName: "app/routes/customize.tsx",
+                lineNumber: 59,
+                columnNumber: 11
+              }, this),
+              /* @__PURE__ */ jsxDEV4(
+                Link,
+                {
+                  to: "/",
+                  style: {
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    color: "white",
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    textDecoration: "none",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    transition: "all 0.2s"
+                  },
+                  onMouseEnter: (e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.3)";
+                  },
+                  onMouseLeave: (e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.2)";
+                  },
+                  children: "\u2190 \u5546\u54C1\u3092\u5909\u66F4"
+                },
+                void 0,
+                !1,
+                {
+                  fileName: "app/routes/customize.tsx",
+                  lineNumber: 67,
+                  columnNumber: 11
+                },
+                this
+              )
+            ] }, void 0, !0, {
+              fileName: "app/routes/customize.tsx",
+              lineNumber: 58,
+              columnNumber: 9
+            }, this)
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/customize.tsx",
+            lineNumber: 50,
+            columnNumber: 7
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV4("main", { style: { padding: "20px 0" }, children: /* @__PURE__ */ jsxDEV4(TShirtCustomizer, { product }, void 0, !1, {
+          fileName: "app/routes/customize.tsx",
+          lineNumber: 94,
+          columnNumber: 9
+        }, this) }, void 0, !1, {
+          fileName: "app/routes/customize.tsx",
+          lineNumber: 93,
+          columnNumber: 7
+        }, this),
+        /* @__PURE__ */ jsxDEV4(
+          "footer",
+          {
+            style: {
+              background: "linear-gradient(135deg, #434343 0%, #000000 100%)",
+              color: "white",
+              padding: "30px 20px",
+              textAlign: "center",
+              marginTop: "60px"
+            },
+            children: /* @__PURE__ */ jsxDEV4("div", { style: { maxWidth: "1600px", margin: "0 auto" }, children: /* @__PURE__ */ jsxDEV4("p", { style: { margin: 0, opacity: 0.8 }, children: "\xA9 2026 PrintAIze | Powered by AI & Shopify" }, void 0, !1, {
+              fileName: "app/routes/customize.tsx",
+              lineNumber: 108,
+              columnNumber: 11
+            }, this) }, void 0, !1, {
+              fileName: "app/routes/customize.tsx",
+              lineNumber: 107,
+              columnNumber: 9
+            }, this)
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/customize.tsx",
+            lineNumber: 98,
+            columnNumber: 7
+          },
+          this
+        )
+      ]
+    },
+    void 0,
+    !0,
+    {
+      fileName: "app/routes/customize.tsx",
+      lineNumber: 42,
+      columnNumber: 5
+    },
+    this
+  );
+}
+
+// app/routes/_index.tsx
+var index_exports = {};
+__export(index_exports, {
+  default: () => Index,
+  meta: () => meta2
+});
+import { Link as Link2 } from "@remix-run/react";
+import { jsxDEV as jsxDEV5 } from "react/jsx-dev-runtime";
+var meta2 = () => [
+  { title: "\u5546\u54C1\u3092\u9078\u629E | PrintAIze" },
+  {
+    name: "description",
+    content: "\u304A\u597D\u307F\u306E\u5546\u54C1\u3092\u9078\u3093\u3067\u30AA\u30EA\u30B8\u30CA\u30EB\u30C7\u30B6\u30A4\u30F3\u3092\u4F5C\u6210\u3057\u307E\u3057\u3087\u3046\uFF01"
+  }
+];
+function Index() {
+  return /* @__PURE__ */ jsxDEV5(
+    "div",
+    {
+      style: {
+        fontFamily: "system-ui, sans-serif",
+        minHeight: "100vh",
+        backgroundColor: "#f5f5f5"
+      },
+      children: [
+        /* @__PURE__ */ jsxDEV5(
+          "header",
+          {
+            style: {
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              padding: "40px 20px",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+            },
+            children: /* @__PURE__ */ jsxDEV5("div", { style: { maxWidth: "1200px", margin: "0 auto", textAlign: "center" }, children: [
+              /* @__PURE__ */ jsxDEV5("h1", { style: { margin: 0, fontSize: "36px", fontWeight: "bold" }, children: "\u{1F3A8} PrintAIze" }, void 0, !1, {
+                fileName: "app/routes/_index.tsx",
+                lineNumber: 38,
+                columnNumber: 11
+              }, this),
+              /* @__PURE__ */ jsxDEV5("p", { style: { margin: "15px 0 0", opacity: 0.95, fontSize: "18px" }, children: "\u4E16\u754C\u306B\u4E00\u3064\u3060\u3051\u306E\u30AA\u30EA\u30B8\u30CA\u30EB\u30C7\u30B6\u30A4\u30F3\u3092\u4F5C\u6210\u3057\u3088\u3046" }, void 0, !1, {
+                fileName: "app/routes/_index.tsx",
+                lineNumber: 41,
+                columnNumber: 11
+              }, this)
+            ] }, void 0, !0, {
+              fileName: "app/routes/_index.tsx",
+              lineNumber: 37,
+              columnNumber: 9
+            }, this)
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/_index.tsx",
+            lineNumber: 29,
+            columnNumber: 7
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV5("main", { style: { padding: "60px 20px", maxWidth: "1200px", margin: "0 auto" }, children: [
+          /* @__PURE__ */ jsxDEV5("div", { style: { textAlign: "center", marginBottom: "50px" }, children: [
+            /* @__PURE__ */ jsxDEV5("h2", { style: { fontSize: "28px", color: "#333", marginBottom: "15px" }, children: "\u5546\u54C1\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044" }, void 0, !1, {
+              fileName: "app/routes/_index.tsx",
+              lineNumber: 50,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDEV5("p", { style: { color: "#666", fontSize: "16px" }, children: "T\u30B7\u30E3\u30C4\u30FB\u30B9\u30A6\u30A7\u30C3\u30C8\u5546\u54C1\u306F\u7537\u5973\u517C\u7528\uFF08\u30E6\u30CB\u30BB\u30C3\u30AF\u30B9\uFF09\u3067\u3059" }, void 0, !1, {
+              fileName: "app/routes/_index.tsx",
+              lineNumber: 53,
+              columnNumber: 11
+            }, this)
+          ] }, void 0, !0, {
+            fileName: "app/routes/_index.tsx",
+            lineNumber: 49,
+            columnNumber: 9
+          }, this),
+          /* @__PURE__ */ jsxDEV5(
+            "div",
+            {
+              style: {
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: "30px",
+                marginBottom: "60px"
+              },
+              children: products.map((product) => /* @__PURE__ */ jsxDEV5(
+                Link2,
+                {
+                  to: `/customize?product=${product.id}`,
+                  style: { textDecoration: "none" },
+                  children: /* @__PURE__ */ jsxDEV5(
+                    "div",
+                    {
+                      style: {
+                        backgroundColor: "white",
+                        borderRadius: "16px",
+                        overflow: "hidden",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                        border: "2px solid transparent"
+                      },
+                      onMouseEnter: (e) => {
+                        e.currentTarget.style.transform = "translateY(-8px)", e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)", e.currentTarget.style.borderColor = "#667eea";
+                      },
+                      onMouseLeave: (e) => {
+                        e.currentTarget.style.transform = "translateY(0)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)", e.currentTarget.style.borderColor = "transparent";
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxDEV5(
+                          "div",
+                          {
+                            style: {
+                              width: "100%",
+                              height: "350px",
+                              backgroundColor: "#FFFFFF",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              position: "relative",
+                              overflow: "hidden"
+                            },
+                            children: [
+                              /* @__PURE__ */ jsxDEV5(
+                                "img",
+                                {
+                                  src: product.mockupImage,
+                                  alt: product.name,
+                                  style: {
+                                    maxWidth: "100%",
+                                    maxHeight: "100%",
+                                    objectFit: "contain"
+                                  },
+                                  onError: (e) => {
+                                    e.currentTarget.style.display = "none";
+                                    let fallback = document.createElement("div");
+                                    fallback.style.fontSize = "80px", fallback.style.opacity = "0.3", fallback.style.color = "#999999", fallback.textContent = product.category === "tshirt" ? "\u{1F455}" : product.category === "longsleeve" ? "\u{1F454}" : (product.category === "sweatshirt", "\u{1F9E5}"), e.currentTarget.parentElement?.appendChild(fallback);
+                                  }
+                                },
+                                void 0,
+                                !1,
+                                {
+                                  fileName: "app/routes/_index.tsx",
+                                  lineNumber: 107,
+                                  columnNumber: 19
+                                },
+                                this
+                              ),
+                              product.id === "box-tshirt-short" && /* @__PURE__ */ jsxDEV5(
+                                "div",
+                                {
+                                  style: {
+                                    position: "absolute",
+                                    top: "15px",
+                                    right: "15px",
+                                    backgroundColor: "#ff6b6b",
+                                    color: "white",
+                                    padding: "6px 12px",
+                                    borderRadius: "20px",
+                                    fontSize: "12px",
+                                    fontWeight: "bold"
+                                  },
+                                  children: "\u4EBA\u6C17"
+                                },
+                                void 0,
+                                !1,
+                                {
+                                  fileName: "app/routes/_index.tsx",
+                                  lineNumber: 131,
+                                  columnNumber: 21
+                                },
+                                this
+                              )
+                            ]
+                          },
+                          void 0,
+                          !0,
+                          {
+                            fileName: "app/routes/_index.tsx",
+                            lineNumber: 95,
+                            columnNumber: 17
+                          },
+                          this
+                        ),
+                        /* @__PURE__ */ jsxDEV5("div", { style: { padding: "24px" }, children: [
+                          /* @__PURE__ */ jsxDEV5(
+                            "h3",
+                            {
+                              style: {
+                                margin: "0 0 10px",
+                                fontSize: "18px",
+                                color: "#333",
+                                fontWeight: "600"
+                              },
+                              children: product.name
+                            },
+                            void 0,
+                            !1,
+                            {
+                              fileName: "app/routes/_index.tsx",
+                              lineNumber: 151,
+                              columnNumber: 19
+                            },
+                            this
+                          ),
+                          /* @__PURE__ */ jsxDEV5(
+                            "p",
+                            {
+                              style: {
+                                margin: "0 0 15px",
+                                fontSize: "14px",
+                                color: "#666",
+                                lineHeight: "1.5"
+                              },
+                              children: product.description
+                            },
+                            void 0,
+                            !1,
+                            {
+                              fileName: "app/routes/_index.tsx",
+                              lineNumber: 161,
+                              columnNumber: 19
+                            },
+                            this
+                          ),
+                          /* @__PURE__ */ jsxDEV5("div", { style: { marginBottom: "15px" }, children: [
+                            /* @__PURE__ */ jsxDEV5("div", { style: { fontSize: "12px", color: "#999", marginBottom: "8px" }, children: "\u30AB\u30E9\u30FC:" }, void 0, !1, {
+                              fileName: "app/routes/_index.tsx",
+                              lineNumber: 174,
+                              columnNumber: 21
+                            }, this),
+                            /* @__PURE__ */ jsxDEV5("div", { style: { display: "flex", gap: "8px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxDEV5(
+                              "div",
+                              {
+                                style: {
+                                  width: "32px",
+                                  height: "32px",
+                                  borderRadius: "50%",
+                                  backgroundColor: color.hex,
+                                  border: color.hex === "#FFFFFF" ? "2px solid #ddd" : "2px solid transparent",
+                                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                                },
+                                title: color.name
+                              },
+                              color.name,
+                              !1,
+                              {
+                                fileName: "app/routes/_index.tsx",
+                                lineNumber: 179,
+                                columnNumber: 25
+                              },
+                              this
+                            )) }, void 0, !1, {
+                              fileName: "app/routes/_index.tsx",
+                              lineNumber: 177,
+                              columnNumber: 21
+                            }, this)
+                          ] }, void 0, !0, {
+                            fileName: "app/routes/_index.tsx",
+                            lineNumber: 173,
+                            columnNumber: 19
+                          }, this),
+                          /* @__PURE__ */ jsxDEV5(
+                            "div",
+                            {
+                              style: {
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                paddingTop: "15px",
+                                borderTop: "1px solid #eee"
+                              },
+                              children: [
+                                /* @__PURE__ */ jsxDEV5("span", { style: { fontSize: "24px", fontWeight: "bold", color: "#667eea" }, children: [
+                                  "\xA5",
+                                  product.price.toLocaleString()
+                                ] }, void 0, !0, {
+                                  fileName: "app/routes/_index.tsx",
+                                  lineNumber: 205,
+                                  columnNumber: 21
+                                }, this),
+                                /* @__PURE__ */ jsxDEV5(
+                                  "span",
+                                  {
+                                    style: {
+                                      fontSize: "14px",
+                                      color: "#667eea",
+                                      fontWeight: "600"
+                                    },
+                                    children: "\u30C7\u30B6\u30A4\u30F3\u958B\u59CB \u2192"
+                                  },
+                                  void 0,
+                                  !1,
+                                  {
+                                    fileName: "app/routes/_index.tsx",
+                                    lineNumber: 208,
+                                    columnNumber: 21
+                                  },
+                                  this
+                                )
+                              ]
+                            },
+                            void 0,
+                            !0,
+                            {
+                              fileName: "app/routes/_index.tsx",
+                              lineNumber: 196,
+                              columnNumber: 19
+                            },
+                            this
+                          )
+                        ] }, void 0, !0, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 150,
+                          columnNumber: 17
+                        }, this)
+                      ]
+                    },
+                    void 0,
+                    !0,
+                    {
+                      fileName: "app/routes/_index.tsx",
+                      lineNumber: 73,
+                      columnNumber: 15
+                    },
+                    this
+                  )
+                },
+                product.id,
+                !1,
+                {
+                  fileName: "app/routes/_index.tsx",
+                  lineNumber: 68,
+                  columnNumber: 13
+                },
+                this
+              ))
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/routes/_index.tsx",
+              lineNumber: 59,
+              columnNumber: 9
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV5(
+            "div",
+            {
+              style: {
+                backgroundColor: "white",
+                borderRadius: "16px",
+                padding: "40px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+              },
+              children: [
+                /* @__PURE__ */ jsxDEV5("h3", { style: { textAlign: "center", fontSize: "24px", marginBottom: "40px", color: "#333" }, children: "\u2728 \u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u6A5F\u80FD" }, void 0, !1, {
+                  fileName: "app/routes/_index.tsx",
+                  lineNumber: 233,
+                  columnNumber: 11
+                }, this),
+                /* @__PURE__ */ jsxDEV5(
+                  "div",
+                  {
+                    style: {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                      gap: "30px"
+                    },
+                    children: [
+                      /* @__PURE__ */ jsxDEV5("div", { style: { textAlign: "center" }, children: [
+                        /* @__PURE__ */ jsxDEV5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u{1F916}" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 244,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "AI\u753B\u50CF\u751F\u6210" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 245,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u30C6\u30AD\u30B9\u30C8\u304B\u3089\u753B\u50CF\u3092\u751F\u6210\u3057\u3066\u3001\u30AA\u30EA\u30B8\u30CA\u30EB\u30C7\u30B6\u30A4\u30F3\u3092\u4F5C\u6210" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 246,
+                          columnNumber: 15
+                        }, this)
+                      ] }, void 0, !0, {
+                        fileName: "app/routes/_index.tsx",
+                        lineNumber: 243,
+                        columnNumber: 13
+                      }, this),
+                      /* @__PURE__ */ jsxDEV5("div", { style: { textAlign: "center" }, children: [
+                        /* @__PURE__ */ jsxDEV5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u{1F4F7}" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 251,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "\u5199\u771F\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 252,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u304A\u6C17\u306B\u5165\u308A\u306E\u5199\u771F\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u81EA\u7531\u306B\u914D\u7F6E" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 253,
+                          columnNumber: 15
+                        }, this)
+                      ] }, void 0, !0, {
+                        fileName: "app/routes/_index.tsx",
+                        lineNumber: 250,
+                        columnNumber: 13
+                      }, this),
+                      /* @__PURE__ */ jsxDEV5("div", { style: { textAlign: "center" }, children: [
+                        /* @__PURE__ */ jsxDEV5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u270F\uFE0F" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 258,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "\u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 259,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u30D5\u30A9\u30F3\u30C8\u30FB\u30B5\u30A4\u30BA\u30FB\u8272\u3092\u81EA\u7531\u306B\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 260,
+                          columnNumber: 15
+                        }, this)
+                      ] }, void 0, !0, {
+                        fileName: "app/routes/_index.tsx",
+                        lineNumber: 257,
+                        columnNumber: 13
+                      }, this),
+                      /* @__PURE__ */ jsxDEV5("div", { style: { textAlign: "center" }, children: [
+                        /* @__PURE__ */ jsxDEV5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u{1F3A8}" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 265,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "\u30D5\u30A3\u30EB\u30BF\u30FC\u52B9\u679C" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 266,
+                          columnNumber: 15
+                        }, this),
+                        /* @__PURE__ */ jsxDEV5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u30B0\u30EC\u30FC\u30B9\u30B1\u30FC\u30EB\u3001\u30BB\u30D4\u30A2\u3001\u660E\u308B\u3055\u8ABF\u6574\u306A\u3069" }, void 0, !1, {
+                          fileName: "app/routes/_index.tsx",
+                          lineNumber: 267,
+                          columnNumber: 15
+                        }, this)
+                      ] }, void 0, !0, {
+                        fileName: "app/routes/_index.tsx",
+                        lineNumber: 264,
+                        columnNumber: 13
+                      }, this)
+                    ]
+                  },
+                  void 0,
+                  !0,
+                  {
+                    fileName: "app/routes/_index.tsx",
+                    lineNumber: 236,
+                    columnNumber: 11
+                  },
+                  this
+                )
+              ]
+            },
+            void 0,
+            !0,
+            {
+              fileName: "app/routes/_index.tsx",
+              lineNumber: 225,
+              columnNumber: 9
+            },
+            this
+          )
+        ] }, void 0, !0, {
+          fileName: "app/routes/_index.tsx",
+          lineNumber: 48,
+          columnNumber: 7
+        }, this),
+        /* @__PURE__ */ jsxDEV5(
+          "footer",
+          {
+            style: {
+              background: "linear-gradient(135deg, #434343 0%, #000000 100%)",
+              color: "white",
+              padding: "40px 20px",
+              textAlign: "center",
+              marginTop: "60px"
+            },
+            children: /* @__PURE__ */ jsxDEV5("div", { style: { maxWidth: "1200px", margin: "0 auto" }, children: [
+              /* @__PURE__ */ jsxDEV5("h3", { style: { marginTop: 0, fontSize: "20px" }, children: "\u2728 AI\u753B\u50CF\u751F\u6210 \xD7 Shopify" }, void 0, !1, {
+                fileName: "app/routes/_index.tsx",
+                lineNumber: 286,
+                columnNumber: 11
+              }, this),
+              /* @__PURE__ */ jsxDEV5("p", { style: { margin: "10px 0", opacity: 0.8 }, children: "Powered by Replicate AI & Shopify Storefront API" }, void 0, !1, {
+                fileName: "app/routes/_index.tsx",
+                lineNumber: 289,
+                columnNumber: 11
+              }, this),
+              /* @__PURE__ */ jsxDEV5("p", { style: { margin: "20px 0 0", fontSize: "14px", opacity: 0.6 }, children: "\xA9 2026 PrintAIze | All Rights Reserved" }, void 0, !1, {
+                fileName: "app/routes/_index.tsx",
+                lineNumber: 292,
+                columnNumber: 11
+              }, this)
+            ] }, void 0, !0, {
+              fileName: "app/routes/_index.tsx",
+              lineNumber: 285,
+              columnNumber: 9
+            }, this)
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/_index.tsx",
+            lineNumber: 276,
+            columnNumber: 7
+          },
+          this
+        )
+      ]
+    },
+    void 0,
+    !0,
+    {
+      fileName: "app/routes/_index.tsx",
+      lineNumber: 21,
+      columnNumber: 5
+    },
+    this
+  );
+}
+
+// server-assets-manifest:@remix-run/dev/assets-manifest
+var assets_manifest_default = { entry: { module: "/build/entry.client-EH7FZAJF.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-UUZ63XC6.js", "/build/_shared/chunk-AM6ZHEVA.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-RKAKVKLP.js", imports: ["/build/_shared/chunk-G7CHZRZX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-POWNVARY.js", imports: ["/build/_shared/chunk-MH6BU3J7.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-FNNDW7FO.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-ZSGAKDLA.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-ULI4CFBA.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-VXH64HIG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-BDW6R7GK.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-OO3JPXKQ.js", imports: ["/build/_shared/chunk-MH6BU3J7.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "30f3d443", hmr: { runtime: "/build/_shared/chunk-AM6ZHEVA.js", timestamp: 1769487044731 }, url: "/build/manifest-30F3D443.js" };
+
+// server-entry-module:@remix-run/dev/server-build
+var mode = "development", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
+  root: {
+    id: "root",
+    parentId: void 0,
+    path: "",
+    index: void 0,
+    caseSensitive: void 0,
+    module: root_exports
+  },
+  "routes/api.add-to-cart-multiple": {
+    id: "routes/api.add-to-cart-multiple",
+    parentId: "root",
+    path: "api/add-to-cart-multiple",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_add_to_cart_multiple_exports
+  },
+  "routes/api.cloudinary-signature": {
+    id: "routes/api.cloudinary-signature",
+    parentId: "root",
+    path: "api/cloudinary-signature",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_cloudinary_signature_exports
+  },
+  "routes/api.generate-image": {
+    id: "routes/api.generate-image",
+    parentId: "root",
+    path: "api/generate-image",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_generate_image_exports
+  },
+  "routes/api.upload-image": {
+    id: "routes/api.upload-image",
+    parentId: "root",
+    path: "api/upload-image",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_upload_image_exports
+  },
+  "routes/api.add-to-cart": {
+    id: "routes/api.add-to-cart",
+    parentId: "root",
+    path: "api/add-to-cart",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_add_to_cart_exports
+  },
+  "routes/customize": {
+    id: "routes/customize",
+    parentId: "root",
+    path: "customize",
+    index: void 0,
+    caseSensitive: void 0,
+    module: customize_exports
+  },
+  "routes/_index": {
+    id: "routes/_index",
+    parentId: "root",
+    path: void 0,
+    index: !0,
+    caseSensitive: void 0,
+    module: index_exports
+  }
+};
+
+// server.js
+var server_default = createRequestHandler({ build: server_build_exports, mode: "development" });
+export {
+  server_default as default
+};
+//# sourceMappingURL=index.js.map

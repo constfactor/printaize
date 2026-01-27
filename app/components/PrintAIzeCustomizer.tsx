@@ -1,5 +1,8 @@
 /**
- * Tシャツカスタマイザーコンポーネント（完全版）
+ * PrintAIze カスタマイザーコンポーネント
+ * AIを活用したオリジナルプリントデザイン作成ツール
+ * 
+ * 機能:
  * - 画像アップロード＆編集
  * - AI画像生成（Replicate）
  * - テキスト追加＆編集
@@ -11,7 +14,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "~/lib/products";
 
-interface TShirtCustomizerProps {
+interface PrintAIzeCustomizerProps {
   product: Product;
 }
 
@@ -226,7 +229,7 @@ const FONT_LIST = [
   { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" },
 ];
 
-export default function TShirtCustomizer({ product }: TShirtCustomizerProps) {
+export default function PrintAIzeCustomizer({ product }: PrintAIzeCustomizerProps) {
   // ========== ステップ1: 状態管理 ==========
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<any>(null);
