@@ -606,6 +606,170 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
     // プリント範囲の境界を取得
     const printArea = getPrintAreaInPixels(canvasSize);
+    
+    // ========== スマホ用：2本指ピンチ＆回転の実装 ==========
+    let touchListenersAdded = false;
+    const canvasElement = canvasRef.current;
+    
+    if (isMobileDevice && canvasElement) {
+      let lastDistance = 0;
+      let lastAngle = 0;
+      let isGesture = false;
+      let lastCenter = { x: 0, y: 0 };
+      
+      const getTouchDistance = (touch1: Touch, touch2: Touch) => {
+        const dx = touch1.clientX - touch2.clientX;
+        const dy = touch1.clientY - touch2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      };
+      
+      const getTouchAngle = (touch1: Touch, touch2: Touch) => {
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        return Math.atan2(dy, dx) * 180 / Math.PI;
+      };
+      
+      const getTouchCenter = (touch1: Touch, touch2: Touch) => {
+        return {
+          x: (touch1.clientX + touch2.clientX) / 2,
+          y: (touch1.clientY + touch2.clientY) / 2,
+        };
+      };
+      
+      const handleTouchStart = (e: TouchEvent) => {
+        if (e.touches.length === 2) {
+          isGesture = true;
+          const activeObject = canvas.getActiveObject();
+          if (activeObject && activeObject.name !== 'printArea') {
+            e.preventDefault();
+            lastDistance = getTouchDistance(e.touches[0], e.touches[1]);
+            lastAngle = getTouchAngle(e.touches[0], e.touches[1]);
+            lastCenter = getTouchCenter(e.touches[0], e.touches[1]);
+            
+            // 四隅のコントロールを非表示にして、ピンチ操作に集中
+            activeObject.setControlsVisibility({
+              mt: false,
+              mb: false,
+              ml: false,
+              mr: false,
+              tl: false,
+              tr: false,
+              bl: false,
+              br: false,
+              mtr: false,
+            });
+            canvas.renderAll();
+          }
+        }
+      };
+      
+      const handleTouchMove = (e: TouchEvent) => {
+        if (e.touches.length === 2 && isGesture) {
+          const activeObject = canvas.getActiveObject();
+          if (activeObject && activeObject.name !== 'printArea') {
+            e.preventDefault();
+            
+            // 中心点の移動を計算
+            const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
+            const rect = canvasElement.getBoundingClientRect();
+            const canvasScale = canvasSize / rect.width; // キャンバスの実際のスケール
+            
+            if (lastCenter.x !== 0) {
+              const dx = (currentCenter.x - lastCenter.x) * canvasScale;
+              const dy = (currentCenter.y - lastCenter.y) * canvasScale;
+              activeObject.left = (activeObject.left || 0) + dx;
+              activeObject.top = (activeObject.top || 0) + dy;
+            }
+            lastCenter = currentCenter;
+            
+            // ピンチイン・ピンチアウト（拡大縮小）
+            const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+            if (lastDistance > 0) {
+              const scale = currentDistance / lastDistance;
+              const newScaleX = (activeObject.scaleX || 1) * scale;
+              const newScaleY = (activeObject.scaleY || 1) * scale;
+              
+              // 最小・最大サイズ制限
+              if (newScaleX > 0.1 && newScaleX < 10 && newScaleY > 0.1 && newScaleY < 10) {
+                activeObject.scaleX = newScaleX;
+                activeObject.scaleY = newScaleY;
+              }
+            }
+            lastDistance = currentDistance;
+            
+            // 回転
+            const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
+            if (lastAngle !== 0) {
+              const angleDiff = currentAngle - lastAngle;
+              activeObject.angle = (activeObject.angle || 0) + angleDiff;
+            }
+            lastAngle = currentAngle;
+            
+            // 位置を更新して範囲チェック
+            activeObject.setCoords();
+            const objBounds = activeObject.getBoundingRect(true);
+            
+            // 範囲内に収める
+            if (objBounds.left < printArea.left) {
+              activeObject.left += (printArea.left - objBounds.left);
+            }
+            if (objBounds.top < printArea.top) {
+              activeObject.top += (printArea.top - objBounds.top);
+            }
+            if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
+              activeObject.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
+            }
+            if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
+              activeObject.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
+            }
+            
+            activeObject.setCoords();
+            canvas.renderAll();
+          }
+        }
+      };
+      
+      const handleTouchEnd = (e: TouchEvent) => {
+        if (e.touches.length < 2) {
+          isGesture = false;
+          lastDistance = 0;
+          lastAngle = 0;
+          lastCenter = { x: 0, y: 0 };
+          
+          // コントロールを再表示
+          const activeObject = canvas.getActiveObject();
+          if (activeObject && activeObject.name !== 'printArea') {
+            activeObject.setControlsVisibility({
+              mt: false,
+              mb: false,
+              ml: false,
+              mr: false,
+              tl: true,
+              tr: true,
+              bl: true,
+              br: true,
+              mtr: true,
+              deleteControl: true,
+            });
+            canvas.renderAll();
+            saveHistory();
+          }
+        }
+      };
+      
+      canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+      canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvasElement.addEventListener('touchend', handleTouchEnd);
+      touchListenersAdded = true;
+      
+      // クリーンアップ用の参照を保存
+      (canvas as any)._touchHandlers = {
+        element: canvasElement,
+        start: handleTouchStart,
+        move: handleTouchMove,
+        end: handleTouchEnd,
+      };
+    }
 
     // 画像の移動・スケール・回転制限（範囲内に収める）
     canvas.on("object:moving", (e: any) => {
@@ -963,6 +1127,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     // クリーンアップ
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      
+      // タッチイベントリスナーを削除
+      if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._touchHandlers) {
+        const handlers = (fabricCanvasRef.current as any)._touchHandlers;
+        handlers.element.removeEventListener('touchstart', handlers.start);
+        handlers.element.removeEventListener('touchmove', handlers.move);
+        handlers.element.removeEventListener('touchend', handlers.end);
+      }
+      
       if (fabricCanvasRef.current) {
         fabricCanvasRef.current.dispose();
       }
