@@ -401,9 +401,14 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
   // ========== ステップ1.5: Fabric.js読み込み待機 ==========
   useEffect(() => {
+    console.log('🔵 Fabric.js読み込みチェック開始');
+    
     // Fabric.jsがグローバルに読み込まれるまで待つ
+    let checkCount = 0;
     const checkFabric = setInterval(() => {
+      checkCount++;
       if (typeof window !== 'undefined' && typeof (window as any).fabric !== 'undefined') {
+        console.log('✅ Fabric.js読み込み成功！（' + checkCount + '回目のチェック）');
         setFabricLoaded(true);
         clearInterval(checkFabric);
       }
@@ -413,7 +418,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     const timeout = setTimeout(() => {
       clearInterval(checkFabric);
       if (!fabricLoaded) {
-        console.error('Fabric.jsの読み込みに失敗しました');
+        console.error('❌ Fabric.jsの読み込みに失敗しました（10秒タイムアウト）');
+        console.error('window.fabric:', typeof (window as any).fabric);
       }
     }, 10000);
 
