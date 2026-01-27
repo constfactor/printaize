@@ -455,15 +455,32 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
     fabricCanvasRef.current = canvas;
     setIsFabricReady(true);
+    
+    // コントロールサイズを設定（モバイルは大きく、PCは通常サイズ）
+    const isMobileDevice = window.innerWidth < 768;
+    const controlSize = isMobileDevice ? 32 : 24; // モバイル: 32px, PC: 24px
+    const cornerSize = isMobileDevice ? 28 : 20; // 角のコントロールサイズ
+    
+    // デフォルトコントロールのサイズを変更
+    fabricLib.Object.prototype.set({
+      borderColor: '#667eea',
+      cornerColor: '#667eea',
+      cornerStyle: 'circle',
+      transparentCorners: false,
+      cornerSize: cornerSize,
+      touchCornerSize: isMobileDevice ? 40 : cornerSize, // タッチ時はさらに大きく
+      padding: isMobileDevice ? 10 : 5,
+    });
 
     // カスタム削除コントロールを追加
     const deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
     
+    const deleteControlSize = isMobileDevice ? 32 : 24; // モバイルで大きく
     const deleteControl = new fabricLib.Control({
       x: 0.5,
       y: -0.5,
-      offsetY: -16,
-      offsetX: 16,
+      offsetY: isMobileDevice ? -20 : -16,
+      offsetX: isMobileDevice ? 20 : 16,
       cursorStyle: 'pointer',
       mouseUpHandler: (eventData: any, transform: any) => {
         const target = transform.target;
@@ -489,14 +506,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         return true;
       },
       render: (ctx: CanvasRenderingContext2D, left: number, top: number, styleOverride: any, fabricObject: any) => {
-        const size = 24;
         ctx.save();
         ctx.translate(left, top);
         ctx.rotate(fabricLib.util.degreesToRadians(fabricObject.angle || 0));
-        ctx.drawImage(deleteImg, -size / 2, -size / 2, size, size);
+        ctx.drawImage(deleteImg, -deleteControlSize / 2, -deleteControlSize / 2, deleteControlSize, deleteControlSize);
         ctx.restore();
       },
-      cornerSize: 24
+      cornerSize: deleteControlSize
     });
 
     // 削除アイコン画像を読み込む
@@ -2595,8 +2611,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     const centerX = printArea.left + printArea.width / 2;
                     const centerY = printArea.top + printArea.height / 2;
                     
-                    // ズーム倍率（2倍）
-                    const zoom = 1.7;
+                    // ズーム倍率（スマホ: 2倍、PC: 1.7倍）
+                    const zoom = isMobile ? 2.0 : 1.7;
                     
                     // ズーム後の表示位置を計算（プリントエリアが中央に来るように）
                     const point = new (window as any).fabric.Point(centerX, centerY);
