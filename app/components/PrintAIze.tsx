@@ -639,7 +639,26 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       const handleTouchStart = (e: TouchEvent) => {
         if (e.touches.length === 2) {
           isGesture = true;
-          const activeObject = canvas.getActiveObject();
+          let activeObject = canvas.getActiveObject();
+          
+          // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
+          if (!activeObject || activeObject.name === 'printArea') {
+            const rect = canvasElement.getBoundingClientRect();
+            const canvasScale = canvasSize / rect.width;
+            const touch1 = e.touches[0];
+            const pointer = {
+              x: (touch1.clientX - rect.left) * canvasScale,
+              y: (touch1.clientY - rect.top) * canvasScale,
+            };
+            
+            // タッチ位置にあるオブジェクトを検索
+            const target = canvas.findTarget(e as any, false);
+            if (target && target.name !== 'printArea') {
+              canvas.setActiveObject(target);
+              activeObject = target;
+            }
+          }
+          
           if (activeObject && activeObject.name !== 'printArea') {
             e.preventDefault();
             lastDistance = getTouchDistance(e.touches[0], e.touches[1]);
