@@ -405,10 +405,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     
     // Fabric.jsがグローバルに読み込まれるまで待つ
     let checkCount = 0;
+    let isLoaded = false;
+    
     const checkFabric = setInterval(() => {
       checkCount++;
       if (typeof window !== 'undefined' && typeof (window as any).fabric !== 'undefined') {
         console.log('✅ Fabric.js読み込み成功！（' + checkCount + '回目のチェック）');
+        isLoaded = true;
         setFabricLoaded(true);
         clearInterval(checkFabric);
       }
@@ -417,7 +420,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     // タイムアウト（10秒後）
     const timeout = setTimeout(() => {
       clearInterval(checkFabric);
-      if (!fabricLoaded) {
+      if (!isLoaded) {
         console.error('❌ Fabric.jsの読み込みに失敗しました（10秒タイムアウト）');
         console.error('window.fabric:', typeof (window as any).fabric);
       }
@@ -643,9 +646,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       };
       
       const handleTouchStart = (e: TouchEvent) => {
-        console.log('🔵 Touch start - fingers:', e.touches.length);
+        console.log('🔵 Touch start - fingers:', e.touches.length, 'target:', e.target);
         
         if (e.touches.length === 2) {
+          // 2本指タッチ時はページズームを無効化
+          canvasElement.style.touchAction = 'none';
+          
           isGesture = true;
           let activeObject = canvas.getActiveObject();
           
@@ -675,6 +681,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           if (activeObject && activeObject.name !== 'printArea') {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             
             console.log('✅ Starting pinch gesture');
             
@@ -776,6 +783,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         if (e.touches.length < 2) {
           console.log('🔵 Touch end - gesture complete');
           
+          // touchActionを元に戻す
+          canvasElement.style.touchAction = 'pan-y';
+          
           isGesture = false;
           lastDistance = 0;
           lastAngle = 0;
@@ -805,12 +815,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         }
       };
       
-      canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-      canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-      canvasElement.addEventListener('touchend', handleTouchEnd);
+      // キャプチャフェーズで処理（Fabric.jsより先に実行される）
+      canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
+      canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+      canvasElement.addEventListener('touchend', handleTouchEnd, { capture: true });
       touchListenersAdded = true;
       
-      console.log('✅ Touch event listeners added for pinch gestures');
+      console.log('✅ Touch event listeners added for pinch gestures (with capture phase)');
       
       // クリーンアップ用の参照を保存
       (canvas as any)._touchHandlers = {
@@ -1178,12 +1189,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       
-      // タッチイベントリスナーを削除
+      // タッチイベントリスナーを削除（captureフェーズで追加したので、削除もcaptureで）
       if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._touchHandlers) {
         const handlers = (fabricCanvasRef.current as any)._touchHandlers;
-        handlers.element.removeEventListener('touchstart', handlers.start);
-        handlers.element.removeEventListener('touchmove', handlers.move);
-        handlers.element.removeEventListener('touchend', handlers.end);
+        handlers.element.removeEventListener('touchstart', handlers.start, { capture: true });
+        handlers.element.removeEventListener('touchmove', handlers.move, { capture: true });
+        handlers.element.removeEventListener('touchend', handlers.end, { capture: true });
       }
       
       if (fabricCanvasRef.current) {
