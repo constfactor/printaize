@@ -301,8 +301,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   });
   
   // 商品選択関連
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState<string>("M");
+  const [selectedColor, setSelectedColor] = useState<"white" | "black">("white");
+  const [selectedSize, setSelectedSize] = useState<"S" | "M" | "L" | "XL" | "XXL">("M");
   
   const sizes = ["S", "M", "L", "XL", "XXL"];
 
@@ -3032,6 +3032,25 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         flex: 1,
         overflow: "hidden",
       }}>
+        {/* モバイルでは商品画像を先に表示 */}
+        {isMobile && (
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            style={{
+              width: "100%",
+              backgroundColor: "#f5f5f7",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "40px 20px",
+              position: "relative",
+            }}
+          >
+            <canvas ref={canvasRef} style={{ maxWidth: "100%", height: "auto" }} />
+          </motion.div>
+        )}
         {/* 左カラム: タブ + コンテンツ */}
         <motion.div
           style={{
@@ -3089,8 +3108,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             </motion.div>
           )}
 
-          {/* タブメニュー / 編集ツール（モバイル時、オブジェクト選択で切り替え） */}
-        {isMobile ? (
+          {/* タブメニュー（モバイル時） */}
+        {isMobile && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -3104,11 +3123,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               overflowX: "auto",
             }}
           >
-            {/* モバイルでオブジェクト未選択時: タブメニュー */}
-            {!selectedObject && [
+            {[
               { id: "item" as TabType, label: "アイテム" },
-              { id: "ai" as TabType, label: "AI" },
-              { id: "images" as TabType, label: "画像" },
+              { id: "ai" as TabType, label: "AI画像生成" },
+              { id: "images" as TabType, label: "画像管理" },
               { id: "text" as TabType, label: "テキスト" },
             ].map((tab) => (
               <motion.button
@@ -3136,149 +3154,162 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 {tab.label}
               </motion.button>
             ))}
-          
-          {/* モバイルでオブジェクト選択時: 編集ツール */}
-          {isMobile && selectedObject && (
-            <>
-              <motion.button
-                onClick={undo}
-                disabled={!canUndo}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: canUndo ? "#fff" : "#f5f5f7",
-                  color: canUndo ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: canUndo ? "pointer" : "not-allowed",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                ↶
-              </motion.button>
-              <motion.button
-                onClick={redo}
-                disabled={!canRedo}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.05 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: canRedo ? "#fff" : "#f5f5f7",
-                  color: canRedo ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: canRedo ? "pointer" : "not-allowed",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                ↷
-              </motion.button>
-              <motion.button
-                onClick={centerVertically}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: "#fff",
-                  color: "#1d1d1f",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                上下
-              </motion.button>
-              <motion.button
-                onClick={centerHorizontally}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.15 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: "#fff",
-                  color: "#1d1d1f",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                左右
-              </motion.button>
-              <motion.button
-                onClick={bringForward}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.2 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: "#fff",
-                  color: "#1d1d1f",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                手前
-              </motion.button>
-              <motion.button
-                onClick={sendBackward}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.25 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: "#fff",
-                  color: "#1d1d1f",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                奥
-              </motion.button>
-              <motion.button
-                onClick={fitToPrintArea}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, delay: 0.3 }}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "980px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: "#fff",
-                  color: "#1d1d1f",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                最大
-              </motion.button>
-            </>
-          )}
           </motion.div>
-        ) : null}
+        )}
+
+        {/* カラー＆サイズ選択、カートに追加（モバイルのみ） */}
+        {isMobile && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            style={{
+              padding: "20px",
+              borderBottom: "1px solid #f0f0f0",
+            }}
+          >
+            {/* 本体カラー */}
+            <div style={{ marginBottom: "24px" }}>
+              <h3 style={{
+                fontSize: "14px",
+                fontWeight: "600",
+                color: "#1d1d1f",
+                marginBottom: "12px",
+              }}>
+                本体カラー
+              </h3>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "12px",
+              }}>
+                <motion.button
+                  onClick={() => setSelectedColor("white")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    padding: "20px",
+                    borderRadius: "16px",
+                    border: selectedColor === "white" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
+                    backgroundColor: "#ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "8px",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <div style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    backgroundColor: "#ffffff",
+                    border: "2px solid #d2d2d7",
+                  }} />
+                  <span style={{
+                    fontSize: "13px",
+                    fontWeight: "500",
+                    color: "#1d1d1f",
+                  }}>
+                    ホワイト
+                  </span>
+                </motion.button>
+                <motion.button
+                  onClick={() => setSelectedColor("black")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    padding: "20px",
+                    borderRadius: "16px",
+                    border: selectedColor === "black" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
+                    backgroundColor: "#ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "8px",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <div style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1d1d1f",
+                  }} />
+                  <span style={{
+                    fontSize: "13px",
+                    fontWeight: "500",
+                    color: "#1d1d1f",
+                  }}>
+                    ブラック
+                  </span>
+                </motion.button>
+              </div>
+            </div>
+
+            {/* サイズ */}
+            <div style={{ marginBottom: "24px" }}>
+              <h3 style={{
+                fontSize: "14px",
+                fontWeight: "600",
+                color: "#1d1d1f",
+                marginBottom: "12px",
+              }}>
+                サイズ
+              </h3>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: "8px",
+              }}>
+                {(["S", "M", "L", "XL", "XXL"] as const).map((size) => (
+                  <motion.button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      padding: "12px 8px",
+                      borderRadius: "980px",
+                      border: selectedSize === size ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
+                      backgroundColor: selectedSize === size ? "#f5f5f7" : "#ffffff",
+                      color: "#1d1d1f",
+                      fontSize: "13px",
+                      fontWeight: selectedSize === size ? "600" : "500",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {size}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* カートに追加ボタン */}
+            <motion.button
+              onClick={() => setIsModalOpen(true)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: "980px",
+                border: "none",
+                backgroundColor: "#1d1d1f",
+                color: "#ffffff",
+                fontSize: "15px",
+                fontWeight: "600",
+                cursor: "pointer",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              カートに追加
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* デスクトップ: アコーディオン形式のタブメニュー */}
         {!isMobile && (
@@ -3295,6 +3326,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 borderRadius: activeTab === "item" ? "24px" : "980px", // Pill → Box
                 backgroundColor: activeTab === "item" ? "#f5f5f7" : "#ffffff",
                 padding: activeTab === "item" ? "24px" : "0", // ボタン内部のpadding
+                width: activeTab === "item" ? "100%" : "fit-content", // 開いた時は100%、閉じた時はfit-content
               }}
               transition={{ 
                 layout: {
@@ -3312,8 +3344,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 border: "1.5px solid #d2d2d7",
                 marginBottom: "12px",
                 overflow: "hidden",
-                willChange: "border-radius, background-color, padding",
-                width: "fit-content", // テキスト内容に合わせた自然な幅
+                willChange: "border-radius, background-color, padding, width",
               }}
             >
               {/* ヘッダーボタン */}
@@ -3417,6 +3448,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 borderRadius: activeTab === "ai" ? "24px" : "980px",
                 backgroundColor: activeTab === "ai" ? "#f5f5f7" : "#ffffff",
                 padding: activeTab === "ai" ? "24px" : "0",
+                width: activeTab === "ai" ? "100%" : "fit-content",
               }}
               transition={{ 
                 layout: {
@@ -3434,8 +3466,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 border: "1.5px solid #d2d2d7",
                 marginBottom: "12px",
                 overflow: "hidden",
-                willChange: "border-radius, background-color, padding",
-                width: "fit-content",
+                willChange: "border-radius, background-color, padding, width",
               }}
             >
               <motion.button
@@ -3585,6 +3616,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 borderRadius: activeTab === "images" ? "24px" : "980px",
                 backgroundColor: activeTab === "images" ? "#f5f5f7" : "#ffffff",
                 padding: activeTab === "images" ? "24px" : "0",
+                width: activeTab === "images" ? "100%" : "fit-content",
               }}
               transition={{ 
                 layout: {
@@ -3602,8 +3634,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 border: "1.5px solid #d2d2d7",
                 marginBottom: "12px",
                 overflow: "hidden",
-                willChange: "border-radius, background-color, padding",
-                width: "fit-content",
+                willChange: "border-radius, background-color, padding, width",
               }}
             >
               <motion.button
@@ -3770,6 +3801,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 borderRadius: activeTab === "text" ? "24px" : "980px",
                 backgroundColor: activeTab === "text" ? "#f5f5f7" : "#ffffff",
                 padding: activeTab === "text" ? "24px" : "0",
+                width: activeTab === "text" ? "100%" : "fit-content",
               }}
               transition={{ 
                 layout: {
@@ -3787,8 +3819,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 border: "1.5px solid #d2d2d7",
                 marginBottom: "12px",
                 overflow: "hidden",
-                willChange: "border-radius, background-color, padding",
-                width: "fit-content",
+                willChange: "border-radius, background-color, padding, width",
               }}
             >
               <motion.button
@@ -4264,7 +4295,140 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           )}
         </AnimatePresence>
 
-        {/* 編集ツール（デスクトップのみ） */}
+        {/* カラー＆サイズ選択、カートに追加（デスクトップのみ） */}
+        {!isMobile && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            style={{
+              padding: "40px",
+              borderTop: "1px solid #f0f0f0",
+            }}
+          >
+            {/* 本体カラー */}
+            <div style={{ marginBottom: "32px" }}>
+              <h3 style={{
+                fontSize: "15px",
+                fontWeight: "600",
+                color: "#1d1d1f",
+                marginBottom: "16px",
+              }}>
+                本体カラー
+              </h3>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "12px",
+              }}>
+                <motion.button
+                  onClick={() => setSelectedColor("white")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    padding: "24px",
+                    borderRadius: "16px",
+                    border: selectedColor === "white" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
+                    backgroundColor: "#ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "12px",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <div style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    backgroundColor: "#ffffff",
+                    border: "2px solid #d2d2d7",
+                  }} />
+                  <span style={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#1d1d1f",
+                  }}>
+                    ホワイト
+                  </span>
+                </motion.button>
+                <motion.button
+                  onClick={() => setSelectedColor("black")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    padding: "24px",
+                    borderRadius: "16px",
+                    border: selectedColor === "black" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
+                    backgroundColor: "#ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "12px",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <div style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1d1d1f",
+                  }} />
+                  <span style={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#1d1d1f",
+                  }}>
+                    ブラック
+                  </span>
+                </motion.button>
+              </div>
+            </div>
+
+            {/* サイズ */}
+            <div style={{ marginBottom: "32px" }}>
+              <h3 style={{
+                fontSize: "15px",
+                fontWeight: "600",
+                color: "#1d1d1f",
+                marginBottom: "16px",
+              }}>
+                サイズ
+              </h3>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: "8px",
+              }}>
+                {(["S", "M", "L", "XL", "XXL"] as const).map((size) => (
+                  <motion.button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      padding: "12px 8px",
+                      borderRadius: "980px",
+                      border: selectedSize === size ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
+                      backgroundColor: selectedSize === size ? "#f5f5f7" : "#ffffff",
+                      color: "#1d1d1f",
+                      fontSize: "14px",
+                      fontWeight: selectedSize === size ? "600" : "500",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {size}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* カートに追加ボタン（デスクトップのみ） */}
         {!isMobile && (
           <motion.div
             style={{
@@ -4272,195 +4436,46 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               borderTop: "1px solid #f0f0f0",
             }}
           >
-            <h3 style={{
-              fontSize: "15px",
-              fontWeight: "600",
-              color: "#1d1d1f",
-              marginBottom: "16px",
-            }}>
-              編集ツール
-            </h3>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "12px",
-            }}>
-              <motion.button
-                onClick={undo}
-                disabled={!canUndo}
-                whileHover={canUndo ? { scale: 1.05 } : {}}
-                whileTap={canUndo ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: canUndo ? "#fff" : "#f5f5f7",
-                  color: canUndo ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: canUndo ? "pointer" : "not-allowed",
-                }}
-              >
-                ↶ 元に戻す
-              </motion.button>
-              <motion.button
-                onClick={redo}
-                disabled={!canRedo}
-                whileHover={canRedo ? { scale: 1.05 } : {}}
-                whileTap={canRedo ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: canRedo ? "#fff" : "#f5f5f7",
-                  color: canRedo ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: canRedo ? "pointer" : "not-allowed",
-                }}
-              >
-                ↷ やり直し
-              </motion.button>
-              <motion.button
-                onClick={centerVertically}
-                disabled={!selectedObject}
-                whileHover={selectedObject ? { scale: 1.05 } : {}}
-                whileTap={selectedObject ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                  color: selectedObject ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: selectedObject ? "pointer" : "not-allowed",
-                }}
-              >
-                上下中央
-              </motion.button>
-              <motion.button
-                onClick={centerHorizontally}
-                disabled={!selectedObject}
-                whileHover={selectedObject ? { scale: 1.05 } : {}}
-                whileTap={selectedObject ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                  color: selectedObject ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: selectedObject ? "pointer" : "not-allowed",
-                }}
-              >
-                左右中央
-              </motion.button>
-              <motion.button
-                onClick={bringForward}
-                disabled={!selectedObject}
-                whileHover={selectedObject ? { scale: 1.05 } : {}}
-                whileTap={selectedObject ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                  color: selectedObject ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: selectedObject ? "pointer" : "not-allowed",
-                }}
-              >
-                手前へ
-              </motion.button>
-              <motion.button
-                onClick={sendBackward}
-                disabled={!selectedObject}
-                whileHover={selectedObject ? { scale: 1.05 } : {}}
-                whileTap={selectedObject ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                  color: selectedObject ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: selectedObject ? "pointer" : "not-allowed",
-                }}
-              >
-                奥へ
-              </motion.button>
-              <motion.button
-                onClick={fitToPrintArea}
-                disabled={!selectedObject}
-                whileHover={selectedObject ? { scale: 1.05 } : {}}
-                whileTap={selectedObject ? { scale: 0.95 } : {}}
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1.5px solid #d2d2d7",
-                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                  color: selectedObject ? "#1d1d1f" : "#86868b",
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  cursor: selectedObject ? "pointer" : "not-allowed",
-                  gridColumn: "1 / -1",
-                }}
-              >
-                プリント範囲最大
-              </motion.button>
-            </div>
+            <motion.button
+              onClick={() => setIsModalOpen(true)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                width: "100%",
+                padding: "16px",
+                borderRadius: "980px",
+                border: "none",
+                backgroundColor: "#1d1d1f",
+                color: "#ffffff",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              カートに追加
+            </motion.button>
           </motion.div>
         )}
-
-        {/* カートに追加ボタン */}
-        <motion.div
-          style={{
-            padding: isMobile ? "20px" : "40px",
-            borderTop: "1px solid #f0f0f0",
-          }}
-        >
-          <motion.button
-            onClick={() => setIsModalOpen(true)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            style={{
-              width: "100%",
-              padding: "16px 24px",
-              borderRadius: "12px",
-              border: "none",
-              backgroundColor: "#0071e3",
-              color: "#ffffff",
-              fontSize: "17px",
-              fontWeight: "500",
-              cursor: "pointer",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            カートに追加
-          </motion.button>
-        </motion.div>
       </motion.div>
 
-        {/* 右カラム: Tシャツモックアップ */}
-        <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          style={{
-            width: isMobile ? "100%" : "60%",
-            height: "100%",
-            backgroundColor: "#f5f5f7",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-            padding: isMobile ? "20px" : "40px",
-          }}
-        >
+        {/* 右カラム: Tシャツモックアップ（デスクトップのみ） */}
+        {!isMobile && (
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            style={{
+              width: "60%",
+              height: "100%",
+              backgroundColor: "#f5f5f7",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              padding: "40px",
+            }}
+          >
         {/* キャンバスコンテナ */}
         <div 
           className="canvas-container"
@@ -5298,6 +5313,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </div>
         </div>
         </motion.div>
+        )}
       </div>
       
       {/* 著作権モーダル */}
