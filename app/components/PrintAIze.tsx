@@ -623,8 +623,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       let lastDistance = 0;
       let initialDistance = 0;  // 初回の距離を保存
       let initialScale = { x: 1, y: 1 };  // 初回のスケールを保存
+      let initialAngle = 0;  // 初回の角度を保存
+      let cumulativeAngle = 0;  // 累積角度
       let lastAngle = 0;
       let isGesture = false;
+      let rotationEnabled = false;  // 回転モードかどうか
+      let gestureFrameCount = 0;  // ジェスチャーのフレーム数
       let lastCenter = { x: 0, y: 0 };
       
       const getTouchDistance = (touch1: Touch, touch2: Touch) => {
@@ -678,17 +682,19 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             e.stopPropagation();
             e.stopImmediatePropagation();
             
-            // 初回の距離とスケールを保存
+            // 初回の距離とスケールと角度を保存
             initialDistance = getTouchDistance(e.touches[0], e.touches[1]);
             lastDistance = initialDistance;
             initialScale = {
               x: activeObject.scaleX || 1,
               y: activeObject.scaleY || 1,
             };
-            lastAngle = getTouchAngle(e.touches[0], e.touches[1]);
+            initialAngle = getTouchAngle(e.touches[0], e.touches[1]);
+            lastAngle = initialAngle;
+            cumulativeAngle = 0;
+            rotationEnabled = false;  // 回転モードはまだ無効
+            gestureFrameCount = 0;
             lastCenter = getTouchCenter(e.touches[0], e.touches[1]);
-            
-            console.log('✅ Starting pinch - initialDistance:', initialDistance, 'initialScale:', initialScale);
             
             // PCの場合のみコントロールを一時非表示（スマホは最初から非表示）
             if (activeObject.hasControls) {
@@ -716,6 +722,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             e.preventDefault();
             e.stopPropagation();
             
+            // フレームカウントを増やす
+            gestureFrameCount++;
+            
             // 中心点の移動を計算
             const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
             const rect = canvasWrapper.getBoundingClientRect();
@@ -739,8 +748,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               const newScaleX = initialScale.x * enhancedRatio;
               const newScaleY = initialScale.y * enhancedRatio;
               
-              console.log('🟢 Pinching - ratio:', scaleRatio.toFixed(2), 'enhanced:', enhancedRatio.toFixed(2), 'newScale:', newScaleX.toFixed(2));
-              
               // 最小・最大サイズ制限（縮小しやすくするため最小値を下げる）
               if (newScaleX > 0.05 && newScaleX < 15 && newScaleY > 0.05 && newScaleY < 15) {
                 activeObject.scaleX = newScaleX;
@@ -748,15 +755,28 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               }
             }
             
-            // 回転（しきい値を設定：2度以上の変化がある場合のみ回転）
+            // 回転（Instagram風：累積角度で判定）
             const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
-            if (lastAngle !== 0) {
-              const angleDiff = currentAngle - lastAngle;
-              // 2度以上の角度変化がある場合のみ回転を適用
-              if (Math.abs(angleDiff) > 2) {
-                activeObject.angle = (activeObject.angle || 0) + angleDiff;
-              }
+            let angleDiff = currentAngle - lastAngle;
+            
+            // 角度の差が180度を超える場合は反対方向に補正（-180〜180の範囲に正規化）
+            if (angleDiff > 180) angleDiff -= 360;
+            if (angleDiff < -180) angleDiff += 360;
+            
+            // 累積角度を更新
+            cumulativeAngle += angleDiff;
+            
+            // 回転モード判定：累積で15度以上回転したら回転モードON
+            if (!rotationEnabled && gestureFrameCount > 3 && Math.abs(cumulativeAngle) > 15) {
+              rotationEnabled = true;
+              console.log('🔄 Rotation enabled - cumulative:', cumulativeAngle.toFixed(1));
             }
+            
+            // 回転モードがONの場合のみ回転を適用（滑らかに）
+            if (rotationEnabled) {
+              activeObject.angle = (activeObject.angle || 0) + angleDiff;
+            }
+            
             lastAngle = currentAngle;
             
             // 位置を更新して範囲チェック
@@ -792,7 +812,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           lastDistance = 0;
           initialDistance = 0;
           initialScale = { x: 1, y: 1 };
+          initialAngle = 0;
+          cumulativeAngle = 0;
           lastAngle = 0;
+          rotationEnabled = false;
+          gestureFrameCount = 0;
           lastCenter = { x: 0, y: 0 };
           
           // 最終的な範囲チェック（指を離した時）
