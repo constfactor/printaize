@@ -1831,7 +1831,37 @@ ${width} \xD7 ${height}px
       left: printArea.left + printArea.width / 2,
       top: printArea.top + printArea.height / 2
     }), selectedObject.setCoords(), canvas.renderAll(), saveHistory();
-  }, handleClearCanvas = () => {
+  }, undo = () => {
+    if (!(!canUndo || !fabricCanvasRef.current) && historyStepRef.current > 0) {
+      historyStepRef.current--, isLoadingHistoryRef.current = !0;
+      let canvas = fabricCanvasRef.current, historyData = historyRef.current[historyStepRef.current];
+      canvas.loadFromJSON(historyData, () => {
+        canvas.renderAll(), isLoadingHistoryRef.current = !1, setCanUndo(historyStepRef.current > 0), setCanRedo(historyStepRef.current < historyRef.current.length - 1);
+      });
+    }
+  }, redo = () => {
+    if (!(!canRedo || !fabricCanvasRef.current) && historyStepRef.current < historyRef.current.length - 1) {
+      historyStepRef.current++, isLoadingHistoryRef.current = !0;
+      let canvas = fabricCanvasRef.current, historyData = historyRef.current[historyStepRef.current];
+      canvas.loadFromJSON(historyData, () => {
+        canvas.renderAll(), isLoadingHistoryRef.current = !1, setCanUndo(historyStepRef.current > 0), setCanRedo(historyStepRef.current < historyRef.current.length - 1);
+      });
+    }
+  }, centerVertically = () => {
+    if (!fabricCanvasRef.current || !selectedObject)
+      return;
+    let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width);
+    selectedObject.set({
+      top: printArea.top + printArea.height / 2
+    }), selectedObject.setCoords(), canvas.renderAll(), saveHistory();
+  }, centerHorizontally = () => {
+    if (!fabricCanvasRef.current || !selectedObject)
+      return;
+    let canvas = fabricCanvasRef.current, printArea = getPrintAreaInPixels(canvas.width);
+    selectedObject.set({
+      left: printArea.left + printArea.width / 2
+    }), selectedObject.setCoords(), canvas.renderAll(), saveHistory();
+  }, bringForward = () => handleBringForward(), sendBackward = () => handleSendBackwards(), fitToPrintArea = () => handleFitToPrintArea(), handleClearCanvas = () => {
     if (fabricCanvasRef.current) {
       fabricCanvasRef.current.getObjects().forEach((obj) => {
         fabricCanvasRef.current?.remove(obj);
@@ -4154,7 +4184,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-2GORV5ZO.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "386eb95c", hmr: void 0, url: "/build/manifest-386EB95C.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-SUW6RUJC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "bf783da9", hmr: void 0, url: "/build/manifest-BF783DA9.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

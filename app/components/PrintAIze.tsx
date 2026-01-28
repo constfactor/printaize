@@ -2762,6 +2762,79 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     saveHistory();
   };
 
+  // 編集ツール用の関数（エイリアス）
+  const undo = () => {
+    if (!canUndo || !fabricCanvasRef.current) return;
+    
+    if (historyStepRef.current > 0) {
+      historyStepRef.current--;
+      isLoadingHistoryRef.current = true;
+      
+      const canvas = fabricCanvasRef.current;
+      const historyData = historyRef.current[historyStepRef.current];
+      
+      canvas.loadFromJSON(historyData, () => {
+        canvas.renderAll();
+        isLoadingHistoryRef.current = false;
+        setCanUndo(historyStepRef.current > 0);
+        setCanRedo(historyStepRef.current < historyRef.current.length - 1);
+      });
+    }
+  };
+
+  const redo = () => {
+    if (!canRedo || !fabricCanvasRef.current) return;
+    
+    if (historyStepRef.current < historyRef.current.length - 1) {
+      historyStepRef.current++;
+      isLoadingHistoryRef.current = true;
+      
+      const canvas = fabricCanvasRef.current;
+      const historyData = historyRef.current[historyStepRef.current];
+      
+      canvas.loadFromJSON(historyData, () => {
+        canvas.renderAll();
+        isLoadingHistoryRef.current = false;
+        setCanUndo(historyStepRef.current > 0);
+        setCanRedo(historyStepRef.current < historyRef.current.length - 1);
+      });
+    }
+  };
+
+  const centerVertically = () => {
+    if (!fabricCanvasRef.current || !selectedObject) return;
+    
+    const canvas = fabricCanvasRef.current;
+    const printArea = getPrintAreaInPixels(canvas.width!);
+    
+    selectedObject.set({
+      top: printArea.top + printArea.height / 2,
+    });
+    
+    selectedObject.setCoords();
+    canvas.renderAll();
+    saveHistory();
+  };
+
+  const centerHorizontally = () => {
+    if (!fabricCanvasRef.current || !selectedObject) return;
+    
+    const canvas = fabricCanvasRef.current;
+    const printArea = getPrintAreaInPixels(canvas.width!);
+    
+    selectedObject.set({
+      left: printArea.left + printArea.width / 2,
+    });
+    
+    selectedObject.setCoords();
+    canvas.renderAll();
+    saveHistory();
+  };
+
+  const bringForward = () => handleBringForward();
+  const sendBackward = () => handleSendBackwards();
+  const fitToPrintArea = () => handleFitToPrintArea();
+
   const handleClearCanvas = () => {
     if (fabricCanvasRef.current) {
       fabricCanvasRef.current.getObjects().forEach((obj) => {
