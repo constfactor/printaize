@@ -732,15 +732,17 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             // ピンチイン・ピンチアウト（拡大縮小）- 初期距離からの相対的な変化を計算
             const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
             if (initialDistance > 0) {
-              // 初期距離からの倍率を計算
+              // 初期距離からの倍率を計算（感度を1.5倍に上げる）
               const scaleRatio = currentDistance / initialDistance;
-              const newScaleX = initialScale.x * scaleRatio;
-              const newScaleY = initialScale.y * scaleRatio;
+              // 1.0からの差分を1.5倍にして、より敏感に反応させる
+              const enhancedRatio = 1.0 + (scaleRatio - 1.0) * 1.5;
+              const newScaleX = initialScale.x * enhancedRatio;
+              const newScaleY = initialScale.y * enhancedRatio;
               
-              console.log('🟢 Pinching - ratio:', scaleRatio.toFixed(2), 'newScale:', newScaleX.toFixed(2));
+              console.log('🟢 Pinching - ratio:', scaleRatio.toFixed(2), 'enhanced:', enhancedRatio.toFixed(2), 'newScale:', newScaleX.toFixed(2));
               
-              // 最小・最大サイズ制限
-              if (newScaleX > 0.1 && newScaleX < 10 && newScaleY > 0.1 && newScaleY < 10) {
+              // 最小・最大サイズ制限（縮小しやすくするため最小値を下げる）
+              if (newScaleX > 0.05 && newScaleX < 15 && newScaleY > 0.05 && newScaleY < 15) {
                 activeObject.scaleX = newScaleX;
                 activeObject.scaleY = newScaleY;
               }
