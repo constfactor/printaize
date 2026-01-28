@@ -375,6 +375,60 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     };
   }, [isFontDropdownOpen]);
 
+  // GSAP スクロール連動アニメーション
+  useEffect(() => {
+    // GSAPとScrollTriggerが読み込まれているか確認
+    if (typeof window === 'undefined' || !(window as any).gsap || !(window as any).ScrollTrigger) {
+      return;
+    }
+
+    const gsap = (window as any).gsap;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    
+    gsap.registerPlugin(ScrollTrigger);
+
+    // 商品情報ヘッダーのアニメーション（デスクトップのみ）
+    if (!isMobile) {
+      gsap.fromTo(
+        '.product-header',
+        { 
+          opacity: 0, 
+          y: 30,
+          scale: 0.95,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.product-header',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+      // Tシャツモックアップのパララックス効果
+      gsap.to('.canvas-container', {
+        y: -30,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.canvas-container',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      });
+    }
+
+    // クリーンアップ
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger: any) => trigger.kill());
+    };
+  }, [isMobile]);
+
   // カラーに基づいて商品画像のパスを生成
   const getCurrentMockupImage = () => {
     // カラー名から画像ファイル名を決定
@@ -2938,6 +2992,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       >
         {/* 商品情報ヘッダー */}
         <motion.div
+          className="product-header"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -3925,12 +3980,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         }}
       >
         {/* キャンバスコンテナ */}
-        <div style={{
-          width: "100%",
-          maxWidth: "min(800px, 100%)",
-          aspectRatio: isMobile ? "3 / 4" : "1 / 1",
-          position: "relative",
-        }}>
+        <div 
+          className="canvas-container"
+          style={{
+            width: "100%",
+            maxWidth: "min(800px, 100%)",
+            aspectRatio: isMobile ? "3 / 4" : "1 / 1",
+            position: "relative",
+          }}
+        >
           <div style={{ 
             display: "flex", 
             flexDirection: "column", 

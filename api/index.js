@@ -176,6 +176,20 @@ function App() {
           crossOrigin: "anonymous"
         }
       ),
+      /* @__PURE__ */ jsx2(
+        "script",
+        {
+          src: "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+          crossOrigin: "anonymous"
+        }
+      ),
+      /* @__PURE__ */ jsx2(
+        "script",
+        {
+          src: "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js",
+          crossOrigin: "anonymous"
+        }
+      ),
       /* @__PURE__ */ jsx2(Outlet, {}),
       /* @__PURE__ */ jsx2(ScrollRestoration, {}),
       /* @__PURE__ */ jsx2(
@@ -836,7 +850,42 @@ function PrintAIze({ product }) {
     return isFontDropdownOpen && document.addEventListener("click", handleClickOutside), () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [isFontDropdownOpen]);
+  }, [isFontDropdownOpen]), useEffect(() => {
+    if (typeof window > "u" || !window.gsap || !window.ScrollTrigger)
+      return;
+    let gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
+    return gsap.registerPlugin(ScrollTrigger), isMobile || (gsap.fromTo(
+      ".product-header",
+      {
+        opacity: 0,
+        y: 30,
+        scale: 0.95
+      },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".product-header",
+          start: "top 80%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    ), gsap.to(".canvas-container", {
+      y: -30,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".canvas-container",
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1
+      }
+    })), () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, [isMobile]);
   let getCurrentMockupImage = () => {
     let colorSlug = selectedColor.name === "\u30DB\u30EF\u30A4\u30C8" || selectedColor.name === "\u30AA\u30D5\u30DB\u30EF\u30A4\u30C8" ? "white" : "black";
     return `/images/products/${product.id}-${colorSlug}.png`;
@@ -1911,6 +1960,7 @@ ${width} \xD7 ${height}px
               /* @__PURE__ */ jsxs2(
                 motion.div,
                 {
+                  className: "product-header",
                   initial: { y: -20, opacity: 0 },
                   animate: { y: 0, opacity: 1 },
                   transition: { delay: 0.2, duration: 0.5 },
@@ -2929,118 +2979,123 @@ ${width} \xD7 ${height}px
               padding: isMobile ? "20px" : "40px"
             },
             children: [
-              /* @__PURE__ */ jsx3("div", { style: {
-                width: "100%",
-                maxWidth: "min(800px, 100%)",
-                aspectRatio: isMobile ? "3 / 4" : "1 / 1",
-                position: "relative"
-              }, children: /* @__PURE__ */ jsxs2("div", { style: {
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: isMobile ? "10px" : "40px",
-                width: "100%",
-                boxSizing: "border-box"
-              }, children: [
-                /* @__PURE__ */ jsxs2(
-                  "div",
-                  {
-                    style: {
-                      border: "none",
-                      borderRadius: "0",
-                      overflow: "hidden",
-                      boxShadow: "none",
-                      backgroundColor: "#fafafa",
-                      width: "100%",
-                      maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
-                      margin: "0 auto",
-                      position: "relative",
-                      aspectRatio: "1 / 1",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      touchAction: isMobile ? "pan-y" : "auto"
-                    },
-                    children: [
-                      /* @__PURE__ */ jsx3(
-                        "button",
-                        {
-                          onClick: () => {
-                            if (!fabricCanvasRef.current)
-                              return;
-                            let canvas = fabricCanvasRef.current;
-                            if (isZoomed)
-                              canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
-                            else {
-                              let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
-                              canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
+              /* @__PURE__ */ jsx3(
+                "div",
+                {
+                  className: "canvas-container",
+                  style: {
+                    width: "100%",
+                    maxWidth: "min(800px, 100%)",
+                    aspectRatio: isMobile ? "3 / 4" : "1 / 1",
+                    position: "relative"
+                  },
+                  children: /* @__PURE__ */ jsxs2("div", { style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    padding: isMobile ? "10px" : "40px",
+                    width: "100%",
+                    boxSizing: "border-box"
+                  }, children: [
+                    /* @__PURE__ */ jsxs2(
+                      "div",
+                      {
+                        style: {
+                          border: "none",
+                          borderRadius: "0",
+                          overflow: "hidden",
+                          boxShadow: "none",
+                          backgroundColor: "#fafafa",
+                          width: "100%",
+                          maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
+                          margin: "0 auto",
+                          position: "relative",
+                          aspectRatio: "1 / 1",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          touchAction: isMobile ? "pan-y" : "auto"
+                        },
+                        children: [
+                          /* @__PURE__ */ jsx3(
+                            "button",
+                            {
+                              onClick: () => {
+                                if (!fabricCanvasRef.current)
+                                  return;
+                                let canvas = fabricCanvasRef.current;
+                                if (isZoomed)
+                                  canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
+                                else {
+                                  let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
+                                  canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
+                                }
+                                canvas.renderAll();
+                              },
+                              style: {
+                                position: "absolute",
+                                top: "10px",
+                                right: "10px",
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                border: "none",
+                                backgroundColor: "white",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                zIndex: 10,
+                                transition: "all 0.2s ease"
+                              },
+                              onMouseEnter: (e) => {
+                                e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                              },
+                              onMouseLeave: (e) => {
+                                e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+                              },
+                              title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u30D7\u30EA\u30F3\u30C8\u30A8\u30EA\u30A2\u3092\u62E1\u5927",
+                              children: /* @__PURE__ */ jsx3(Icon, { type: isZoomed ? "zoomIn" : "zoomOut", size: 20, color: "#667eea" })
                             }
-                            canvas.renderAll();
-                          },
-                          style: {
-                            position: "absolute",
-                            top: "10px",
-                            right: "10px",
-                            width: "40px",
-                            height: "40px",
-                            borderRadius: "50%",
-                            border: "none",
-                            backgroundColor: "white",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            zIndex: 10,
-                            transition: "all 0.2s ease"
-                          },
-                          onMouseEnter: (e) => {
-                            e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-                          },
-                          onMouseLeave: (e) => {
-                            e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                          },
-                          title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u30D7\u30EA\u30F3\u30C8\u30A8\u30EA\u30A2\u3092\u62E1\u5927",
-                          children: /* @__PURE__ */ jsx3(Icon, { type: isZoomed ? "zoomIn" : "zoomOut", size: 20, color: "#667eea" })
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        "canvas",
-                        {
-                          ref: canvasRef,
-                          style: {
-                            display: "block",
-                            width: "100%",
-                            height: "100%",
-                            maxWidth: "100%",
-                            maxHeight: "100%",
-                            objectFit: "contain"
-                          }
-                        }
-                      ),
-                      showTrash && /* @__PURE__ */ jsxs2(
-                        "div",
-                        {
-                          style: {
-                            position: "absolute",
-                            bottom: isMobile ? "30px" : "40px",
-                            left: "50%",
-                            transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
-                            width: isMobile ? "70px" : "80px",
-                            height: isMobile ? "70px" : "80px",
-                            borderRadius: "50%",
-                            backgroundColor: isOverTrash ? "#ff4444" : "#666",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
-                            transition: "all 0.2s ease",
-                            zIndex: 15,
-                            animation: "trashBounce 0.3s ease"
-                          },
-                          children: [
-                            /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
-                            /* @__PURE__ */ jsx3("style", { children: `
+                          ),
+                          /* @__PURE__ */ jsx3(
+                            "canvas",
+                            {
+                              ref: canvasRef,
+                              style: {
+                                display: "block",
+                                width: "100%",
+                                height: "100%",
+                                maxWidth: "100%",
+                                maxHeight: "100%",
+                                objectFit: "contain"
+                              }
+                            }
+                          ),
+                          showTrash && /* @__PURE__ */ jsxs2(
+                            "div",
+                            {
+                              style: {
+                                position: "absolute",
+                                bottom: isMobile ? "30px" : "40px",
+                                left: "50%",
+                                transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
+                                width: isMobile ? "70px" : "80px",
+                                height: isMobile ? "70px" : "80px",
+                                borderRadius: "50%",
+                                backgroundColor: isOverTrash ? "#ff4444" : "#666",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
+                                transition: "all 0.2s ease",
+                                zIndex: 15,
+                                animation: "trashBounce 0.3s ease"
+                              },
+                              children: [
+                                /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
+                                /* @__PURE__ */ jsx3("style", { children: `
                     @keyframes trashBounce {
                       0% {
                         transform: translateX(-50%) scale(0.8);
@@ -3055,276 +3110,278 @@ ${width} \xD7 ${height}px
                       }
                     }
                   ` })
+                              ]
+                            }
+                          ),
+                          (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
+                            "svg",
+                            {
+                              style: {
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                pointerEvents: "none",
+                                zIndex: 5
+                              },
+                              children: [
+                                snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
+                                  "line",
+                                  {
+                                    x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                                    y1: "0",
+                                    x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                                    y2: "100%",
+                                    stroke: "#ff00ff",
+                                    strokeWidth: "1",
+                                    strokeDasharray: "5,5",
+                                    opacity: "0.8"
+                                  }
+                                ),
+                                snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
+                                  "line",
+                                  {
+                                    x1: "0",
+                                    y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                                    x2: "100%",
+                                    y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                                    stroke: "#ff00ff",
+                                    strokeWidth: "1",
+                                    strokeDasharray: "5,5",
+                                    opacity: "0.8"
+                                  }
+                                )
+                              ]
+                            }
+                          )
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsxs2("div", { style: {
+                      marginTop: "15px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: isMobile ? "8px" : "10px",
+                      justifyContent: "center",
+                      width: "100%",
+                      maxWidth: isMobile ? "100%" : "800px"
+                    }, children: [
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleUndo,
+                          disabled: !canUndo,
+                          style: {
+                            ...historyButtonStyle(canUndo),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
+                          },
+                          title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
+                          children: [
+                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                              /* @__PURE__ */ jsx3("path", { d: "M3 7v6h6" }),
+                              /* @__PURE__ */ jsx3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" })
+                            ] }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" })
                           ]
                         }
                       ),
-                      (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
-                        "svg",
+                      /* @__PURE__ */ jsxs2(
+                        "button",
                         {
+                          onClick: handleRedo,
+                          disabled: !canRedo,
                           style: {
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            pointerEvents: "none",
-                            zIndex: 5
+                            ...historyButtonStyle(canRedo),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
                           },
+                          title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
                           children: [
-                            snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
-                              "line",
-                              {
-                                x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
-                                y1: "0",
-                                x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
-                                y2: "100%",
-                                stroke: "#ff00ff",
-                                strokeWidth: "1",
-                                strokeDasharray: "5,5",
-                                opacity: "0.8"
-                              }
-                            ),
-                            snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
-                              "line",
-                              {
-                                x1: "0",
-                                y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
-                                x2: "100%",
-                                y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
-                                stroke: "#ff00ff",
-                                strokeWidth: "1",
-                                strokeDasharray: "5,5",
-                                opacity: "0.8"
-                              }
-                            )
+                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                              /* @__PURE__ */ jsx3("path", { d: "M21 7v6h-6" }),
+                              /* @__PURE__ */ jsx3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" })
+                            ] }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleCenterVertical,
+                          disabled: !selectedObject,
+                          style: {
+                            ...historyButtonStyle(!!selectedObject),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
+                          },
+                          title: "\u4E0A\u4E0B\u4E2D\u592E",
+                          children: [
+                            /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }) }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleCenterHorizontal,
+                          disabled: !selectedObject,
+                          style: {
+                            ...historyButtonStyle(!!selectedObject),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
+                          },
+                          title: "\u5DE6\u53F3\u4E2D\u592E",
+                          children: [
+                            /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }) }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleBringForward,
+                          disabled: !selectedObject,
+                          style: {
+                            ...historyButtonStyle(!!selectedObject),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
+                          },
+                          title: "\u624B\u524D\u306B\u79FB\u52D5",
+                          children: [
+                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                              /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
+                              /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" })
+                            ] }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleSendBackwards,
+                          disabled: !selectedObject,
+                          style: {
+                            ...historyButtonStyle(!!selectedObject),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
+                          },
+                          title: "\u5965\u306B\u79FB\u52D5",
+                          children: [
+                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                              /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
+                              /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" })
+                            ] }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleFitToPrintArea,
+                          disabled: !selectedObject,
+                          style: {
+                            ...historyButtonStyle(!!selectedObject),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px"
+                          },
+                          title: "\u5370\u5237\u9762\u3092\u8986\u3046",
+                          children: [
+                            /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2(
+                        "button",
+                        {
+                          onClick: handleRemoveSelected,
+                          disabled: !selectedObject,
+                          style: {
+                            ...historyButtonStyle(!!selectedObject),
+                            padding: isMobile ? "8px 10px" : "10px 12px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "4px",
+                            minWidth: isMobile ? "60px" : "70px",
+                            backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
+                          },
+                          title: "\u524A\u9664 (Delete/Backspace)",
+                          children: [
+                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                              /* @__PURE__ */ jsx3("polyline", { points: "3 6 5 6 21 6" }),
+                              /* @__PURE__ */ jsx3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
+                              /* @__PURE__ */ jsx3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
+                              /* @__PURE__ */ jsx3("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
+                            ] }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" })
                           ]
                         }
                       )
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxs2("div", { style: {
-                  marginTop: "15px",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: isMobile ? "8px" : "10px",
-                  justifyContent: "center",
-                  width: "100%",
-                  maxWidth: isMobile ? "100%" : "800px"
-                }, children: [
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleUndo,
-                      disabled: !canUndo,
-                      style: {
-                        ...historyButtonStyle(canUndo),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
-                      children: [
-                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                          /* @__PURE__ */ jsx3("path", { d: "M3 7v6h6" }),
-                          /* @__PURE__ */ jsx3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" })
-                        ] }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleRedo,
-                      disabled: !canRedo,
-                      style: {
-                        ...historyButtonStyle(canRedo),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
-                      children: [
-                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                          /* @__PURE__ */ jsx3("path", { d: "M21 7v6h-6" }),
-                          /* @__PURE__ */ jsx3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" })
-                        ] }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleCenterVertical,
-                      disabled: !selectedObject,
-                      style: {
-                        ...historyButtonStyle(!!selectedObject),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u4E0A\u4E0B\u4E2D\u592E",
-                      children: [
-                        /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }) }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleCenterHorizontal,
-                      disabled: !selectedObject,
-                      style: {
-                        ...historyButtonStyle(!!selectedObject),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u5DE6\u53F3\u4E2D\u592E",
-                      children: [
-                        /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }) }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleBringForward,
-                      disabled: !selectedObject,
-                      style: {
-                        ...historyButtonStyle(!!selectedObject),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u624B\u524D\u306B\u79FB\u52D5",
-                      children: [
-                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                          /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
-                          /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" })
-                        ] }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleSendBackwards,
-                      disabled: !selectedObject,
-                      style: {
-                        ...historyButtonStyle(!!selectedObject),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u5965\u306B\u79FB\u52D5",
-                      children: [
-                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                          /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
-                          /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" })
-                        ] }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleFitToPrintArea,
-                      disabled: !selectedObject,
-                      style: {
-                        ...historyButtonStyle(!!selectedObject),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px"
-                      },
-                      title: "\u5370\u5237\u9762\u3092\u8986\u3046",
-                      children: [
-                        /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" })
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: handleRemoveSelected,
-                      disabled: !selectedObject,
-                      style: {
-                        ...historyButtonStyle(!!selectedObject),
-                        padding: isMobile ? "8px 10px" : "10px 12px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "4px",
-                        minWidth: isMobile ? "60px" : "70px",
-                        backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
-                      },
-                      title: "\u524A\u9664 (Delete/Backspace)",
-                      children: [
-                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                          /* @__PURE__ */ jsx3("polyline", { points: "3 6 5 6 21 6" }),
-                          /* @__PURE__ */ jsx3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
-                          /* @__PURE__ */ jsx3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
-                          /* @__PURE__ */ jsx3("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
-                        ] }),
-                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" })
-                      ]
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxs2("div", { style: {
-                  ...infoBoxStyle,
-                  width: "100%",
-                  maxWidth: isMobile ? "100%" : "800px",
-                  backgroundColor: "#ffffff",
-                  marginTop: isMobile ? "15px" : "20px",
-                  padding: isMobile ? "15px" : "20px"
-                }, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: {
-                    marginTop: 0,
-                    fontSize: isMobile ? "14px" : "16px"
-                  }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }),
-                  /* @__PURE__ */ jsxs2("ul", { style: {
-                    marginBottom: 0,
-                    lineHeight: 1.6,
-                    paddingLeft: isMobile ? "18px" : "20px",
-                    fontSize: isMobile ? "12px" : "13px"
-                  }, children: [
-                    /* @__PURE__ */ jsx3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }),
-                    /* @__PURE__ */ jsx3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }),
-                    /* @__PURE__ */ jsx3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }),
-                    /* @__PURE__ */ jsx3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }),
-                    /* @__PURE__ */ jsx3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" })
+                    ] }),
+                    /* @__PURE__ */ jsxs2("div", { style: {
+                      ...infoBoxStyle,
+                      width: "100%",
+                      maxWidth: isMobile ? "100%" : "800px",
+                      backgroundColor: "#ffffff",
+                      marginTop: isMobile ? "15px" : "20px",
+                      padding: isMobile ? "15px" : "20px"
+                    }, children: [
+                      /* @__PURE__ */ jsx3("h3", { style: {
+                        marginTop: 0,
+                        fontSize: isMobile ? "14px" : "16px"
+                      }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }),
+                      /* @__PURE__ */ jsxs2("ul", { style: {
+                        marginBottom: 0,
+                        lineHeight: 1.6,
+                        paddingLeft: isMobile ? "18px" : "20px",
+                        fontSize: isMobile ? "12px" : "13px"
+                      }, children: [
+                        /* @__PURE__ */ jsx3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }),
+                        /* @__PURE__ */ jsx3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }),
+                        /* @__PURE__ */ jsx3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }),
+                        /* @__PURE__ */ jsx3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }),
+                        /* @__PURE__ */ jsx3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" })
+                      ] })
+                    ] })
                   ] })
-                ] })
-              ] }) }),
+                }
+              ),
               /* @__PURE__ */ jsx3("div", { style: {
                 display: isMobile ? "block" : "none",
                 width: "100%",
@@ -4628,7 +4685,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-CCK4M7H6.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "9bc5a36e", hmr: void 0, url: "/build/manifest-9BC5A36E.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-A3XUC6IR.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-4BZ4LMSW.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "a8f8097e", hmr: void 0, url: "/build/manifest-A8F8097E.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
