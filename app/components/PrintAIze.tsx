@@ -307,6 +307,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   const [showTrash, setShowTrash] = useState(false);
   const [isOverTrash, setIsOverTrash] = useState(false);
   
+  // スナップガイドライン状態
+  const [snapGuides, setSnapGuides] = useState<{
+    vertical: number | null;   // 縦ガイドのX座標
+    horizontal: number | null; // 横ガイドのY座標
+  }>({ vertical: null, horizontal: null });
+  
   // ズーム時のESCキーハンドラー
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -938,6 +944,77 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         setIsOverTrash(false);
       }
       
+      // Instagram風スナップガイドライン
+      const snapThreshold = 10; // スナップする距離（px）
+      const centerX = printArea.left + printArea.width / 2;
+      const centerY = printArea.top + printArea.height / 2;
+      const objCenterX = objBounds.left + objBounds.width / 2;
+      const objCenterY = objBounds.top + objBounds.height / 2;
+      
+      // 移動方向を検出（前回の位置との差分）
+      if (!obj._lastPos) {
+        obj._lastPos = { x: obj.left, y: obj.top };
+      }
+      const moveX = Math.abs(obj.left - obj._lastPos.x);
+      const moveY = Math.abs(obj.top - obj._lastPos.y);
+      const isHorizontalMove = moveX > moveY * 2; // 左右移動が支配的
+      const isVerticalMove = moveY > moveX * 2;   // 上下移動が支配的
+      obj._lastPos = { x: obj.left, y: obj.top };
+      
+      let newGuides = { vertical: null as number | null, horizontal: null as number | null };
+      
+      // 中央縦ガイド（左右移動時以外、または中央に近い場合）
+      if (!isHorizontalMove || Math.abs(objCenterX - centerX) < snapThreshold * 3) {
+        if (Math.abs(objCenterX - centerX) < snapThreshold) {
+          obj.left += (centerX - objCenterX);
+          newGuides.vertical = centerX;
+        }
+      }
+      
+      // 中央横ガイド（上下移動時以外、または中央に近い場合）
+      if (!isVerticalMove || Math.abs(objCenterY - centerY) < snapThreshold * 3) {
+        if (Math.abs(objCenterY - centerY) < snapThreshold) {
+          obj.top += (centerY - objCenterY);
+          newGuides.horizontal = centerY;
+        }
+      }
+      
+      // 左端ガイド
+      if (!isHorizontalMove || Math.abs(objBounds.left - printArea.left) < snapThreshold * 3) {
+        if (Math.abs(objBounds.left - printArea.left) < snapThreshold) {
+          obj.left += (printArea.left - objBounds.left);
+          newGuides.vertical = printArea.left + objBounds.width / 2;
+        }
+      }
+      
+      // 右端ガイド
+      const rightEdge = printArea.left + printArea.width;
+      if (!isHorizontalMove || Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold * 3) {
+        if (Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold) {
+          obj.left += (rightEdge - (objBounds.left + objBounds.width));
+          newGuides.vertical = rightEdge - objBounds.width / 2;
+        }
+      }
+      
+      // 上端ガイド
+      if (!isVerticalMove || Math.abs(objBounds.top - printArea.top) < snapThreshold * 3) {
+        if (Math.abs(objBounds.top - printArea.top) < snapThreshold) {
+          obj.top += (printArea.top - objBounds.top);
+          newGuides.horizontal = printArea.top + objBounds.height / 2;
+        }
+      }
+      
+      // 下端ガイド
+      const bottomEdge = printArea.top + printArea.height;
+      if (!isVerticalMove || Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold * 3) {
+        if (Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold) {
+          obj.top += (bottomEdge - (objBounds.top + objBounds.height));
+          newGuides.horizontal = bottomEdge - objBounds.height / 2;
+        }
+      }
+      
+      setSnapGuides(newGuides);
+      
       // 左端制限
       if (objBounds.left < printArea.left) {
         obj.left += (printArea.left - objBounds.left);
@@ -1105,6 +1182,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // ゴミ箱をリセット
       setShowTrash(false);
       setIsOverTrash(false);
+      // スナップガイドラインをリセット
+      setSnapGuides({ vertical: null, horizontal: null });
       // オブジェクト未選択時はスクロールを許可（モバイルのみ）
       if (canvasRef.current && window.innerWidth < 768) {
         canvasRef.current.style.touchAction = "pan-y";
@@ -1134,9 +1213,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       setShowTrash(false);
       setIsOverTrash(false);
       
+      // スナップガイドラインをリセット
+      setSnapGuides({ vertical: null, horizontal: null });
+      
       // Shift移動の記録をクリア
       if (obj && obj._movingStart) {
         obj._movingStart = null;
+      }
+      if (obj && obj._lastPos) {
+        obj._lastPos = null;
       }
       
       // テキストオブジェクトの場合、フォントサイズを自動調整
@@ -3041,6 +3126,46 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     }
                   `}</style>
                 </div>
+              )}
+              
+              {/* スナップガイドライン（Instagram風） */}
+              {(snapGuides.vertical !== null || snapGuides.horizontal !== null) && (
+                <svg
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    pointerEvents: "none",
+                    zIndex: 5,
+                  }}
+                >
+                  {snapGuides.vertical !== null && (
+                    <line
+                      x1={`${(snapGuides.vertical / canvasSize) * 100}%`}
+                      y1="0"
+                      x2={`${(snapGuides.vertical / canvasSize) * 100}%`}
+                      y2="100%"
+                      stroke="#ff00ff"
+                      strokeWidth="1"
+                      strokeDasharray="5,5"
+                      opacity="0.8"
+                    />
+                  )}
+                  {snapGuides.horizontal !== null && (
+                    <line
+                      x1="0"
+                      y1={`${(snapGuides.horizontal / canvasSize) * 100}%`}
+                      x2="100%"
+                      y2={`${(snapGuides.horizontal / canvasSize) * 100}%`}
+                      stroke="#ff00ff"
+                      strokeWidth="1"
+                      strokeDasharray="5,5"
+                      opacity="0.8"
+                    />
+                  )}
+                </svg>
               )}
             </div>
 
