@@ -229,6 +229,9 @@ const FONT_LIST = [
   { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" },
 ];
 
+// キャンバスサイズの定数
+const CANVAS_SIZE = 800;
+
 export default function PrintAIze({ product }: PrintAIzeProps) {
   // ========== ステップ1: 状態管理 ==========
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -447,12 +450,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     const fabricLib = (window as any).fabric;
 
     // キャンバスサイズは固定（800x800）- CSS transformでスケーリング
-    const canvasSize = 800;
     
     // キャンバスを作成
     const canvas = new fabricLib.Canvas(canvasRef.current, {
-      width: canvasSize,
-      height: canvasSize,
+      width: CANVAS_SIZE,
+      height: CANVAS_SIZE,
       backgroundColor: "#fafafa",
       selection: true,
       preserveObjectStacking: true, // 選択時にz-orderを変更しない
@@ -573,7 +575,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
         
         // プリント範囲の矩形を描画（点線）
-        const printArea = getPrintAreaInPixels(canvasSize);
+        const printArea = getPrintAreaInPixels(CANVAS_SIZE);
         
         // 商品の色に応じて点線の色を決定
         const getPrintAreaStrokeColor = () => {
@@ -619,7 +621,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     );
 
     // プリント範囲の境界を取得
-    const printArea = getPrintAreaInPixels(canvasSize);
+    const printArea = getPrintAreaInPixels(CANVAS_SIZE);
     
     // ========== スマホ用：2本指ピンチ＆回転の実装 ==========
     let touchListenersAdded = false;
@@ -670,7 +672,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
           if (!activeObject || activeObject.name === 'printArea') {
             const rect = canvasWrapper.getBoundingClientRect();
-            const canvasScale = canvasSize / rect.width;
+            const canvasScale = CANVAS_SIZE / rect.width;
             const touch1 = e.touches[0];
             const pointer = {
               x: (touch1.clientX - rect.left) * canvasScale,
@@ -737,7 +739,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             // 中心点の移動を計算
             const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
             const rect = canvasWrapper.getBoundingClientRect();
-            const canvasScale = canvasSize / rect.width; // キャンバスの実際のスケール
+            const canvasScale = CANVAS_SIZE / rect.width; // キャンバスの実際のスケール
             
             if (lastCenter.x !== 0) {
               const dx = (currentCenter.x - lastCenter.x) * canvasScale;
@@ -2960,8 +2962,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     setIsZoomed(false);
                   } else {
                     // ズームイン：プリントエリアの中心にズーム
-                    const canvasSize = 800;
-                    const printArea = getPrintAreaInPixels(canvasSize);
+                    const printArea = getPrintAreaInPixels(CANVAS_SIZE);
                     
                     // プリントエリアの中心座標
                     const centerX = printArea.left + printArea.width / 2;
@@ -3076,9 +3077,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 >
                   {snapGuides.vertical !== null && (
                     <line
-                      x1={`${(snapGuides.vertical / canvasSize) * 100}%`}
+                      x1={`${(snapGuides.vertical / CANVAS_SIZE) * 100}%`}
                       y1="0"
-                      x2={`${(snapGuides.vertical / canvasSize) * 100}%`}
+                      x2={`${(snapGuides.vertical / CANVAS_SIZE) * 100}%`}
                       y2="100%"
                       stroke="#ff00ff"
                       strokeWidth="1"
@@ -3089,9 +3090,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   {snapGuides.horizontal !== null && (
                     <line
                       x1="0"
-                      y1={`${(snapGuides.horizontal / canvasSize) * 100}%`}
+                      y1={`${(snapGuides.horizontal / CANVAS_SIZE) * 100}%`}
                       x2="100%"
-                      y2={`${(snapGuides.horizontal / canvasSize) * 100}%`}
+                      y2={`${(snapGuides.horizontal / CANVAS_SIZE) * 100}%`}
                       stroke="#ff00ff"
                       strokeWidth="1"
                       strokeDasharray="5,5"

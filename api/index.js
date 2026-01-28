@@ -147,7 +147,6 @@ function App() {
       /* @__PURE__ */ jsx2("link", { rel: "preconnect", href: "https://fonts.googleapis.com" }),
       /* @__PURE__ */ jsx2("link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" }),
       /* @__PURE__ */ jsx2("link", { href: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;700&family=M+PLUS+1p:wght@400;700&family=M+PLUS+2:wght@400;700&family=Murecho:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&family=Zen+Kaku+Gothic+Antique:wght@400;700&family=Zen+Old+Mincho:wght@400;700&family=Zen+Kurenaido&family=Zen+Antique&family=Zen+Antique+Soft&family=Kosugi+Maru&family=Kosugi&family=Sawarabi+Mincho&family=Sawarabi+Gothic&family=Klee+One:wght@400;600&family=Shippori+Mincho:wght@400;700&family=Shippori+Antique&family=Shippori+Antique+B1&family=Yusei+Magic&family=Yomogi&family=BIZ+UDPGothic:wght@400;700&family=BIZ+UDPMincho:wght@400;700&family=Dela+Gothic+One&family=DotGothic16&family=Hina+Mincho&family=Kiwi+Maru:wght@400;500&family=Reggae+One&family=RocknRoll+One&family=Potta+One&family=Train+One&family=Rampart+One&family=Kaisei+Decol:wght@400;700&family=Kaisei+HarunoUmi:wght@400;700&family=Kaisei+Tokumin:wght@400;700&family=Kaisei+Opti:wght@400;700&family=Stick&family=Mochiy+Pop+One&family=Mochiy+Pop+P+One&family=New+Tegomin&family=Hachi+Maru+Pop&family=Otomanopee+One&family=Shirokuma&family=Slackkey&family=Cherry+Bomb+One&family=Monomaniac+One&family=Palette+Mosaic&family=Yuji+Syuku&family=Yuji+Boku&family=Yuji+Mai&display=swap", rel: "stylesheet" }),
-      /* @__PURE__ */ jsx2("script", { src: "https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js" }),
       /* @__PURE__ */ jsx2("style", { children: `
           * {
             box-sizing: border-box;
@@ -170,6 +169,13 @@ function App() {
         ` })
     ] }),
     /* @__PURE__ */ jsxs("body", { children: [
+      /* @__PURE__ */ jsx2(
+        "script",
+        {
+          src: "https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js",
+          crossOrigin: "anonymous"
+        }
+      ),
       /* @__PURE__ */ jsx2(Outlet, {}),
       /* @__PURE__ */ jsx2(ScrollRestoration, {}),
       /* @__PURE__ */ jsx2(
@@ -792,7 +798,7 @@ var Icon = ({ type, size = 20, color = "currentColor" }) => /* @__PURE__ */ jsx3
   { value: "Impact", label: "Impact", family: "Impact, sans-serif", type: "english" },
   { value: "Palatino", label: "Palatino", family: "Palatino, serif", type: "english" },
   { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" }
-];
+], CANVAS_SIZE = 800;
 function PrintAIze({ product }) {
   let canvasRef = useRef(null), fabricCanvasRef = useRef(null), fileInputRef = useRef(null), [uploadedImages, setUploadedImages] = useState([]), [isLoading, setIsLoading] = useState(!1), [isFabricReady, setIsFabricReady] = useState(!1), [showCopyrightModal, setShowCopyrightModal] = useState(!1), [copyrightAgreed, setCopyrightAgreed] = useState(!1), [imageQualityWarning, setImageQualityWarning] = useState(null), pendingImageRef = useRef(null), [fabricLoaded, setFabricLoaded] = useState(!1), [aiPrompt, setAiPrompt] = useState(""), [isGenerating, setIsGenerating] = useState(!1), [lastAIPrompt, setLastAIPrompt] = useState(""), [generatedImageUrl, setGeneratedImageUrl] = useState(""), [textInput, setTextInput] = useState(""), [textColor, setTextColor] = useState("#000000"), [fontSize, setFontSize] = useState(40), [fontFamily, setFontFamily] = useState("Noto Sans JP"), firstTextObjectRef = useRef(null), [isFontDropdownOpen, setIsFontDropdownOpen] = useState(!1), [selectedObject, setSelectedObject] = useState(null), [activeFontTab, setActiveFontTab] = useState("japanese"), historyRef = useRef([]), historyStepRef = useRef(0), [canUndo, setCanUndo] = useState(!1), [canRedo, setCanRedo] = useState(!1), isHistoryInitializedRef = useRef(!1), isLoadingHistoryRef = useRef(!1), [isAddingToCart, setIsAddingToCart] = useState(!1), [loadingMessage, setLoadingMessage] = useState(""), [isModalOpen, setIsModalOpen] = useState(!1), [modalColor, setModalColor] = useState(product.colors[0].name), [modalQuantities, setModalQuantities] = useState(() => {
     let initial = {};
@@ -806,7 +812,7 @@ function PrintAIze({ product }) {
         XXL: 0
       };
     }), initial;
-  }), [selectedColor, setSelectedColor] = useState(product.colors[0]), [selectedSize, setSelectedSize] = useState("M"), sizes = ["S", "M", "L", "XL", "XXL"], [isMobile, setIsMobile] = useState(!1), [isZoomed, setIsZoomed] = useState(!1);
+  }), [selectedColor, setSelectedColor] = useState(product.colors[0]), [selectedSize, setSelectedSize] = useState("M"), sizes = ["S", "M", "L", "XL", "XXL"], [isMobile, setIsMobile] = useState(!1), [isZoomed, setIsZoomed] = useState(!1), [showTrash, setShowTrash] = useState(!1), [isOverTrash, setIsOverTrash] = useState(!1), [snapGuides, setSnapGuides] = useState({ vertical: null, horizontal: null });
   useEffect(() => {
     let handleEscape = (e) => {
       e.key === "Escape" && isZoomed && fabricCanvasRef.current && (fabricCanvasRef.current.setViewportTransform([1, 0, 0, 1, 0, 0]), fabricCanvasRef.current.renderAll(), setIsZoomed(!1));
@@ -844,10 +850,10 @@ function PrintAIze({ product }) {
     };
   };
   useEffect(() => {
-    let checkFabric = setInterval(() => {
-      typeof window < "u" && typeof window.fabric < "u" && (setFabricLoaded(!0), clearInterval(checkFabric));
+    let checkCount = 0, isLoaded = !1, checkFabric = setInterval(() => {
+      checkCount++, typeof window < "u" && typeof window.fabric < "u" && (isLoaded = !0, setFabricLoaded(!0), clearInterval(checkFabric));
     }, 100), timeout = setTimeout(() => {
-      clearInterval(checkFabric), fabricLoaded || console.error("Fabric.js\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+      clearInterval(checkFabric), isLoaded || console.error("\u274C Fabric.js\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
     }, 1e4);
     return () => {
       clearInterval(checkFabric), clearTimeout(timeout);
@@ -855,9 +861,9 @@ function PrintAIze({ product }) {
   }, []), useEffect(() => {
     if (!canvasRef.current || !fabricLoaded || typeof window.fabric > "u")
       return;
-    let fabricLib = window.fabric, canvasSize = 800, canvas = new fabricLib.Canvas(canvasRef.current, {
-      width: canvasSize,
-      height: canvasSize,
+    let fabricLib = window.fabric, canvas = new fabricLib.Canvas(canvasRef.current, {
+      width: CANVAS_SIZE,
+      height: CANVAS_SIZE,
       backgroundColor: "#fafafa",
       selection: !0,
       preserveObjectStacking: !0,
@@ -925,7 +931,7 @@ function PrintAIze({ product }) {
         }), img.setControlsVisibility({
           deleteControl: !1
         }), canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-        let printArea2 = getPrintAreaInPixels(canvasSize), getPrintAreaStrokeColor = () => {
+        let printArea2 = getPrintAreaInPixels(CANVAS_SIZE), getPrintAreaStrokeColor = () => {
           let colorName = selectedColor.name.toLowerCase();
           return colorName.includes("\u30D6\u30E9\u30C3\u30AF") || colorName.includes("black") ? "white" : "#000000";
         }, printRect = new fabricLib.Rect({
@@ -948,15 +954,15 @@ function PrintAIze({ product }) {
         }), canvas.add(printRect), setTimeout(() => {
           if (!isHistoryInitializedRef.current) {
             let json8 = JSON.stringify(canvas.toJSON(["selectable", "evented", "name"]));
-            historyRef.current = [json8], historyStepRef.current = 0, isHistoryInitializedRef.current = !0, updateHistoryButtons(), console.log("\u521D\u671F\u5316\u5B8C\u4E86 - \u5C65\u6B74\u4FDD\u5B58\u304C\u6709\u52B9\u306B\u306A\u308A\u307E\u3057\u305F");
+            historyRef.current = [json8], historyStepRef.current = 0, isHistoryInitializedRef.current = !0, updateHistoryButtons();
           }
         }, 100);
       },
       { crossOrigin: "anonymous" }
     );
-    let printArea = getPrintAreaInPixels(canvasSize), touchListenersAdded = !1, canvasElement = canvasRef.current;
-    if (isMobileDevice && canvasElement) {
-      let lastDistance = 0, lastAngle = 0, isGesture = !1, lastCenter = { x: 0, y: 0 }, getTouchDistance = (touch1, touch2) => {
+    let printArea = getPrintAreaInPixels(CANVAS_SIZE), touchListenersAdded = !1, canvasElement = canvasRef.current, canvasWrapper = canvas.wrapperEl;
+    if (isMobileDevice && canvasWrapper) {
+      let lastDistance = 0, initialDistance = 0, initialScale = { x: 1, y: 1 }, initialAngle = 0, cumulativeAngle = 0, lastAngle = 0, isGesture = !1, rotationEnabled = !1, gestureFrameCount = 0, lastCenter = { x: 0, y: 0 }, getTouchDistance = (touch1, touch2) => {
         let dx = touch1.clientX - touch2.clientX, dy = touch1.clientY - touch2.clientY;
         return Math.sqrt(dx * dx + dy * dy);
       }, getTouchAngle = (touch1, touch2) => {
@@ -967,9 +973,19 @@ function PrintAIze({ product }) {
         y: (touch1.clientY + touch2.clientY) / 2
       }), handleTouchStart = (e) => {
         if (e.touches.length === 2) {
-          isGesture = !0;
+          canvasWrapper.style.touchAction = "none", isGesture = !0;
           let activeObject = canvas.getActiveObject();
-          activeObject && activeObject.name !== "printArea" && (e.preventDefault(), lastDistance = getTouchDistance(e.touches[0], e.touches[1]), lastAngle = getTouchAngle(e.touches[0], e.touches[1]), lastCenter = getTouchCenter(e.touches[0], e.touches[1]), activeObject.setControlsVisibility({
+          if (!activeObject || activeObject.name === "printArea") {
+            let rect = canvasWrapper.getBoundingClientRect(), canvasScale = CANVAS_SIZE / rect.width, touch1 = e.touches[0], pointer = {
+              x: (touch1.clientX - rect.left) * canvasScale,
+              y: (touch1.clientY - rect.top) * canvasScale
+            }, target = canvas.findTarget(e, !1);
+            target && target.name !== "printArea" && (canvas.setActiveObject(target), activeObject = target);
+          }
+          activeObject && activeObject.name !== "printArea" && (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation(), initialDistance = getTouchDistance(e.touches[0], e.touches[1]), lastDistance = initialDistance, initialScale = {
+            x: activeObject.scaleX || 1,
+            y: activeObject.scaleY || 1
+          }, initialAngle = getTouchAngle(e.touches[0], e.touches[1]), lastAngle = initialAngle, cumulativeAngle = 0, rotationEnabled = !1, gestureFrameCount = 0, lastCenter = getTouchCenter(e.touches[0], e.touches[1]), activeObject.hasControls && activeObject.setControlsVisibility({
             mt: !1,
             mb: !1,
             ml: !1,
@@ -985,49 +1001,48 @@ function PrintAIze({ product }) {
         if (e.touches.length === 2 && isGesture) {
           let activeObject = canvas.getActiveObject();
           if (activeObject && activeObject.name !== "printArea") {
-            e.preventDefault();
-            let currentCenter = getTouchCenter(e.touches[0], e.touches[1]), rect = canvasElement.getBoundingClientRect(), canvasScale = canvasSize / rect.width;
+            e.preventDefault(), e.stopPropagation(), gestureFrameCount++;
+            let currentCenter = getTouchCenter(e.touches[0], e.touches[1]), rect = canvasWrapper.getBoundingClientRect(), canvasScale = CANVAS_SIZE / rect.width;
             if (lastCenter.x !== 0) {
               let dx = (currentCenter.x - lastCenter.x) * canvasScale, dy = (currentCenter.y - lastCenter.y) * canvasScale;
               activeObject.left = (activeObject.left || 0) + dx, activeObject.top = (activeObject.top || 0) + dy;
             }
             lastCenter = currentCenter;
             let currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-            if (lastDistance > 0) {
-              let scale = currentDistance / lastDistance, newScaleX = (activeObject.scaleX || 1) * scale, newScaleY = (activeObject.scaleY || 1) * scale;
-              newScaleX > 0.1 && newScaleX < 10 && newScaleY > 0.1 && newScaleY < 10 && (activeObject.scaleX = newScaleX, activeObject.scaleY = newScaleY);
+            if (initialDistance > 0) {
+              let enhancedRatio = 1 + (currentDistance / initialDistance - 1) * 1.5, newScaleX = initialScale.x * enhancedRatio, newScaleY = initialScale.y * enhancedRatio;
+              newScaleX > 0.05 && newScaleX < 15 && newScaleY > 0.05 && newScaleY < 15 && (activeObject.scaleX = newScaleX, activeObject.scaleY = newScaleY);
             }
-            lastDistance = currentDistance;
-            let currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
-            if (lastAngle !== 0) {
-              let angleDiff = currentAngle - lastAngle;
-              activeObject.angle = (activeObject.angle || 0) + angleDiff;
-            }
-            lastAngle = currentAngle, activeObject.setCoords();
+            let currentAngle = getTouchAngle(e.touches[0], e.touches[1]), angleDiff = currentAngle - lastAngle;
+            angleDiff > 180 && (angleDiff -= 360), angleDiff < -180 && (angleDiff += 360), cumulativeAngle += angleDiff, !rotationEnabled && gestureFrameCount > 3 && Math.abs(cumulativeAngle) > 15 && (rotationEnabled = !0), rotationEnabled && (activeObject.angle = (activeObject.angle || 0) + angleDiff), lastAngle = currentAngle, activeObject.setCoords();
             let objBounds = activeObject.getBoundingRect(!0);
             objBounds.left < printArea.left && (activeObject.left += printArea.left - objBounds.left), objBounds.top < printArea.top && (activeObject.top += printArea.top - objBounds.top), objBounds.left + objBounds.width > printArea.left + printArea.width && (activeObject.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top + objBounds.height > printArea.top + printArea.height && (activeObject.top -= objBounds.top + objBounds.height - (printArea.top + printArea.height)), activeObject.setCoords(), canvas.renderAll();
           }
         }
       }, handleTouchEnd = (e) => {
         if (e.touches.length < 2) {
-          isGesture = !1, lastDistance = 0, lastAngle = 0, lastCenter = { x: 0, y: 0 };
+          canvasWrapper.style.touchAction = "pan-y", isGesture = !1, lastDistance = 0, initialDistance = 0, initialScale = { x: 1, y: 1 }, initialAngle = 0, cumulativeAngle = 0, lastAngle = 0, rotationEnabled = !1, gestureFrameCount = 0, lastCenter = { x: 0, y: 0 };
           let activeObject = canvas.getActiveObject();
-          activeObject && activeObject.name !== "printArea" && (activeObject.setControlsVisibility({
-            mt: !1,
-            mb: !1,
-            ml: !1,
-            mr: !1,
-            tl: !0,
-            tr: !0,
-            bl: !0,
-            br: !0,
-            mtr: !0,
-            deleteControl: !0
-          }), canvas.renderAll(), saveHistory());
+          if (activeObject && activeObject.name !== "printArea") {
+            activeObject.setCoords();
+            let objBounds = activeObject.getBoundingRect(!0);
+            objBounds.left < printArea.left && (activeObject.left += printArea.left - objBounds.left), objBounds.top < printArea.top && (activeObject.top += printArea.top - objBounds.top), objBounds.left + objBounds.width > printArea.left + printArea.width && (activeObject.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top + objBounds.height > printArea.top + printArea.height && (activeObject.top -= objBounds.top + objBounds.height - (printArea.top + printArea.height)), activeObject.setCoords(), activeObject.hasControls && activeObject.setControlsVisibility({
+              mt: !1,
+              mb: !1,
+              ml: !1,
+              mr: !1,
+              tl: !0,
+              tr: !0,
+              bl: !0,
+              br: !0,
+              mtr: !0,
+              deleteControl: !0
+            }), canvas.renderAll(), saveHistory();
+          }
         }
       };
-      canvasElement.addEventListener("touchstart", handleTouchStart, { passive: !1 }), canvasElement.addEventListener("touchmove", handleTouchMove, { passive: !1 }), canvasElement.addEventListener("touchend", handleTouchEnd), touchListenersAdded = !0, canvas._touchHandlers = {
-        element: canvasElement,
+      canvasWrapper.addEventListener("touchstart", handleTouchStart, { passive: !1, capture: !0 }), canvasWrapper.addEventListener("touchmove", handleTouchMove, { passive: !1, capture: !0 }), canvasWrapper.addEventListener("touchend", handleTouchEnd, { capture: !0 }), touchListenersAdded = !0, canvas._touchHandlers = {
+        element: canvasWrapper,
         start: handleTouchStart,
         move: handleTouchMove,
         end: handleTouchEnd
@@ -1044,8 +1059,20 @@ function PrintAIze({ product }) {
       } else
         obj._movingStart = null;
       obj.setCoords();
-      let objBounds = obj.getBoundingRect(!0);
-      objBounds.left < printArea.left && (obj.left += printArea.left - objBounds.left), objBounds.left + objBounds.width > printArea.left + printArea.width && (obj.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top < printArea.top && (obj.top += printArea.top - objBounds.top), objBounds.top + objBounds.height > printArea.top + printArea.height && (obj.top -= objBounds.top + objBounds.height - (printArea.top + printArea.height));
+      let objBounds = obj.getBoundingRect(!0), trashZoneStart = printArea.top + printArea.height, trashZoneThreshold = trashZoneStart + 80, trashZoneActive = trashZoneStart + 120, objectBottom = objBounds.top + objBounds.height;
+      objectBottom > trashZoneThreshold ? (setShowTrash(!0), objectBottom > trashZoneActive ? setIsOverTrash(!0) : setIsOverTrash(!1)) : (setShowTrash(!1), setIsOverTrash(!1));
+      let snapThreshold = 10, centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, objCenterX = objBounds.left + objBounds.width / 2, objCenterY = objBounds.top + objBounds.height / 2;
+      obj._lastPos || (obj._lastPos = { x: obj.left, y: obj.top });
+      let moveX = Math.abs(obj.left - obj._lastPos.x), moveY = Math.abs(obj.top - obj._lastPos.y), isHorizontalMove = moveX > moveY * 2, isVerticalMove = moveY > moveX * 2;
+      obj._lastPos = { x: obj.left, y: obj.top };
+      let newGuides = { vertical: null, horizontal: null };
+      (!isHorizontalMove || Math.abs(objCenterX - centerX) < snapThreshold * 3) && Math.abs(objCenterX - centerX) < snapThreshold && (obj.left += centerX - objCenterX, newGuides.vertical = centerX), (!isVerticalMove || Math.abs(objCenterY - centerY) < snapThreshold * 3) && Math.abs(objCenterY - centerY) < snapThreshold && (obj.top += centerY - objCenterY, newGuides.horizontal = centerY), (!isHorizontalMove || Math.abs(objBounds.left - printArea.left) < snapThreshold * 3) && Math.abs(objBounds.left - printArea.left) < snapThreshold && (obj.left += printArea.left - objBounds.left, newGuides.vertical = printArea.left + objBounds.width / 2);
+      let rightEdge = printArea.left + printArea.width;
+      (!isHorizontalMove || Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold * 3) && Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold && (obj.left += rightEdge - (objBounds.left + objBounds.width), newGuides.vertical = rightEdge - objBounds.width / 2), (!isVerticalMove || Math.abs(objBounds.top - printArea.top) < snapThreshold * 3) && Math.abs(objBounds.top - printArea.top) < snapThreshold && (obj.top += printArea.top - objBounds.top, newGuides.horizontal = printArea.top + objBounds.height / 2);
+      let bottomEdge = printArea.top + printArea.height;
+      (!isVerticalMove || Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold * 3) && Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold && (obj.top += bottomEdge - (objBounds.top + objBounds.height), newGuides.horizontal = bottomEdge - objBounds.height / 2), setSnapGuides(newGuides), objBounds.left < printArea.left && (obj.left += printArea.left - objBounds.left), objBounds.left + objBounds.width > printArea.left + printArea.width && (obj.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top < printArea.top && (obj.top += printArea.top - objBounds.top);
+      let maxBottom = printArea.top + printArea.height + 200;
+      objBounds.top + objBounds.height > maxBottom && (obj.top -= objBounds.top + objBounds.height - maxBottom);
     }), canvas.on("object:scaling", (e) => {
       let obj = e.target;
       if (!obj || obj.name === "printArea")
@@ -1080,10 +1107,18 @@ function PrintAIze({ product }) {
     }), canvas.on("selection:updated", (e) => {
       setSelectedObject(e.selected?.[0] || null), canvasRef.current && (canvasRef.current.style.touchAction = "none");
     }), canvas.on("selection:cleared", () => {
-      setSelectedObject(null), canvasRef.current && window.innerWidth < 768 && (canvasRef.current.style.touchAction = "pan-y");
+      setSelectedObject(null), setShowTrash(!1), setIsOverTrash(!1), setSnapGuides({ vertical: null, horizontal: null }), canvasRef.current && window.innerWidth < 768 && (canvasRef.current.style.touchAction = "pan-y");
     }), canvas.on("object:modified", (e) => {
       let obj = e.target;
-      if (obj && obj._movingStart && (obj._movingStart = null), obj && obj.type === "i-text" && adjustTextSizeToFitPrintArea(obj), obj && obj.name !== "printArea") {
+      if (obj && obj.name !== "printArea") {
+        obj.setCoords();
+        let objBounds = obj.getBoundingRect(!0), trashZoneActive = printArea.top + printArea.height + 120;
+        if (objBounds.top + objBounds.height > trashZoneActive) {
+          canvas.remove(obj), setShowTrash(!1), setIsOverTrash(!1), canvas.renderAll();
+          return;
+        }
+      }
+      if (setShowTrash(!1), setIsOverTrash(!1), setSnapGuides({ vertical: null, horizontal: null }), obj && obj._movingStart && (obj._movingStart = null), obj && obj._lastPos && (obj._lastPos = null), obj && obj.type === "i-text" && adjustTextSizeToFitPrintArea(obj), obj && obj.name !== "printArea") {
         obj.setCoords();
         let objBounds = obj.getBoundingRect(!0), needsAdjustment = !1;
         if (objBounds.left < printArea.left || objBounds.top < printArea.top || objBounds.left + objBounds.width > printArea.left + printArea.width || objBounds.top + objBounds.height > printArea.top + printArea.height) {
@@ -1129,7 +1164,7 @@ function PrintAIze({ product }) {
     return window.addEventListener("keydown", handleKeyDown), () => {
       if (window.removeEventListener("keydown", handleKeyDown), fabricCanvasRef.current && fabricCanvasRef.current._touchHandlers) {
         let handlers = fabricCanvasRef.current._touchHandlers;
-        handlers.element.removeEventListener("touchstart", handlers.start), handlers.element.removeEventListener("touchmove", handlers.move), handlers.element.removeEventListener("touchend", handlers.end);
+        handlers.element.removeEventListener("touchstart", handlers.start, { capture: !0 }), handlers.element.removeEventListener("touchmove", handlers.move, { capture: !0 }), handlers.element.removeEventListener("touchend", handlers.end, { capture: !0 });
       }
       fabricCanvasRef.current && fabricCanvasRef.current.dispose();
     };
@@ -1159,29 +1194,13 @@ function PrintAIze({ product }) {
     });
   }, [selectedColor, fabricLoaded, getCurrentMockupImage]);
   let saveHistory = () => {
-    if (!fabricCanvasRef.current)
+    if (!fabricCanvasRef.current || !isHistoryInitializedRef.current || isLoadingHistoryRef.current)
       return;
-    if (!isHistoryInitializedRef.current) {
-      console.log("\u5C65\u6B74\u672A\u521D\u671F\u5316\u306E\u305F\u3081\u4FDD\u5B58\u3092\u30B9\u30AD\u30C3\u30D7");
-      return;
-    }
-    if (isLoadingHistoryRef.current) {
-      console.log("\u5C65\u6B74\u8AAD\u307F\u8FBC\u307F\u4E2D\u306E\u305F\u3081\u4FDD\u5B58\u3092\u30B9\u30AD\u30C3\u30D7");
-      return;
-    }
     let json8 = JSON.stringify(fabricCanvasRef.current.toJSON(["selectable", "evented", "name"]));
-    historyRef.current = historyRef.current.slice(0, historyStepRef.current + 1), historyRef.current.push(json8), historyStepRef.current = historyRef.current.length - 1, console.log("\u5C65\u6B74\u4FDD\u5B58:", {
-      step: historyStepRef.current,
-      total: historyRef.current.length
-    }), historyRef.current.length > 50 && (historyRef.current.splice(1, 1), historyStepRef.current--), updateHistoryButtons();
+    historyRef.current = historyRef.current.slice(0, historyStepRef.current + 1), historyRef.current.push(json8), historyStepRef.current = historyRef.current.length - 1, historyRef.current.length > 50 && (historyRef.current.splice(1, 1), historyStepRef.current--), updateHistoryButtons();
   }, updateHistoryButtons = () => {
     let newCanUndo = historyStepRef.current > 0, newCanRedo = historyStepRef.current < historyRef.current.length - 1;
-    console.log("\u5C65\u6B74\u66F4\u65B0:", {
-      current: historyStepRef.current,
-      total: historyRef.current.length,
-      canUndo: newCanUndo,
-      canRedo: newCanRedo
-    }), setCanUndo(newCanUndo), setCanRedo(newCanRedo);
+    setCanUndo(newCanUndo), setCanRedo(newCanRedo);
   }, handleUndo = () => {
     if (historyStepRef.current > 0 && fabricCanvasRef.current) {
       isLoadingHistoryRef.current = !0, historyStepRef.current--;
@@ -1279,14 +1298,18 @@ ${width} \xD7 ${height}px
             maxHeight / (fabricImg.height || 1),
             1
           );
-          fabricImg.scale(scale), fabricImg.set({
+          fabricImg.scale(scale);
+          let isMobileView = window.innerWidth < 768;
+          fabricImg.set({
             left: printArea.left + printArea.width / 2,
             top: printArea.top + printArea.height / 2,
             originX: "center",
             originY: "center",
             selectable: !0,
-            hasControls: !0,
-            hasBorders: !0
+            hasControls: !isMobileView,
+            // スマホではコントロール非表示
+            hasBorders: !isMobileView
+            // スマホでは枠線も非表示
           }), fabricImg.originalImageData = imageUrl, fabricImg.originalWidth = img.width, fabricImg.originalHeight = img.height, canvas.add(fabricImg), canvas.setActiveObject(fabricImg), canvas.renderAll(), setIsLoading(!1), event.target.value = "";
         }) : (setIsLoading(!1), event.target.value = "");
       }, img.src = imageUrl;
@@ -1339,14 +1362,18 @@ ${width} \xD7 ${height}px
           maxHeight / (img.height || 1),
           1
         );
-        img.scale(scale), img.set({
+        img.scale(scale);
+        let isMobileView = window.innerWidth < 768;
+        img.set({
           left: printArea.left + printArea.width / 2,
           top: printArea.top + printArea.height / 2,
           originX: "center",
           originY: "center",
           selectable: !0,
-          hasControls: !0,
-          hasBorders: !0
+          hasControls: !isMobileView,
+          // スマホではコントロール非表示
+          hasBorders: !isMobileView
+          // スマホでは枠線も非表示
         }), img.originalImageData = data.imageUrl, img.originalWidth = img.width, img.originalHeight = img.height, fabricCanvasRef.current?.add(img), fabricCanvasRef.current?.setActiveObject(img), fabricCanvasRef.current?.renderAll();
       }, { crossOrigin: "anonymous" }), setAiPrompt("")) : alert(data.error || "AI\u753B\u50CF\u751F\u6210\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
     } catch (error) {
@@ -1414,15 +1441,10 @@ ${width} \xD7 ${height}px
     setFontFamily(font), selectedObject && selectedObject.type === "i-text" && (selectedObject.set({ fontFamily: font }), adjustTextSizeToFitPrintArea(selectedObject), fabricCanvasRef.current?.renderAll(), saveHistory());
   }, getFilteredFonts = () => FONT_LIST.filter((font) => font.type === activeFontTab), uploadToSupabaseDirect = async (imageDataUrl) => {
     try {
-      console.log("Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u958B\u59CB...");
-      let blob = await (await fetch(imageDataUrl)).blob(), fileSizeMB = Math.round(blob.size / 1024 / 1024 * 100) / 100;
-      console.log("\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3059\u308B\u30D5\u30A1\u30A4\u30EB\u30B5\u30A4\u30BA:", fileSizeMB, "MB");
-      let timestamp = Date.now(), randomId = Math.random().toString(36).substring(2, 15), fileName = `design-${timestamp}-${randomId}.png`, { createClient } = await import("@supabase/supabase-js"), supabaseUrl = window.ENV?.SUPABASE_URL || "", supabaseKey = window.ENV?.SUPABASE_ANON_KEY || "";
+      let blob = await (await fetch(imageDataUrl)).blob(), timestamp = Date.now(), randomId = Math.random().toString(36).substring(2, 15), fileName = `design-${timestamp}-${randomId}.png`, { createClient } = await import("@supabase/supabase-js"), supabaseUrl = window.ENV?.SUPABASE_URL || "", supabaseKey = window.ENV?.SUPABASE_ANON_KEY || "";
       if (!supabaseUrl || !supabaseKey)
         throw new Error("Supabase\u8A2D\u5B9A\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093");
-      let supabase = createClient(supabaseUrl, supabaseKey);
-      console.log("Supabase\u306B\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D:", fileName);
-      let { data, error } = await supabase.storage.from("printaize").upload(fileName, blob, {
+      let supabase = createClient(supabaseUrl, supabaseKey), { data, error } = await supabase.storage.from("printaize").upload(fileName, blob, {
         contentType: "image/png",
         cacheControl: "3600",
         upsert: !1
@@ -1430,7 +1452,7 @@ ${width} \xD7 ${height}px
       if (error)
         throw console.error("Supabase\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", error), new Error(`Supabase\u3078\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F: ${error.message}`);
       let { data: urlData } = supabase.storage.from("printaize").getPublicUrl(data.path);
-      return console.log("Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", urlData.publicUrl), urlData.publicUrl;
+      return urlData.publicUrl;
     } catch (error) {
       throw console.error("Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", error), error;
     }
@@ -1441,14 +1463,12 @@ ${width} \xD7 ${height}px
         console.error("Fabric.js not loaded"), reject(new Error("Fabric.js not loaded"));
         return;
       }
-      let targetWidth = 2953, targetHeight = 3685, scaleRatio = targetWidth / printArea.width;
-      console.log("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u958B\u59CB:", { targetWidth, targetHeight, scaleRatio });
-      let offscreenCanvas = new fabricLib.Canvas(null, {
+      let targetWidth = 2953, targetHeight = 3685, scaleRatio = targetWidth / printArea.width, offscreenCanvas = new fabricLib.Canvas(null, {
         width: targetWidth,
         height: targetHeight,
         backgroundColor: "transparent"
       }), filteredObjects = canvas.getObjects().filter((obj) => obj.name !== "printArea"), totalObjects = filteredObjects.length;
-      if (console.log("\u51E6\u7406\u3059\u308B\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u6570:", totalObjects), totalObjects === 0) {
+      if (totalObjects === 0) {
         let dataURL = offscreenCanvas.toDataURL({ format: "png", quality: 1 });
         resolve(dataURL);
         return;
@@ -1456,17 +1476,17 @@ ${width} \xD7 ${height}px
       let loadedObjects = [], loadedCount = 0, timeout = setTimeout(() => {
         console.error("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u30BF\u30A4\u30E0\u30A2\u30A6\u30C8"), reject(new Error("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u304C\u30BF\u30A4\u30E0\u30A2\u30A6\u30C8\u3057\u307E\u3057\u305F"));
       }, 3e4), checkComplete = () => {
-        if (loadedCount++, console.log(`\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u8AAD\u307F\u8FBC\u307F: ${loadedCount}/${totalObjects}`), loadedCount === totalObjects) {
+        if (loadedCount++, loadedCount === totalObjects) {
           clearTimeout(timeout);
           try {
-            console.log("\u5168\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u8AAD\u307F\u8FBC\u307F\u5B8C\u4E86\u3002loadedObjects\u6570:", loadedObjects.length), loadedObjects.sort((a, b) => a.index - b.index), loadedObjects.forEach((item, i) => {
-              console.log(`\u30AD\u30E3\u30F3\u30D0\u30B9\u306B\u8FFD\u52A0 [${i}]:`, item.fabricObj.type, "index:", item.index), offscreenCanvas.add(item.fabricObj);
+            loadedObjects.sort((a, b) => a.index - b.index), loadedObjects.forEach((item) => {
+              offscreenCanvas.add(item.fabricObj);
             }), offscreenCanvas.renderAll();
             let dataURL = offscreenCanvas.toDataURL({
               format: "png",
               multiplier: 1
-            }), sizeKB = Math.round(dataURL.length / 1024), sizeMB = (sizeKB / 1024).toFixed(2);
-            console.log("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u5B8C\u4E86\uFF08PNG\u900F\u904E\u3001300DPI\uFF09 - \u30B5\u30A4\u30BA:", sizeKB, "KB (", sizeMB, "MB)"), console.log("\u{1F4A1} Supabase\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3092\u4F7F\u7528\u3059\u308B\u305F\u3081\u3001\u30D5\u30A1\u30A4\u30EB\u30B5\u30A4\u30BA\u5236\u9650\u306A\u3057"), resolve(dataURL);
+            });
+            resolve(dataURL);
           } catch (error) {
             console.error("Canvas render\u30A8\u30E9\u30FC:", error), reject(error);
           }
@@ -1476,7 +1496,7 @@ ${width} \xD7 ${height}px
         try {
           let relativeLeft = (obj.left - printArea.left) * scaleRatio, relativeTop = (obj.top - printArea.top) * scaleRatio;
           if (obj.type === "image" && obj.originalImageData)
-            console.log("\u753B\u50CF\u8AAD\u307F\u8FBC\u307F\u958B\u59CB:", obj.originalImageData.substring(0, 50)), fabricLib.Image.fromURL(
+            fabricLib.Image.fromURL(
               obj.originalImageData,
               (hdImg) => {
                 if (!hdImg) {
@@ -1508,7 +1528,7 @@ ${width} \xD7 ${height}px
                     originY: obj.originY,
                     flipX: obj.flipX,
                     flipY: obj.flipY
-                  }), obj.filters && obj.filters.length > 0 && (hdImg.filters = obj.filters.map((filter) => Object.assign(Object.create(Object.getPrototypeOf(filter)), filter)), hdImg.applyFilters()), console.log("\u753B\u50CF\u3092loadedObjects\u306B\u8FFD\u52A0:", index), loadedObjects.push({ index, fabricObj: hdImg }), checkComplete();
+                  }), obj.filters && obj.filters.length > 0 && (hdImg.filters = obj.filters.map((filter) => Object.assign(Object.create(Object.getPrototypeOf(filter)), filter)), hdImg.applyFilters()), loadedObjects.push({ index, fabricObj: hdImg }), checkComplete();
                 } catch (error) {
                   console.error("\u753B\u50CF\u8A2D\u5B9A\u30A8\u30E9\u30FC:", error), checkComplete();
                 }
@@ -1528,7 +1548,7 @@ ${width} \xD7 ${height}px
               scaleX: obj.scaleX,
               scaleY: obj.scaleY
             });
-            console.log("\u30C6\u30AD\u30B9\u30C8\u3092loadedObjects\u306B\u8FFD\u52A0:", index), loadedObjects.push({ index, fabricObj: hdText }), checkComplete();
+            loadedObjects.push({ index, fabricObj: hdText }), checkComplete();
           } else
             checkComplete();
         } catch (error) {
@@ -1585,11 +1605,9 @@ ${width} \xD7 ${height}px
         }
         let dataURLHD;
         try {
-          if (console.log("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u3092\u751F\u6210\u4E2D..."), !printArea)
+          if (!printArea)
             throw new Error("\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093");
           dataURLHD = await generateHighResolutionOutput(canvas, printArea);
-          let sizeInKB = Math.round(dataURLHD.length * 0.75 / 1024), sizeInMB = (sizeInKB / 1024).toFixed(2);
-          console.log(`\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u5B8C\u4E86\uFF08PNG\u900F\u904E\u3001300DPI\uFF09 - \u30B5\u30A4\u30BA: ${sizeInKB} KB ( ${sizeInMB} MB)`);
         } catch (error) {
           console.error("\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u30A8\u30E9\u30FC:", error), alert(`\u9AD8\u89E3\u50CF\u5EA6\u51FA\u529B\u306B\u5931\u6557\u3057\u307E\u3057\u305F
 
@@ -1598,7 +1616,7 @@ ${width} \xD7 ${height}px
         }
         let designImageUrl;
         try {
-          console.log("\u30D7\u30EC\u30D3\u30E5\u30FC\u753B\u50CF\u3092\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D..."), designImageUrl = await uploadToSupabaseDirect(dataURL), console.log("\u30D7\u30EC\u30D3\u30E5\u30FC\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", designImageUrl);
+          designImageUrl = await uploadToSupabaseDirect(dataURL);
         } catch (uploadError) {
           console.error("\u30D7\u30EC\u30D3\u30E5\u30FC\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", uploadError), alert(`\u30D7\u30EC\u30D3\u30E5\u30FC\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F
 
@@ -1607,7 +1625,7 @@ ${width} \xD7 ${height}px
         }
         let designImageUrlHD;
         try {
-          console.log("\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D..."), designImageUrlHD = await uploadToSupabaseDirect(dataURLHD), console.log("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", designImageUrlHD);
+          designImageUrlHD = await uploadToSupabaseDirect(dataURLHD);
         } catch (uploadError) {
           console.error("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", uploadError), alert(`\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F
 
@@ -1627,7 +1645,7 @@ ${width} \xD7 ${height}px
                 // 全カラー・サイズの選択を保存
               }
             }).select().single();
-            insertError ? console.error("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u306E\u8A18\u9332\u30A8\u30E9\u30FC:", insertError) : insertData && (designImageId = insertData.id, console.log("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u3092\u8A18\u9332\u3057\u307E\u3057\u305F:", designImageId));
+            insertError ? console.error("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u306E\u8A18\u9332\u30A8\u30E9\u30FC:", insertError) : insertData && (designImageId = insertData.id);
           }
         } catch (dbError) {
           console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u5931\u6557\uFF08\u7D9A\u884C\uFF09:", dbError);
@@ -1639,9 +1657,7 @@ ${width} \xD7 ${height}px
             { key: "design_image", value: designImageUrl },
             { key: "design_image_hd", value: designImageUrlHD }
           ]
-        }));
-        console.log("\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3059\u308B\u30A2\u30A4\u30C6\u30E0\u6570:", cartItems.length), console.log("\u30AB\u30FC\u30C8\u30A2\u30A4\u30C6\u30E0:", cartItems);
-        let checkoutUrl = "";
+        })), checkoutUrl = "";
         try {
           let response = await fetch("/api/add-to-cart-multiple", {
             method: "POST",
@@ -1659,7 +1675,7 @@ ${width} \xD7 ${height}px
 \u30A8\u30E9\u30FC: ${error instanceof Error ? error.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC"}`), setIsAddingToCart(!1), setLoadingMessage("");
           return;
         }
-        checkoutUrl ? (designImageId && (console.log("\u30AB\u30FC\u30C8\u8FFD\u52A0\u6210\u529F\u3002design_image_id:", designImageId), console.log("ordered \u306F false \u306E\u307E\u307E\uFF0830\u65E5\u5F8C\u306B\u81EA\u52D5\u524A\u9664\u3055\u308C\u308B\uFF09")), window.location.href = checkoutUrl) : alert("\u30C1\u30A7\u30C3\u30AF\u30A2\u30A6\u30C8URL\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+        checkoutUrl ? window.location.href = checkoutUrl : alert("\u30C1\u30A7\u30C3\u30AF\u30A2\u30A6\u30C8URL\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
       } catch (error) {
         console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error), alert(`\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002
 
@@ -1693,12 +1709,8 @@ ${width} \xD7 ${height}px
           format: "png",
           quality: 1
         });
-        console.log("\u30D7\u30EC\u30D3\u30E5\u30FC\u753B\u50CF\u30B5\u30A4\u30BA:", Math.round(dataURL.length / 1024), "KB"), printAreaRect && (printAreaRect.visible = !0, canvas.renderAll());
-        let printArea = getPrintAreaInPixels(canvas.width);
-        console.log("\u9AD8\u89E3\u50CF\u5EA6\u7248\u3092\u751F\u6210\u4E2D...");
-        let dataURLHD = await generateHighResolutionOutput(canvas, printArea);
-        console.log("\u9AD8\u89E3\u50CF\u5EA6\u7248\u751F\u6210\u5B8C\u4E86\u3002\u30B5\u30A4\u30BA:", Math.round(dataURLHD.length / 1024), "KB");
-        let uploadData = await (await fetch("/api/upload-image", {
+        printAreaRect && (printAreaRect.visible = !0, canvas.renderAll());
+        let printArea = getPrintAreaInPixels(canvas.width), dataURLHD = await generateHighResolutionOutput(canvas, printArea), uploadData = await (await fetch("/api/upload-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1711,7 +1723,7 @@ ${width} \xD7 ${height}px
         }
         let designImageUrlHD;
         try {
-          console.log("\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u76F4\u63A5\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u4E2D..."), designImageUrlHD = await uploadToSupabaseDirect(dataURLHD), console.log("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6210\u529F:", designImageUrlHD);
+          designImageUrlHD = await uploadToSupabaseDirect(dataURLHD);
         } catch (uploadError) {
           console.error("\u9AD8\u89E3\u50CF\u5EA6\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u30A8\u30E9\u30FC:", uploadError), alert(`\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u306E\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u306B\u5931\u6557\u3057\u307E\u3057\u305F
 
@@ -1732,7 +1744,7 @@ ${width} \xD7 ${height}px
                 size: selectedSize
               }
             }).select("id").single();
-            !insertError && insertData ? (designImageId = insertData.id, console.log("\u30C7\u30B6\u30A4\u30F3\u753B\u50CF\u3092\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u306B\u8A18\u9332:", designImageId)) : console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u30A8\u30E9\u30FC\uFF08\u7D9A\u884C\uFF09:", insertError);
+            !insertError && insertData ? designImageId = insertData.id : console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u30A8\u30E9\u30FC\uFF08\u7D9A\u884C\uFF09:", insertError);
           }
         } catch (dbError) {
           console.warn("\u30C7\u30FC\u30BF\u30D9\u30FC\u30B9\u8A18\u9332\u5931\u6557\uFF08\u7D9A\u884C\uFF09:", dbError);
@@ -1770,7 +1782,7 @@ ${width} \xD7 ${height}px
             productVariantId
           })
         })).json();
-        data.success && data.checkoutUrl ? (designImageId && (console.log("\u30AB\u30FC\u30C8\u8FFD\u52A0\u6210\u529F\u3002design_image_id:", designImageId), console.log("ordered \u306F false \u306E\u307E\u307E\uFF0830\u65E5\u5F8C\u306B\u81EA\u52D5\u524A\u9664\u3055\u308C\u308B\uFF09")), window.location.href = data.checkoutUrl) : alert(data.error || "\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
+        data.success && data.checkoutUrl ? window.location.href = data.checkoutUrl : alert(data.error || "\u30AB\u30FC\u30C8\u3078\u306E\u8FFD\u52A0\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
       } catch (error) {
         console.error("\u30AB\u30FC\u30C8\u8FFD\u52A0\u30A8\u30E9\u30FC:", error);
         let errorMessage = error instanceof Error ? error.message : "\u4E0D\u660E\u306A\u30A8\u30E9\u30FC";
@@ -1969,7 +1981,7 @@ ${width} \xD7 ${height}px
                     if (isZoomed)
                       canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
                     else {
-                      let printArea = getPrintAreaInPixels(800), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
+                      let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
                       canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
                     }
                     canvas.renderAll();
@@ -2014,6 +2026,88 @@ ${width} \xD7 ${height}px
                     objectFit: "contain",
                     touchAction: isMobile ? "pan-y" : "none"
                   }
+                }
+              ),
+              showTrash && /* @__PURE__ */ jsxs2(
+                "div",
+                {
+                  style: {
+                    position: "absolute",
+                    bottom: "20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "50%",
+                    backgroundColor: isOverTrash ? "#ff4444" : "#666",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    transition: "all 0.2s ease",
+                    zIndex: 15,
+                    animation: "trashBounce 0.3s ease"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx3(Icon, { type: "trash", size: 28, color: "white" }),
+                    /* @__PURE__ */ jsx3("style", { children: `
+                    @keyframes trashBounce {
+                      0% {
+                        transform: translateX(-50%) scale(0.8);
+                        opacity: 0;
+                      }
+                      50% {
+                        transform: translateX(-50%) scale(1.1);
+                      }
+                      100% {
+                        transform: translateX(-50%) scale(1);
+                        opacity: 1;
+                      }
+                    }
+                  ` })
+                  ]
+                }
+              ),
+              (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
+                "svg",
+                {
+                  style: {
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    pointerEvents: "none",
+                    zIndex: 5
+                  },
+                  children: [
+                    snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
+                      "line",
+                      {
+                        x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                        y1: "0",
+                        x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                        y2: "100%",
+                        stroke: "#ff00ff",
+                        strokeWidth: "1",
+                        strokeDasharray: "5,5",
+                        opacity: "0.8"
+                      }
+                    ),
+                    snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
+                      "line",
+                      {
+                        x1: "0",
+                        y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                        x2: "100%",
+                        y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                        stroke: "#ff00ff",
+                        strokeWidth: "1",
+                        strokeDasharray: "5,5",
+                        opacity: "0.8"
+                      }
+                    )
+                  ]
                 }
               )
             ]
@@ -3600,7 +3694,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-APCDOICC.js", imports: ["/build/_shared/chunk-4G2AVHG4.js", "/build/_shared/chunk-Q3IECNXJ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-P6RQDHWF.js", imports: ["/build/_shared/chunk-PGOH7JLP.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-WRGN5J6B.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-3OAHNCES.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-RGR2YX5K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-SBHTVHCW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-7WMWW6SL.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-HKEEMJ2K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-OJERIRNN.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "fad37948", hmr: void 0, url: "/build/manifest-FAD37948.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-APCDOICC.js", imports: ["/build/_shared/chunk-4G2AVHG4.js", "/build/_shared/chunk-Q3IECNXJ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-C2BYF5BU.js", imports: ["/build/_shared/chunk-PGOH7JLP.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-WRGN5J6B.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-3OAHNCES.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-RGR2YX5K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-SBHTVHCW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-7WMWW6SL.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-HKEEMJ2K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-YYPGWX5C.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "acd29d7c", hmr: void 0, url: "/build/manifest-ACD29D7C.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
