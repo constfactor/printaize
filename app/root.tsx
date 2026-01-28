@@ -66,13 +66,17 @@ export default function App() {
           crossOrigin="anonymous"
         ></script>
         
-        {/* GSAP + ScrollTrigger */}
+        {/* GSAP + ScrollTrigger + Flip */}
         <script 
           src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
           crossOrigin="anonymous"
         ></script>
         <script 
           src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+          crossOrigin="anonymous"
+        ></script>
+        <script 
+          src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"
           crossOrigin="anonymous"
         ></script>
         

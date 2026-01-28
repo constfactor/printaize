@@ -324,7 +324,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   
   // タブ状態（Apple風デザイン用）
   type TabType = "item" | "ai" | "images" | "text";
-  const [activeTab, setActiveTab] = useState<TabType>("item");
+  const [activeTab, setActiveTab] = useState<TabType | null>(null); // 最初は全て閉じた状態
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   
   // ズーム時のESCキーハンドラー
@@ -2973,37 +2973,27 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         margin: "0 auto", 
         padding: 0,
         display: "flex",
-        flexDirection: isMobile ? "column" : "row",
+        flexDirection: "column",
         overflow: "hidden",
         backgroundColor: "#ffffff",
       }}
     >
-      {/* 左カラム: タブ + コンテンツ */}
-      <motion.div
-        style={{
-          width: isMobile ? "100%" : "40%",
-          height: isMobile ? "auto" : "100vh",
-          backgroundColor: "#ffffff",
-          borderRight: isMobile ? "none" : "1px solid #f0f0f0",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        {/* 商品情報ヘッダー */}
+      {/* 商品情報ヘッダー（デスクトップのみ上部に表示） */}
+      {!isMobile && (
         <motion.div
           className="product-header"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
           style={{
-            padding: isMobile ? "24px 20px" : "40px",
+            padding: "40px 60px",
             borderBottom: "1px solid #f0f0f0",
+            backgroundColor: "#ffffff",
           }}
         >
           <h1 style={{ 
             margin: 0, 
-            fontSize: isMobile ? "24px" : "32px",
+            fontSize: "28px",
             fontWeight: "600",
             letterSpacing: "-0.02em",
             color: "#1d1d1f",
@@ -3013,72 +3003,139 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </h1>
           <div style={{ 
             marginTop: "8px", 
-            fontSize: isMobile ? "14px" : "16px",
+            fontSize: "15px",
             color: "#6e6e73",
             lineHeight: 1.5,
           }}>
             {product.description}
           </div>
           <div style={{ 
-            marginTop: "16px", 
-            fontSize: isMobile ? "28px" : "32px", 
+            marginTop: "12px", 
+            fontSize: "24px", 
             fontWeight: "600", 
             color: "#1d1d1f",
             letterSpacing: "-0.01em",
+            textAlign: "right",
           }}>
             ¥{product.price.toLocaleString()}
-            <span style={{ fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }}>
+            <span style={{ fontSize: "14px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }}>
               税込
             </span>
           </div>
         </motion.div>
+      )}
 
-        {/* タブメニュー / 編集ツール（モバイル時、オブジェクト選択で切り替え） */}
+      {/* 2カラムレイアウト */}
+      <div style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        flex: 1,
+        overflow: "hidden",
+      }}>
+        {/* 左カラム: タブ + コンテンツ */}
         <motion.div
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
           style={{
+            width: isMobile ? "100%" : "40%",
+            height: "100%",
+            backgroundColor: "#ffffff",
+            borderRight: isMobile ? "none" : "1px solid #f0f0f0",
             display: "flex",
-            gap: "8px",
-            padding: isMobile ? "16px 20px" : "20px 40px",
-            borderBottom: "1px solid #f0f0f0",
-            flexWrap: "wrap",
-            overflowX: "auto",
+            flexDirection: "column",
+            overflow: "hidden",
           }}
         >
-          {/* デスクトップ or モバイルでオブジェクト未選択時: タブメニュー */}
-          {(!isMobile || !selectedObject) && [
-            { id: "item" as TabType, label: "アイテム" },
-            { id: "ai" as TabType, label: "AI" },
-            { id: "images" as TabType, label: "画像" },
-            { id: "text" as TabType, label: "テキスト" },
-          ].map((tab) => (
-            <motion.button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                if (isMobile) setIsOverlayOpen(true);
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+          {/* モバイルの商品情報ヘッダー */}
+          {isMobile && (
+            <motion.div
+              className="product-header"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
               style={{
-                padding: "10px 20px",
-                borderRadius: "980px",
-                border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
-                backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
-                color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
-                fontSize: "14px",
-                fontWeight: "500",
-                cursor: "pointer",
-                transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
-                letterSpacing: "-0.01em",
-                whiteSpace: "nowrap",
+                padding: "24px 20px",
+                borderBottom: "1px solid #f0f0f0",
               }}
             >
-              {tab.label}
-            </motion.button>
-          ))}
+              <h1 style={{ 
+                margin: 0, 
+                fontSize: "24px",
+                fontWeight: "600",
+                letterSpacing: "-0.02em",
+                color: "#1d1d1f",
+                lineHeight: 1.2,
+              }}>
+                {product.name}
+              </h1>
+              <div style={{ 
+                marginTop: "8px", 
+                fontSize: "14px",
+                color: "#6e6e73",
+                lineHeight: 1.5,
+              }}>
+                {product.description}
+              </div>
+              <div style={{ 
+                marginTop: "16px", 
+                fontSize: "28px", 
+                fontWeight: "600", 
+                color: "#1d1d1f",
+                letterSpacing: "-0.01em",
+              }}>
+                ¥{product.price.toLocaleString()}
+                <span style={{ fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }}>
+                  税込
+                </span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* タブメニュー / 編集ツール（モバイル時、オブジェクト選択で切り替え） */}
+        {isMobile ? (
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            style={{
+              display: "flex",
+              gap: "8px",
+              padding: "16px 20px",
+              borderBottom: "1px solid #f0f0f0",
+              flexWrap: "wrap",
+              overflowX: "auto",
+            }}
+          >
+            {/* モバイルでオブジェクト未選択時: タブメニュー */}
+            {!selectedObject && [
+              { id: "item" as TabType, label: "アイテム" },
+              { id: "ai" as TabType, label: "AI" },
+              { id: "images" as TabType, label: "画像" },
+              { id: "text" as TabType, label: "テキスト" },
+            ].map((tab) => (
+              <motion.button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setIsOverlayOpen(true);
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "980px",
+                  border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
+                  backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
+                  color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                  letterSpacing: "-0.01em",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {tab.label}
+              </motion.button>
+            ))}
           
           {/* モバイルでオブジェクト選択時: 編集ツール */}
           {isMobile && selectedObject && (
@@ -3220,271 +3277,696 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               </motion.button>
             </>
           )}
-        </motion.div>
+          </motion.div>
+        ) : null}
 
-        {/* タブコンテンツ（スクロール可能） - デスクトップのみ */}
+        {/* デスクトップ: アコーディオン形式のタブメニュー */}
         {!isMobile && (
           <div style={{
             flex: 1,
             overflowY: "auto",
             overflowX: "hidden",
-            padding: "40px",
+            padding: "0 40px", // ボタンの外側の余白を左カラムに合わせる
           }}>
-            <AnimatePresence mode="wait">
-            {activeTab === "item" && (
-              <motion.div
-                key="item"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
+            {/* アイテム - Pill型ボタン → ボックス変形アコーディオン */}
+            <motion.div 
+              layout
+              animate={{
+                borderRadius: activeTab === "item" ? "24px" : "980px", // Pill → Box
+                backgroundColor: activeTab === "item" ? "#f5f5f7" : "#ffffff",
+                padding: activeTab === "item" ? "24px" : "0", // ボタン内部のpadding
+              }}
+              transition={{ 
+                layout: {
+                  type: "spring",
+                  stiffness: 100, // スプリング剛性
+                  damping: 20,
+                  mass: 0.8,
+                },
+                default: {
+                  duration: 0.8,
+                  ease: "easeInOut",
+                },
+              }}
+              style={{
+                border: "1.5px solid #d2d2d7",
+                marginBottom: "12px",
+                overflow: "hidden",
+                willChange: "border-radius, background-color, padding",
+                width: "fit-content", // テキスト内容に合わせた自然な幅
+              }}
+            >
+              {/* ヘッダーボタン */}
+              <motion.button
+                onClick={() => setActiveTab(activeTab === "item" ? null : "item")}
+                whileHover={{ 
+                  backgroundColor: activeTab === "item" ? "transparent" : "rgba(0,0,0,0.02)",
+                  transition: { duration: 0.2 }
+                }}
+                whileTap={{ 
+                  scale: 0.98,
+                  transition: { duration: 0.15 }
+                }}
+                style={{
+                  width: "fit-content", // テキスト内容に合わせた自然な幅
+                  textAlign: "left",
+                  padding: activeTab === "item" ? "0 0 16px 0" : "16px 24px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  fontSize: "17px",
+                  fontWeight: "500",
+                  color: "#1d1d1f",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "flex-start", // 左揃え
+                  alignItems: "center",
+                  letterSpacing: "-0.01em",
+                  transition: "padding 0.8s ease-in-out",
+                }}
               >
-                <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }}>
-                  こちらはテストテキストです。商品の詳細情報や選択オプションを将来的に追加予定です。
-                </p>
-              </motion.div>
-            )}
-            {activeTab === "ai" && (
-              <motion.div
-                key="ai"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-              >
-                <div>
-                  <label style={{
-                    display: "block",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "#1d1d1f",
-                    marginBottom: "8px",
-                  }}>
-                    プロンプト
-                  </label>
-                  <textarea
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市..."
-                    rows={4}
-                    disabled={isGenerating}
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      border: "1.5px solid #d2d2d7",
-                      fontSize: "15px",
-                      resize: "vertical",
-                      fontFamily: "inherit",
-                      boxSizing: "border-box",
-                    }}
-                  />
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  {/* 左側の丸アイコン */}
+                  <div style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1d1d1f",
+                    flexShrink: 0,
+                  }} />
+                  アイテム
                 </div>
-                <motion.button
-                  onClick={handleGenerateAI}
-                  disabled={isGenerating || !aiPrompt.trim()}
-                  whileHover={!isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {}}
-                  whileTap={!isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {}}
-                  style={{
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "none",
-                    backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
-                    color: "#fff",
-                    fontSize: "15px",
-                    fontWeight: "500",
-                    cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer",
-                  }}
-                >
-                  {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
-                </motion.button>
-                {lastAIPrompt && (
-                  <p style={{ fontSize: "13px", color: "#6e6e73", margin: 0 }}>
-                    最後の生成: "{lastAIPrompt}"
-                  </p>
+              </motion.button>
+              
+              {/* コンテンツエリア */}
+              <AnimatePresence initial={false}>
+                {activeTab === "item" && (
+                  <motion.div
+                    key="item-content"
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                      opacity: 1,
+                      transition: {
+                        duration: 0.6,
+                        delay: 0.3,
+                        ease: "easeInOut",
+                      },
+                    }}
+                    exit={{ 
+                      opacity: 0,
+                      transition: { 
+                        duration: 0.4,
+                        ease: "easeInOut",
+                      },
+                    }}
+                  >
+                    <motion.div
+                      initial={{ y: -15, opacity: 0 }}
+                      animate={{ 
+                        y: 0, 
+                        opacity: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                          delay: 0.35,
+                        },
+                      }}
+                      exit={{ 
+                        y: -15, 
+                        opacity: 0,
+                        transition: { 
+                          duration: 0.4,
+                          ease: "easeInOut",
+                        },
+                      }}
+                    >
+                      <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }}>
+                        商品を選んでください。<br/>
+                        Tシャツ・スウェット商品は男女兼用（ユニセックス）です
+                      </p>
+                    </motion.div>
+                  </motion.div>
                 )}
-              </motion.div>
-            )}
-            {activeTab === "images" && (
-              <motion.div
-                key="images"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* AI画像生成 - Pill型ボタン → ボックス変形アコーディオン */}
+            <motion.div 
+              layout
+              animate={{
+                borderRadius: activeTab === "ai" ? "24px" : "980px",
+                backgroundColor: activeTab === "ai" ? "#f5f5f7" : "#ffffff",
+                padding: activeTab === "ai" ? "24px" : "0",
+              }}
+              transition={{ 
+                layout: {
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  mass: 0.8,
+                },
+                default: {
+                  duration: 0.8,
+                  ease: "easeInOut",
+                },
+              }}
+              style={{
+                border: "1.5px solid #d2d2d7",
+                marginBottom: "12px",
+                overflow: "hidden",
+                willChange: "border-radius, background-color, padding",
+                width: "fit-content",
+              }}
+            >
+              <motion.button
+                onClick={() => setActiveTab(activeTab === "ai" ? null : "ai")}
+                whileHover={{ 
+                  backgroundColor: activeTab === "ai" ? "transparent" : "rgba(0,0,0,0.02)",
+                  transition: { duration: 0.2 }
+                }}
+                whileTap={{ 
+                  scale: 0.98,
+                  transition: { duration: 0.15 }
+                }}
+                style={{
+                  width: "fit-content",
+                  textAlign: "left",
+                  padding: activeTab === "ai" ? "0 0 16px 0" : "16px 24px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  fontSize: "17px",
+                  fontWeight: "500",
+                  color: "#1d1d1f",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  letterSpacing: "-0.01em",
+                  transition: "padding 0.8s ease-in-out",
+                }}
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  style={{ display: "none" }}
-                />
-                <motion.button
-                  onClick={handleUploadClick}
-                  disabled={isLoading}
-                  whileHover={!isLoading ? { scale: 1.02 } : {}}
-                  whileTap={!isLoading ? { scale: 0.98 } : {}}
-                  style={{
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "none",
-                    backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
-                    color: "#fff",
-                    fontSize: "15px",
-                    fontWeight: "500",
-                    cursor: isLoading ? "not-allowed" : "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                >
-                  {isLoading ? (
-                    <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
-                  ) : (
-                    <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
-                  )}
-                </motion.button>
-                {uploadedImages.length > 0 && (
-                  <div>
-                    <h3 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px" }}>
-                      アップロード済み画像
-                    </h3>
-                    <div style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                      gap: "12px",
-                    }}>
-                      {uploadedImages.map((imgUrl, index) => (
-                        <div
-                          key={index}
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1d1d1f",
+                    flexShrink: 0,
+                  }} />
+                  AI画像生成
+                </div>
+              </motion.button>
+              
+              <AnimatePresence initial={false}>
+                {activeTab === "ai" && (
+                  <motion.div
+                    key="ai-content"
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                      opacity: 1,
+                      transition: {
+                        duration: 0.6,
+                        delay: 0.3,
+                        ease: "easeInOut",
+                      },
+                    }}
+                    exit={{ 
+                      opacity: 0,
+                      transition: { 
+                        duration: 0.4,
+                        ease: "easeInOut",
+                      },
+                    }}
+                  >
+                    <motion.div
+                      initial={{ y: -15, opacity: 0 }}
+                      animate={{ 
+                        y: 0, 
+                        opacity: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                          delay: 0.35,
+                        },
+                      }}
+                      exit={{ 
+                        y: -15, 
+                        opacity: 0,
+                        transition: { 
+                          duration: 0.4,
+                          ease: "easeInOut",
+                        },
+                      }}
+                    >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                      <div>
+                        <label style={{
+                          display: "block",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          color: "#1d1d1f",
+                          marginBottom: "8px",
+                        }}>
+                          プロンプト
+                        </label>
+                        <textarea
+                          value={aiPrompt}
+                          onChange={(e) => setAiPrompt(e.target.value)}
+                          placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市..."
+                          rows={4}
+                          disabled={isGenerating}
                           style={{
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            aspectRatio: "1 / 1",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "12px",
+                            border: "1.5px solid #d2d2d7",
+                            fontSize: "15px",
+                            resize: "vertical",
+                            fontFamily: "inherit",
+                            boxSizing: "border-box",
                           }}
-                        >
-                          <img
-                            src={imgUrl}
-                            alt={`Uploaded ${index + 1}`}
+                        />
+                      </div>
+                      <motion.button
+                        onClick={handleGenerateAI}
+                        disabled={isGenerating || !aiPrompt.trim()}
+                        whileHover={!isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {}}
+                        whileTap={!isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {}}
+                        style={{
+                          padding: "14px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
+                          color: "#fff",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
+                      </motion.button>
+                      {lastAIPrompt && (
+                        <p style={{ fontSize: "13px", color: "#6e6e73", margin: 0 }}>
+                          最後の生成: "{lastAIPrompt}"
+                        </p>
+                      )}
+                    </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* 画像管理 - Pill型ボタン → ボックス変形アコーディオン */}
+            <motion.div 
+              layout
+              animate={{
+                borderRadius: activeTab === "images" ? "24px" : "980px",
+                backgroundColor: activeTab === "images" ? "#f5f5f7" : "#ffffff",
+                padding: activeTab === "images" ? "24px" : "0",
+              }}
+              transition={{ 
+                layout: {
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  mass: 0.8,
+                },
+                default: {
+                  duration: 0.8,
+                  ease: "easeInOut",
+                },
+              }}
+              style={{
+                border: "1.5px solid #d2d2d7",
+                marginBottom: "12px",
+                overflow: "hidden",
+                willChange: "border-radius, background-color, padding",
+                width: "fit-content",
+              }}
+            >
+              <motion.button
+                onClick={() => setActiveTab(activeTab === "images" ? null : "images")}
+                whileHover={{ 
+                  backgroundColor: activeTab === "images" ? "transparent" : "rgba(0,0,0,0.02)",
+                  transition: { duration: 0.2 }
+                }}
+                whileTap={{ 
+                  scale: 0.98,
+                  transition: { duration: 0.15 }
+                }}
+                style={{
+                  width: "fit-content",
+                  textAlign: "left",
+                  padding: activeTab === "images" ? "0 0 16px 0" : "16px 24px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  fontSize: "17px",
+                  fontWeight: "500",
+                  color: "#1d1d1f",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  letterSpacing: "-0.01em",
+                  transition: "padding 0.8s ease-in-out",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1d1d1f",
+                    flexShrink: 0,
+                  }} />
+                  画像管理
+                </div>
+              </motion.button>
+              
+              <AnimatePresence initial={false}>
+                {activeTab === "images" && (
+                  <motion.div
+                    key="images-content"
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                      opacity: 1,
+                      transition: {
+                        duration: 0.6,
+                        delay: 0.3,
+                        ease: "easeInOut",
+                      },
+                    }}
+                    exit={{ 
+                      opacity: 0,
+                      transition: { 
+                        duration: 0.4,
+                        ease: "easeInOut",
+                      },
+                    }}
+                  >
+                    <motion.div
+                      initial={{ y: -15, opacity: 0 }}
+                      animate={{ 
+                        y: 0, 
+                        opacity: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                          delay: 0.35,
+                        },
+                      }}
+                      exit={{ 
+                        y: -15, 
+                        opacity: 0,
+                        transition: { 
+                          duration: 0.4,
+                          ease: "easeInOut",
+                        },
+                      }}
+                    >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        style={{ display: "none" }}
+                      />
+                      <motion.button
+                        onClick={handleUploadClick}
+                        disabled={isLoading}
+                        whileHover={!isLoading ? { scale: 1.02 } : {}}
+                        whileTap={!isLoading ? { scale: 0.98 } : {}}
+                        style={{
+                          padding: "14px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
+                          color: "#fff",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          cursor: isLoading ? "not-allowed" : "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        {isLoading ? (
+                          <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
+                        ) : (
+                          <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
+                        )}
+                      </motion.button>
+                      {uploadedImages.length > 0 && (
+                        <div>
+                          <h3 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px" }}>
+                            アップロード済み画像
+                          </h3>
+                          <div style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                            gap: "12px",
+                          }}>
+                            {uploadedImages.map((imgUrl, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  aspectRatio: "1 / 1",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                }}
+                              >
+                                <img
+                                  src={imgUrl}
+                                  alt={`Uploaded ${index + 1}`}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* テキスト - Pill型ボタン → ボックス変形アコーディオン */}
+            <motion.div 
+              layout
+              animate={{
+                borderRadius: activeTab === "text" ? "24px" : "980px",
+                backgroundColor: activeTab === "text" ? "#f5f5f7" : "#ffffff",
+                padding: activeTab === "text" ? "24px" : "0",
+              }}
+              transition={{ 
+                layout: {
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  mass: 0.8,
+                },
+                default: {
+                  duration: 0.8,
+                  ease: "easeInOut",
+                },
+              }}
+              style={{
+                border: "1.5px solid #d2d2d7",
+                marginBottom: "12px",
+                overflow: "hidden",
+                willChange: "border-radius, background-color, padding",
+                width: "fit-content",
+              }}
+            >
+              <motion.button
+                onClick={() => setActiveTab(activeTab === "text" ? null : "text")}
+                whileHover={{ 
+                  backgroundColor: activeTab === "text" ? "transparent" : "rgba(0,0,0,0.02)",
+                  transition: { duration: 0.2 }
+                }}
+                whileTap={{ 
+                  scale: 0.98,
+                  transition: { duration: 0.15 }
+                }}
+                style={{
+                  width: "fit-content",
+                  textAlign: "left",
+                  padding: activeTab === "text" ? "0 0 16px 0" : "16px 24px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  fontSize: "17px",
+                  fontWeight: "500",
+                  color: "#1d1d1f",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  letterSpacing: "-0.01em",
+                  transition: "padding 0.8s ease-in-out",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1d1d1f",
+                    flexShrink: 0,
+                  }} />
+                  テキスト
+                </div>
+              </motion.button>
+              
+              <AnimatePresence initial={false}>
+                {activeTab === "text" && (
+                  <motion.div
+                    key="text-content"
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                      opacity: 1,
+                      transition: {
+                        duration: 0.6,
+                        delay: 0.3,
+                        ease: "easeInOut",
+                      },
+                    }}
+                    exit={{ 
+                      opacity: 0,
+                      transition: { 
+                        duration: 0.4,
+                        ease: "easeInOut",
+                      },
+                    }}
+                  >
+                    <motion.div
+                      initial={{ y: -15, opacity: 0 }}
+                      animate={{ 
+                        y: 0, 
+                        opacity: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                          delay: 0.35,
+                        },
+                      }}
+                      exit={{ 
+                        y: -15, 
+                        opacity: 0,
+                        transition: { 
+                          duration: 0.4,
+                          ease: "easeInOut",
+                        },
+                      }}
+                    >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                      <div>
+                        <label style={{
+                          display: "block",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          color: "#1d1d1f",
+                          marginBottom: "8px",
+                        }}>
+                          テキスト
+                        </label>
+                        <input
+                          type="text"
+                          value={textInput}
+                          onChange={(e) => handleTextInputChange(e.target.value)}
+                          placeholder="テキストを入力"
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "12px",
+                            border: "1.5px solid #d2d2d7",
+                            fontSize: "15px",
+                            fontFamily: "inherit",
+                            boxSizing: "border-box",
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: "flex", gap: "16px" }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{
+                            display: "block",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#1d1d1f",
+                            marginBottom: "8px",
+                          }}>
+                            色
+                          </label>
+                          <input
+                            type="color"
+                            value={textColor}
+                            onChange={(e) => handleChangeTextColor(e.target.value)}
                             style={{
                               width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
+                              height: "44px",
+                              borderRadius: "12px",
+                              border: "1.5px solid #d2d2d7",
+                              cursor: "pointer",
                             }}
                           />
                         </div>
-                      ))}
+                        <div style={{ flex: 1 }}>
+                          <label style={{
+                            display: "block",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#1d1d1f",
+                            marginBottom: "8px",
+                          }}>
+                            サイズ: {fontSize}px
+                          </label>
+                          <input
+                            type="range"
+                            min="10"
+                            max="100"
+                            value={fontSize}
+                            onChange={(e) => handleChangeFontSize(Number(e.target.value))}
+                            style={{ width: "100%", height: "44px" }}
+                          />
+                        </div>
+                      </div>
+                      <motion.button
+                        onClick={handleAddText}
+                        disabled={!textInput.trim()}
+                        whileHover={textInput.trim() ? { scale: 1.02 } : {}}
+                        whileTap={textInput.trim() ? { scale: 0.98 } : {}}
+                        style={{
+                          padding: "14px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: !textInput.trim() ? "#d2d2d7" : "#0071e3",
+                          color: "#fff",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          cursor: !textInput.trim() ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        テキストを追加
+                      </motion.button>
                     </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 )}
-              </motion.div>
-            )}
-            {activeTab === "text" && (
-              <motion.div
-                key="text"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-              >
-                <div>
-                  <label style={{
-                    display: "block",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "#1d1d1f",
-                    marginBottom: "8px",
-                  }}>
-                    テキスト
-                  </label>
-                  <input
-                    type="text"
-                    value={textInput}
-                    onChange={(e) => handleTextInputChange(e.target.value)}
-                    placeholder="テキストを入力"
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      border: "1.5px solid #d2d2d7",
-                      fontSize: "15px",
-                      fontFamily: "inherit",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", gap: "16px" }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{
-                      display: "block",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                      color: "#1d1d1f",
-                      marginBottom: "8px",
-                    }}>
-                      色
-                    </label>
-                    <input
-                      type="color"
-                      value={textColor}
-                      onChange={(e) => handleChangeTextColor(e.target.value)}
-                      style={{
-                        width: "100%",
-                        height: "44px",
-                        borderRadius: "12px",
-                        border: "1.5px solid #d2d2d7",
-                        cursor: "pointer",
-                      }}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{
-                      display: "block",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                      color: "#1d1d1f",
-                      marginBottom: "8px",
-                    }}>
-                      サイズ: {fontSize}px
-                    </label>
-                    <input
-                      type="range"
-                      min="10"
-                      max="100"
-                      value={fontSize}
-                      onChange={(e) => handleChangeFontSize(Number(e.target.value))}
-                      style={{ width: "100%", height: "44px" }}
-                    />
-                  </div>
-                </div>
-                <motion.button
-                  onClick={handleAddText}
-                  disabled={!textInput.trim()}
-                  whileHover={textInput.trim() ? { scale: 1.02 } : {}}
-                  whileTap={textInput.trim() ? { scale: 0.98 } : {}}
-                  style={{
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "none",
-                    backgroundColor: !textInput.trim() ? "#d2d2d7" : "#0071e3",
-                    color: "#fff",
-                    fontSize: "15px",
-                    fontWeight: "500",
-                    cursor: !textInput.trim() ? "not-allowed" : "pointer",
-                  }}
-                >
-                  テキストを追加
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </AnimatePresence>
+            </motion.div>
           </div>
         )}
 
@@ -3963,22 +4445,22 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         </motion.div>
       </motion.div>
 
-      {/* 右カラム: Tシャツモックアップ */}
-      <motion.div
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.6 }}
-        style={{
-          width: isMobile ? "100%" : "60%",
-          height: isMobile ? "60vh" : "100vh",
-          backgroundColor: "#f5f5f7",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          padding: isMobile ? "20px" : "40px",
-        }}
-      >
+        {/* 右カラム: Tシャツモックアップ */}
+        <motion.div
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          style={{
+            width: isMobile ? "100%" : "60%",
+            height: "100%",
+            backgroundColor: "#f5f5f7",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            padding: isMobile ? "20px" : "40px",
+          }}
+        >
         {/* キャンバスコンテナ */}
         <div 
           className="canvas-container"
@@ -4815,7 +5297,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             </button>
           </div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
       
       {/* 著作権モーダル */}
       {showCopyrightModal && (

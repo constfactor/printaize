@@ -1939,615 +1939,409 @@ ${width} \xD7 ${height}px
         margin: "0 auto",
         padding: 0,
         display: "flex",
-        flexDirection: isMobile ? "column" : "row",
+        flexDirection: "column",
         overflow: "hidden",
         backgroundColor: "#ffffff"
       },
       children: [
-        /* @__PURE__ */ jsxs2(
+        !isMobile && /* @__PURE__ */ jsxs2(
           motion.div,
           {
+            className: "product-header",
+            initial: { y: -20, opacity: 0 },
+            animate: { y: 0, opacity: 1 },
+            transition: { delay: 0.2, duration: 0.5 },
             style: {
-              width: isMobile ? "100%" : "40%",
-              height: isMobile ? "auto" : "100vh",
-              backgroundColor: "#ffffff",
-              borderRight: isMobile ? "none" : "1px solid #f0f0f0",
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden"
+              padding: "40px 60px",
+              borderBottom: "1px solid #f0f0f0",
+              backgroundColor: "#ffffff"
             },
             children: [
-              /* @__PURE__ */ jsxs2(
-                motion.div,
-                {
-                  className: "product-header",
-                  initial: { y: -20, opacity: 0 },
-                  animate: { y: 0, opacity: 1 },
-                  transition: { delay: 0.2, duration: 0.5 },
-                  style: {
-                    padding: isMobile ? "24px 20px" : "40px",
-                    borderBottom: "1px solid #f0f0f0"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx3("h1", { style: {
-                      margin: 0,
-                      fontSize: isMobile ? "24px" : "32px",
-                      fontWeight: "600",
-                      letterSpacing: "-0.02em",
-                      color: "#1d1d1f",
-                      lineHeight: 1.2
-                    }, children: product.name }),
-                    /* @__PURE__ */ jsx3("div", { style: {
-                      marginTop: "8px",
-                      fontSize: isMobile ? "14px" : "16px",
-                      color: "#6e6e73",
-                      lineHeight: 1.5
-                    }, children: product.description }),
-                    /* @__PURE__ */ jsxs2("div", { style: {
-                      marginTop: "16px",
-                      fontSize: isMobile ? "28px" : "32px",
-                      fontWeight: "600",
-                      color: "#1d1d1f",
-                      letterSpacing: "-0.01em"
-                    }, children: [
-                      "\xA5",
-                      product.price.toLocaleString(),
-                      /* @__PURE__ */ jsx3("span", { style: { fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }, children: "\u7A0E\u8FBC" })
-                    ] })
-                  ]
-                }
-              ),
-              /* @__PURE__ */ jsxs2(
-                motion.div,
-                {
-                  initial: { y: -10, opacity: 0 },
-                  animate: { y: 0, opacity: 1 },
-                  transition: { delay: 0.3, duration: 0.5 },
-                  style: {
-                    display: "flex",
-                    gap: "8px",
-                    padding: isMobile ? "16px 20px" : "20px 40px",
-                    borderBottom: "1px solid #f0f0f0",
-                    flexWrap: "wrap",
-                    overflowX: "auto"
-                  },
-                  children: [
-                    (!isMobile || !selectedObject) && [
-                      { id: "item", label: "\u30A2\u30A4\u30C6\u30E0" },
-                      { id: "ai", label: "AI" },
-                      { id: "images", label: "\u753B\u50CF" },
-                      { id: "text", label: "\u30C6\u30AD\u30B9\u30C8" }
-                    ].map((tab) => /* @__PURE__ */ jsx3(
-                      motion.button,
-                      {
-                        onClick: () => {
-                          setActiveTab(tab.id), isMobile && setIsOverlayOpen(!0);
-                        },
-                        whileHover: { scale: 1.02 },
-                        whileTap: { scale: 0.98 },
-                        style: {
-                          padding: "10px 20px",
-                          borderRadius: "980px",
-                          border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
-                          backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
-                          color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
-                          fontSize: "14px",
-                          fontWeight: "500",
-                          cursor: "pointer",
-                          transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
-                          letterSpacing: "-0.01em",
-                          whiteSpace: "nowrap"
-                        },
-                        children: tab.label
-                      },
-                      tab.id
-                    )),
-                    isMobile && selectedObject && /* @__PURE__ */ jsxs2(Fragment, { children: [
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: undo,
-                          disabled: !canUndo,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: canUndo ? "#fff" : "#f5f5f7",
-                            color: canUndo ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: canUndo ? "pointer" : "not-allowed",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u21B6"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: redo,
-                          disabled: !canRedo,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2, delay: 0.05 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: canRedo ? "#fff" : "#f5f5f7",
-                            color: canRedo ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: canRedo ? "pointer" : "not-allowed",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u21B7"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: centerVertically,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2, delay: 0.1 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: "#fff",
-                            color: "#1d1d1f",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u4E0A\u4E0B"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: centerHorizontally,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2, delay: 0.15 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: "#fff",
-                            color: "#1d1d1f",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u5DE6\u53F3"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: bringForward,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2, delay: 0.2 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: "#fff",
-                            color: "#1d1d1f",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u624B\u524D"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: sendBackward,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2, delay: 0.25 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: "#fff",
-                            color: "#1d1d1f",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u5965"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: fitToPrintArea,
-                          initial: { scale: 0.8, opacity: 0 },
-                          animate: { scale: 1, opacity: 1 },
-                          transition: { duration: 0.2, delay: 0.3 },
-                          style: {
-                            padding: "10px 16px",
-                            borderRadius: "980px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: "#fff",
-                            color: "#1d1d1f",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap"
-                          },
-                          children: "\u6700\u5927"
-                        }
-                      )
-                    ] })
-                  ]
-                }
-              ),
-              !isMobile && /* @__PURE__ */ jsx3("div", { style: {
-                flex: 1,
-                overflowY: "auto",
-                overflowX: "hidden",
-                padding: "40px"
-              }, children: /* @__PURE__ */ jsxs2(AnimatePresence, { mode: "wait", children: [
-                activeTab === "item" && /* @__PURE__ */ jsx3(
+              /* @__PURE__ */ jsx3("h1", { style: {
+                margin: 0,
+                fontSize: "28px",
+                fontWeight: "600",
+                letterSpacing: "-0.02em",
+                color: "#1d1d1f",
+                lineHeight: 1.2
+              }, children: product.name }),
+              /* @__PURE__ */ jsx3("div", { style: {
+                marginTop: "8px",
+                fontSize: "15px",
+                color: "#6e6e73",
+                lineHeight: 1.5
+              }, children: product.description }),
+              /* @__PURE__ */ jsxs2("div", { style: {
+                marginTop: "12px",
+                fontSize: "24px",
+                fontWeight: "600",
+                color: "#1d1d1f",
+                letterSpacing: "-0.01em",
+                textAlign: "right"
+              }, children: [
+                "\xA5",
+                product.price.toLocaleString(),
+                /* @__PURE__ */ jsx3("span", { style: { fontSize: "14px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }, children: "\u7A0E\u8FBC" })
+              ] })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxs2("div", { style: {
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          flex: 1,
+          overflow: "hidden"
+        }, children: [
+          /* @__PURE__ */ jsxs2(
+            motion.div,
+            {
+              style: {
+                width: isMobile ? "100%" : "40%",
+                height: "100%",
+                backgroundColor: "#ffffff",
+                borderRight: isMobile ? "none" : "1px solid #f0f0f0",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden"
+              },
+              children: [
+                isMobile && /* @__PURE__ */ jsxs2(
                   motion.div,
                   {
-                    initial: { opacity: 0, x: -20 },
-                    animate: { opacity: 1, x: 0 },
-                    exit: { opacity: 0, x: 20 },
-                    transition: { duration: 0.3 },
-                    children: /* @__PURE__ */ jsx3("p", { style: { margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }, children: "\u3053\u3061\u3089\u306F\u30C6\u30B9\u30C8\u30C6\u30AD\u30B9\u30C8\u3067\u3059\u3002\u5546\u54C1\u306E\u8A73\u7D30\u60C5\u5831\u3084\u9078\u629E\u30AA\u30D7\u30B7\u30E7\u30F3\u3092\u5C06\u6765\u7684\u306B\u8FFD\u52A0\u4E88\u5B9A\u3067\u3059\u3002" })
-                  },
-                  "item"
-                ),
-                activeTab === "ai" && /* @__PURE__ */ jsxs2(
-                  motion.div,
-                  {
-                    initial: { opacity: 0, x: -20 },
-                    animate: { opacity: 1, x: 0 },
-                    exit: { opacity: 0, x: 20 },
-                    transition: { duration: 0.3 },
-                    style: { display: "flex", flexDirection: "column", gap: "20px" },
-                    children: [
-                      /* @__PURE__ */ jsxs2("div", { children: [
-                        /* @__PURE__ */ jsx3("label", { style: {
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#1d1d1f",
-                          marginBottom: "8px"
-                        }, children: "\u30D7\u30ED\u30F3\u30D7\u30C8" }),
-                        /* @__PURE__ */ jsx3(
-                          "textarea",
-                          {
-                            value: aiPrompt,
-                            onChange: (e) => setAiPrompt(e.target.value),
-                            placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02...",
-                            rows: 4,
-                            disabled: isGenerating,
-                            style: {
-                              width: "100%",
-                              padding: "12px",
-                              borderRadius: "12px",
-                              border: "1.5px solid #d2d2d7",
-                              fontSize: "15px",
-                              resize: "vertical",
-                              fontFamily: "inherit",
-                              boxSizing: "border-box"
-                            }
-                          }
-                        )
-                      ] }),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: handleGenerateAI,
-                          disabled: isGenerating || !aiPrompt.trim(),
-                          whileHover: !isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {},
-                          whileTap: !isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {},
-                          style: {
-                            padding: "14px",
-                            borderRadius: "12px",
-                            border: "none",
-                            backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
-                            color: "#fff",
-                            fontSize: "15px",
-                            fontWeight: "500",
-                            cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer"
-                          },
-                          children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
-                        }
-                      ),
-                      lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "13px", color: "#6e6e73", margin: 0 }, children: [
-                        '\u6700\u5F8C\u306E\u751F\u6210: "',
-                        lastAIPrompt,
-                        '"'
-                      ] })
-                    ]
-                  },
-                  "ai"
-                ),
-                activeTab === "images" && /* @__PURE__ */ jsxs2(
-                  motion.div,
-                  {
-                    initial: { opacity: 0, x: -20 },
-                    animate: { opacity: 1, x: 0 },
-                    exit: { opacity: 0, x: 20 },
-                    transition: { duration: 0.3 },
-                    style: { display: "flex", flexDirection: "column", gap: "20px" },
-                    children: [
-                      /* @__PURE__ */ jsx3(
-                        "input",
-                        {
-                          ref: fileInputRef,
-                          type: "file",
-                          accept: "image/*",
-                          multiple: !0,
-                          onChange: handleImageUpload,
-                          style: { display: "none" }
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: handleUploadClick,
-                          disabled: isLoading,
-                          whileHover: isLoading ? {} : { scale: 1.02 },
-                          whileTap: isLoading ? {} : { scale: 0.98 },
-                          style: {
-                            padding: "14px",
-                            borderRadius: "12px",
-                            border: "none",
-                            backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
-                            color: "#fff",
-                            fontSize: "15px",
-                            fontWeight: "500",
-                            cursor: isLoading ? "not-allowed" : "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "8px"
-                          },
-                          children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
-                            /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
-                            " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
-                          ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
-                            /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
-                            " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
-                          ] })
-                        }
-                      ),
-                      uploadedImages.length > 0 && /* @__PURE__ */ jsxs2("div", { children: [
-                        /* @__PURE__ */ jsx3("h3", { style: { fontSize: "15px", fontWeight: "600", marginBottom: "12px" }, children: "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6E08\u307F\u753B\u50CF" }),
-                        /* @__PURE__ */ jsx3("div", { style: {
-                          display: "grid",
-                          gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                          gap: "12px"
-                        }, children: uploadedImages.map((imgUrl, index) => /* @__PURE__ */ jsx3(
-                          "div",
-                          {
-                            style: {
-                              borderRadius: "8px",
-                              overflow: "hidden",
-                              aspectRatio: "1 / 1",
-                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-                            },
-                            children: /* @__PURE__ */ jsx3(
-                              "img",
-                              {
-                                src: imgUrl,
-                                alt: `Uploaded ${index + 1}`,
-                                style: {
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover"
-                                }
-                              }
-                            )
-                          },
-                          index
-                        )) })
-                      ] })
-                    ]
-                  },
-                  "images"
-                ),
-                activeTab === "text" && /* @__PURE__ */ jsxs2(
-                  motion.div,
-                  {
-                    initial: { opacity: 0, x: -20 },
-                    animate: { opacity: 1, x: 0 },
-                    exit: { opacity: 0, x: 20 },
-                    transition: { duration: 0.3 },
-                    style: { display: "flex", flexDirection: "column", gap: "20px" },
-                    children: [
-                      /* @__PURE__ */ jsxs2("div", { children: [
-                        /* @__PURE__ */ jsx3("label", { style: {
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#1d1d1f",
-                          marginBottom: "8px"
-                        }, children: "\u30C6\u30AD\u30B9\u30C8" }),
-                        /* @__PURE__ */ jsx3(
-                          "input",
-                          {
-                            type: "text",
-                            value: textInput,
-                            onChange: (e) => handleTextInputChange(e.target.value),
-                            placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
-                            style: {
-                              width: "100%",
-                              padding: "12px",
-                              borderRadius: "12px",
-                              border: "1.5px solid #d2d2d7",
-                              fontSize: "15px",
-                              fontFamily: "inherit",
-                              boxSizing: "border-box"
-                            }
-                          }
-                        )
-                      ] }),
-                      /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "16px" }, children: [
-                        /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
-                          /* @__PURE__ */ jsx3("label", { style: {
-                            display: "block",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#1d1d1f",
-                            marginBottom: "8px"
-                          }, children: "\u8272" }),
-                          /* @__PURE__ */ jsx3(
-                            "input",
-                            {
-                              type: "color",
-                              value: textColor,
-                              onChange: (e) => handleChangeTextColor(e.target.value),
-                              style: {
-                                width: "100%",
-                                height: "44px",
-                                borderRadius: "12px",
-                                border: "1.5px solid #d2d2d7",
-                                cursor: "pointer"
-                              }
-                            }
-                          )
-                        ] }),
-                        /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
-                          /* @__PURE__ */ jsxs2("label", { style: {
-                            display: "block",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#1d1d1f",
-                            marginBottom: "8px"
-                          }, children: [
-                            "\u30B5\u30A4\u30BA: ",
-                            fontSize,
-                            "px"
-                          ] }),
-                          /* @__PURE__ */ jsx3(
-                            "input",
-                            {
-                              type: "range",
-                              min: "10",
-                              max: "100",
-                              value: fontSize,
-                              onChange: (e) => handleChangeFontSize(Number(e.target.value)),
-                              style: { width: "100%", height: "44px" }
-                            }
-                          )
-                        ] })
-                      ] }),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: handleAddText,
-                          disabled: !textInput.trim(),
-                          whileHover: textInput.trim() ? { scale: 1.02 } : {},
-                          whileTap: textInput.trim() ? { scale: 0.98 } : {},
-                          style: {
-                            padding: "14px",
-                            borderRadius: "12px",
-                            border: "none",
-                            backgroundColor: textInput.trim() ? "#0071e3" : "#d2d2d7",
-                            color: "#fff",
-                            fontSize: "15px",
-                            fontWeight: "500",
-                            cursor: textInput.trim() ? "pointer" : "not-allowed"
-                          },
-                          children: "\u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0"
-                        }
-                      )
-                    ]
-                  },
-                  "text"
-                )
-              ] }) }),
-              /* @__PURE__ */ jsx3(AnimatePresence, { children: isMobile && isOverlayOpen && /* @__PURE__ */ jsxs2(Fragment, { children: [
-                /* @__PURE__ */ jsx3(
-                  motion.div,
-                  {
-                    initial: { opacity: 0 },
-                    animate: { opacity: 1 },
-                    exit: { opacity: 0 },
-                    transition: { duration: 0.3 },
-                    onClick: () => setIsOverlayOpen(!1),
-                    style: {
-                      position: "fixed",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: "rgba(0, 0, 0, 0.4)",
-                      backdropFilter: "blur(10px)",
-                      WebkitBackdropFilter: "blur(10px)",
-                      zIndex: 1e3
-                    }
-                  }
-                ),
-                /* @__PURE__ */ jsxs2(
-                  motion.div,
-                  {
-                    initial: { y: "100%", opacity: 0 },
+                    className: "product-header",
+                    initial: { y: -20, opacity: 0 },
                     animate: { y: 0, opacity: 1 },
-                    exit: { y: "100%", opacity: 0 },
-                    transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
+                    transition: { delay: 0.2, duration: 0.5 },
                     style: {
-                      position: "fixed",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      maxHeight: "80vh",
-                      backgroundColor: "rgba(255, 255, 255, 0.95)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                      borderTopLeftRadius: "20px",
-                      borderTopRightRadius: "20px",
-                      boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.15)",
-                      zIndex: 1001,
-                      overflowY: "auto",
-                      padding: "24px"
+                      padding: "24px 20px",
+                      borderBottom: "1px solid #f0f0f0"
                     },
                     children: [
-                      /* @__PURE__ */ jsx3(
-                        "button",
+                      /* @__PURE__ */ jsx3("h1", { style: {
+                        margin: 0,
+                        fontSize: "24px",
+                        fontWeight: "600",
+                        letterSpacing: "-0.02em",
+                        color: "#1d1d1f",
+                        lineHeight: 1.2
+                      }, children: product.name }),
+                      /* @__PURE__ */ jsx3("div", { style: {
+                        marginTop: "8px",
+                        fontSize: "14px",
+                        color: "#6e6e73",
+                        lineHeight: 1.5
+                      }, children: product.description }),
+                      /* @__PURE__ */ jsxs2("div", { style: {
+                        marginTop: "16px",
+                        fontSize: "28px",
+                        fontWeight: "600",
+                        color: "#1d1d1f",
+                        letterSpacing: "-0.01em"
+                      }, children: [
+                        "\xA5",
+                        product.price.toLocaleString(),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }, children: "\u7A0E\u8FBC" })
+                      ] })
+                    ]
+                  }
+                ),
+                isMobile ? /* @__PURE__ */ jsxs2(
+                  motion.div,
+                  {
+                    initial: { y: -10, opacity: 0 },
+                    animate: { y: 0, opacity: 1 },
+                    transition: { delay: 0.3, duration: 0.5 },
+                    style: {
+                      display: "flex",
+                      gap: "8px",
+                      padding: "16px 20px",
+                      borderBottom: "1px solid #f0f0f0",
+                      flexWrap: "wrap",
+                      overflowX: "auto"
+                    },
+                    children: [
+                      !selectedObject && [
+                        { id: "item", label: "\u30A2\u30A4\u30C6\u30E0" },
+                        { id: "ai", label: "AI" },
+                        { id: "images", label: "\u753B\u50CF" },
+                        { id: "text", label: "\u30C6\u30AD\u30B9\u30C8" }
+                      ].map((tab) => /* @__PURE__ */ jsx3(
+                        motion.button,
                         {
-                          onClick: () => setIsOverlayOpen(!1),
-                          style: {
-                            position: "absolute",
-                            top: "16px",
-                            right: "16px",
-                            width: "32px",
-                            height: "32px",
-                            borderRadius: "50%",
-                            border: "none",
-                            backgroundColor: "rgba(0, 0, 0, 0.05)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            fontSize: "20px",
-                            color: "#1d1d1f"
+                          onClick: () => {
+                            setActiveTab(tab.id), setIsOverlayOpen(!0);
                           },
-                          children: "\xD7"
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2("div", { style: { marginTop: "20px" }, children: [
-                        activeTab === "item" && /* @__PURE__ */ jsx3("div", { children: /* @__PURE__ */ jsx3("p", { style: { margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }, children: "\u3053\u3061\u3089\u306F\u30C6\u30B9\u30C8\u30C6\u30AD\u30B9\u30C8\u3067\u3059\u3002\u5546\u54C1\u306E\u8A73\u7D30\u60C5\u5831\u3084\u9078\u629E\u30AA\u30D7\u30B7\u30E7\u30F3\u3092\u5C06\u6765\u7684\u306B\u8FFD\u52A0\u4E88\u5B9A\u3067\u3059\u3002" }) }),
-                        activeTab === "ai" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                          whileHover: { scale: 1.02 },
+                          whileTap: { scale: 0.98 },
+                          style: {
+                            padding: "10px 20px",
+                            borderRadius: "980px",
+                            border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
+                            backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
+                            color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                            letterSpacing: "-0.01em",
+                            whiteSpace: "nowrap"
+                          },
+                          children: tab.label
+                        },
+                        tab.id
+                      )),
+                      isMobile && selectedObject && /* @__PURE__ */ jsxs2(Fragment, { children: [
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: undo,
+                            disabled: !canUndo,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: canUndo ? "#fff" : "#f5f5f7",
+                              color: canUndo ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: canUndo ? "pointer" : "not-allowed",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u21B6"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: redo,
+                            disabled: !canRedo,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2, delay: 0.05 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: canRedo ? "#fff" : "#f5f5f7",
+                              color: canRedo ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: canRedo ? "pointer" : "not-allowed",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u21B7"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: centerVertically,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2, delay: 0.1 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: "#fff",
+                              color: "#1d1d1f",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u4E0A\u4E0B"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: centerHorizontally,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2, delay: 0.15 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: "#fff",
+                              color: "#1d1d1f",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u5DE6\u53F3"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: bringForward,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2, delay: 0.2 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: "#fff",
+                              color: "#1d1d1f",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u624B\u524D"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: sendBackward,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2, delay: 0.25 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: "#fff",
+                              color: "#1d1d1f",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u5965"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: fitToPrintArea,
+                            initial: { scale: 0.8, opacity: 0 },
+                            animate: { scale: 1, opacity: 1 },
+                            transition: { duration: 0.2, delay: 0.3 },
+                            style: {
+                              padding: "10px 16px",
+                              borderRadius: "980px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: "#fff",
+                              color: "#1d1d1f",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap"
+                            },
+                            children: "\u6700\u5927"
+                          }
+                        )
+                      ] })
+                    ]
+                  }
+                ) : null,
+                !isMobile && /* @__PURE__ */ jsxs2("div", { style: {
+                  flex: 1,
+                  overflowY: "auto",
+                  overflowX: "hidden"
+                }, children: [
+                  /* @__PURE__ */ jsxs2("div", { style: { borderBottom: "1px solid #f0f0f0" }, children: [
+                    /* @__PURE__ */ jsxs2(
+                      motion.button,
+                      {
+                        onClick: () => setActiveTab(activeTab === "item" ? null : "item"),
+                        whileHover: { backgroundColor: "#f9f9f9" },
+                        whileTap: { scale: 0.99 },
+                        style: {
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "24px 40px",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          fontSize: "17px",
+                          fontWeight: "500",
+                          color: "#1d1d1f",
+                          cursor: "pointer",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          letterSpacing: "-0.01em"
+                        },
+                        children: [
+                          "\u30A2\u30A4\u30C6\u30E0",
+                          /* @__PURE__ */ jsx3("span", { style: {
+                            fontSize: "14px",
+                            transform: activeTab === "item" ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 0.3s ease",
+                            display: "inline-block"
+                          }, children: "\u25BC" })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(AnimatePresence, { children: activeTab === "item" && /* @__PURE__ */ jsx3(
+                      motion.div,
+                      {
+                        initial: { height: 0, opacity: 0 },
+                        animate: { height: "auto", opacity: 1 },
+                        exit: { height: 0, opacity: 0 },
+                        transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
+                        style: {
+                          overflow: "hidden",
+                          padding: "0 40px 24px 40px"
+                        },
+                        children: /* @__PURE__ */ jsx3("p", { style: { margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }, children: "\u3053\u3061\u3089\u306F\u30C6\u30B9\u30C8\u30C6\u30AD\u30B9\u30C8\u3067\u3059\u3002\u5546\u54C1\u306E\u8A73\u7D30\u60C5\u5831\u3084\u9078\u629E\u30AA\u30D7\u30B7\u30E7\u30F3\u3092\u5C06\u6765\u7684\u306B\u8FFD\u52A0\u4E88\u5B9A\u3067\u3059\u3002" })
+                      }
+                    ) })
+                  ] }),
+                  /* @__PURE__ */ jsxs2("div", { style: { borderBottom: "1px solid #f0f0f0" }, children: [
+                    /* @__PURE__ */ jsxs2(
+                      motion.button,
+                      {
+                        onClick: () => setActiveTab(activeTab === "ai" ? null : "ai"),
+                        whileHover: { backgroundColor: "#f9f9f9" },
+                        whileTap: { scale: 0.99 },
+                        style: {
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "24px 40px",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          fontSize: "17px",
+                          fontWeight: "500",
+                          color: "#1d1d1f",
+                          cursor: "pointer",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          letterSpacing: "-0.01em"
+                        },
+                        children: [
+                          "AI\u753B\u50CF\u751F\u6210",
+                          /* @__PURE__ */ jsx3("span", { style: {
+                            fontSize: "14px",
+                            transform: activeTab === "ai" ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 0.3s ease",
+                            display: "inline-block"
+                          }, children: "\u25BC" })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(AnimatePresence, { children: activeTab === "ai" && /* @__PURE__ */ jsx3(
+                      motion.div,
+                      {
+                        initial: { height: 0, opacity: 0 },
+                        animate: { height: "auto", opacity: 1 },
+                        exit: { height: 0, opacity: 0 },
+                        transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
+                        style: {
+                          overflow: "hidden",
+                          padding: "0 40px 24px 40px"
+                        },
+                        children: /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
                           /* @__PURE__ */ jsxs2("div", { children: [
                             /* @__PURE__ */ jsx3("label", { style: {
                               display: "block",
@@ -2578,12 +2372,12 @@ ${width} \xD7 ${height}px
                             )
                           ] }),
                           /* @__PURE__ */ jsx3(
-                            "button",
+                            motion.button,
                             {
-                              onClick: () => {
-                                handleGenerateAI(), setIsOverlayOpen(!1);
-                              },
+                              onClick: handleGenerateAI,
                               disabled: isGenerating || !aiPrompt.trim(),
+                              whileHover: !isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {},
+                              whileTap: !isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {},
                               style: {
                                 padding: "14px",
                                 borderRadius: "12px",
@@ -2596,16 +2390,79 @@ ${width} \xD7 ${height}px
                               },
                               children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
                             }
-                          )
-                        ] }),
-                        activeTab === "images" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                          ),
+                          lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "13px", color: "#6e6e73", margin: 0 }, children: [
+                            '\u6700\u5F8C\u306E\u751F\u6210: "',
+                            lastAIPrompt,
+                            '"'
+                          ] })
+                        ] })
+                      }
+                    ) })
+                  ] }),
+                  /* @__PURE__ */ jsxs2("div", { style: { borderBottom: "1px solid #f0f0f0" }, children: [
+                    /* @__PURE__ */ jsxs2(
+                      motion.button,
+                      {
+                        onClick: () => setActiveTab(activeTab === "images" ? null : "images"),
+                        whileHover: { backgroundColor: "#f9f9f9" },
+                        whileTap: { scale: 0.99 },
+                        style: {
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "24px 40px",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          fontSize: "17px",
+                          fontWeight: "500",
+                          color: "#1d1d1f",
+                          cursor: "pointer",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          letterSpacing: "-0.01em"
+                        },
+                        children: [
+                          "\u753B\u50CF\u7BA1\u7406",
+                          /* @__PURE__ */ jsx3("span", { style: {
+                            fontSize: "14px",
+                            transform: activeTab === "images" ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 0.3s ease",
+                            display: "inline-block"
+                          }, children: "\u25BC" })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(AnimatePresence, { children: activeTab === "images" && /* @__PURE__ */ jsx3(
+                      motion.div,
+                      {
+                        initial: { height: 0, opacity: 0 },
+                        animate: { height: "auto", opacity: 1 },
+                        exit: { height: 0, opacity: 0 },
+                        transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
+                        style: {
+                          overflow: "hidden",
+                          padding: "0 40px 24px 40px"
+                        },
+                        children: /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
                           /* @__PURE__ */ jsx3(
-                            "button",
+                            "input",
                             {
-                              onClick: () => {
-                                handleUploadClick(), setIsOverlayOpen(!1);
-                              },
+                              ref: fileInputRef,
+                              type: "file",
+                              accept: "image/*",
+                              multiple: !0,
+                              onChange: handleImageUpload,
+                              style: { display: "none" }
+                            }
+                          ),
+                          /* @__PURE__ */ jsx3(
+                            motion.button,
+                            {
+                              onClick: handleUploadClick,
                               disabled: isLoading,
+                              whileHover: isLoading ? {} : { scale: 1.02 },
+                              whileTap: isLoading ? {} : { scale: 0.98 },
                               style: {
                                 padding: "14px",
                                 borderRadius: "12px",
@@ -2660,8 +2517,55 @@ ${width} \xD7 ${height}px
                               index
                             )) })
                           ] })
-                        ] }),
-                        activeTab === "text" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                        ] })
+                      }
+                    ) })
+                  ] }),
+                  /* @__PURE__ */ jsxs2("div", { style: { borderBottom: "1px solid #f0f0f0" }, children: [
+                    /* @__PURE__ */ jsxs2(
+                      motion.button,
+                      {
+                        onClick: () => setActiveTab(activeTab === "text" ? null : "text"),
+                        whileHover: { backgroundColor: "#f9f9f9" },
+                        whileTap: { scale: 0.99 },
+                        style: {
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "24px 40px",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          fontSize: "17px",
+                          fontWeight: "500",
+                          color: "#1d1d1f",
+                          cursor: "pointer",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          letterSpacing: "-0.01em"
+                        },
+                        children: [
+                          "\u30C6\u30AD\u30B9\u30C8",
+                          /* @__PURE__ */ jsx3("span", { style: {
+                            fontSize: "14px",
+                            transform: activeTab === "text" ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 0.3s ease",
+                            display: "inline-block"
+                          }, children: "\u25BC" })
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(AnimatePresence, { children: activeTab === "text" && /* @__PURE__ */ jsx3(
+                      motion.div,
+                      {
+                        initial: { height: 0, opacity: 0 },
+                        animate: { height: "auto", opacity: 1 },
+                        exit: { height: 0, opacity: 0 },
+                        transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
+                        style: {
+                          overflow: "hidden",
+                          padding: "0 40px 24px 40px"
+                        },
+                        children: /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
                           /* @__PURE__ */ jsxs2("div", { children: [
                             /* @__PURE__ */ jsx3("label", { style: {
                               display: "block",
@@ -2740,12 +2644,12 @@ ${width} \xD7 ${height}px
                             ] })
                           ] }),
                           /* @__PURE__ */ jsx3(
-                            "button",
+                            motion.button,
                             {
-                              onClick: () => {
-                                handleAddText(), setIsOverlayOpen(!1);
-                              },
+                              onClick: handleAddText,
                               disabled: !textInput.trim(),
+                              whileHover: textInput.trim() ? { scale: 1.02 } : {},
+                              whileTap: textInput.trim() ? { scale: 0.98 } : {},
                               style: {
                                 padding: "14px",
                                 borderRadius: "12px",
@@ -2760,342 +2664,630 @@ ${width} \xD7 ${height}px
                             }
                           )
                         ] })
+                      }
+                    ) })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsx3(AnimatePresence, { children: isMobile && isOverlayOpen && /* @__PURE__ */ jsxs2(Fragment, { children: [
+                  /* @__PURE__ */ jsx3(
+                    motion.div,
+                    {
+                      initial: { opacity: 0 },
+                      animate: { opacity: 1 },
+                      exit: { opacity: 0 },
+                      transition: { duration: 0.3 },
+                      onClick: () => setIsOverlayOpen(!1),
+                      style: {
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0, 0, 0, 0.4)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        zIndex: 1e3
+                      }
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    motion.div,
+                    {
+                      initial: { y: "100%", opacity: 0 },
+                      animate: { y: 0, opacity: 1 },
+                      exit: { y: "100%", opacity: 0 },
+                      transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
+                      style: {
+                        position: "fixed",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        maxHeight: "80vh",
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                        backdropFilter: "blur(20px)",
+                        WebkitBackdropFilter: "blur(20px)",
+                        borderTopLeftRadius: "20px",
+                        borderTopRightRadius: "20px",
+                        boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.15)",
+                        zIndex: 1001,
+                        overflowY: "auto",
+                        padding: "24px"
+                      },
+                      children: [
+                        /* @__PURE__ */ jsx3(
+                          "button",
+                          {
+                            onClick: () => setIsOverlayOpen(!1),
+                            style: {
+                              position: "absolute",
+                              top: "16px",
+                              right: "16px",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              border: "none",
+                              backgroundColor: "rgba(0, 0, 0, 0.05)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              fontSize: "20px",
+                              color: "#1d1d1f"
+                            },
+                            children: "\xD7"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2("div", { style: { marginTop: "20px" }, children: [
+                          activeTab === "item" && /* @__PURE__ */ jsx3("div", { children: /* @__PURE__ */ jsx3("p", { style: { margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }, children: "\u3053\u3061\u3089\u306F\u30C6\u30B9\u30C8\u30C6\u30AD\u30B9\u30C8\u3067\u3059\u3002\u5546\u54C1\u306E\u8A73\u7D30\u60C5\u5831\u3084\u9078\u629E\u30AA\u30D7\u30B7\u30E7\u30F3\u3092\u5C06\u6765\u7684\u306B\u8FFD\u52A0\u4E88\u5B9A\u3067\u3059\u3002" }) }),
+                          activeTab === "ai" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                            /* @__PURE__ */ jsxs2("div", { children: [
+                              /* @__PURE__ */ jsx3("label", { style: {
+                                display: "block",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                color: "#1d1d1f",
+                                marginBottom: "8px"
+                              }, children: "\u30D7\u30ED\u30F3\u30D7\u30C8" }),
+                              /* @__PURE__ */ jsx3(
+                                "textarea",
+                                {
+                                  value: aiPrompt,
+                                  onChange: (e) => setAiPrompt(e.target.value),
+                                  placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02...",
+                                  rows: 4,
+                                  disabled: isGenerating,
+                                  style: {
+                                    width: "100%",
+                                    padding: "12px",
+                                    borderRadius: "12px",
+                                    border: "1.5px solid #d2d2d7",
+                                    fontSize: "15px",
+                                    resize: "vertical",
+                                    fontFamily: "inherit",
+                                    boxSizing: "border-box"
+                                  }
+                                }
+                              )
+                            ] }),
+                            /* @__PURE__ */ jsx3(
+                              "button",
+                              {
+                                onClick: () => {
+                                  handleGenerateAI(), setIsOverlayOpen(!1);
+                                },
+                                disabled: isGenerating || !aiPrompt.trim(),
+                                style: {
+                                  padding: "14px",
+                                  borderRadius: "12px",
+                                  border: "none",
+                                  backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
+                                  color: "#fff",
+                                  fontSize: "15px",
+                                  fontWeight: "500",
+                                  cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer"
+                                },
+                                children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
+                              }
+                            )
+                          ] }),
+                          activeTab === "images" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                            /* @__PURE__ */ jsx3(
+                              "button",
+                              {
+                                onClick: () => {
+                                  handleUploadClick(), setIsOverlayOpen(!1);
+                                },
+                                disabled: isLoading,
+                                style: {
+                                  padding: "14px",
+                                  borderRadius: "12px",
+                                  border: "none",
+                                  backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
+                                  color: "#fff",
+                                  fontSize: "15px",
+                                  fontWeight: "500",
+                                  cursor: isLoading ? "not-allowed" : "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  gap: "8px"
+                                },
+                                children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
+                                  /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
+                                  " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
+                                ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                                  /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
+                                  " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+                                ] })
+                              }
+                            ),
+                            uploadedImages.length > 0 && /* @__PURE__ */ jsxs2("div", { children: [
+                              /* @__PURE__ */ jsx3("h3", { style: { fontSize: "15px", fontWeight: "600", marginBottom: "12px" }, children: "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6E08\u307F\u753B\u50CF" }),
+                              /* @__PURE__ */ jsx3("div", { style: {
+                                display: "grid",
+                                gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                                gap: "12px"
+                              }, children: uploadedImages.map((imgUrl, index) => /* @__PURE__ */ jsx3(
+                                "div",
+                                {
+                                  style: {
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                    aspectRatio: "1 / 1",
+                                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                                  },
+                                  children: /* @__PURE__ */ jsx3(
+                                    "img",
+                                    {
+                                      src: imgUrl,
+                                      alt: `Uploaded ${index + 1}`,
+                                      style: {
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover"
+                                      }
+                                    }
+                                  )
+                                },
+                                index
+                              )) })
+                            ] })
+                          ] }),
+                          activeTab === "text" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                            /* @__PURE__ */ jsxs2("div", { children: [
+                              /* @__PURE__ */ jsx3("label", { style: {
+                                display: "block",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                color: "#1d1d1f",
+                                marginBottom: "8px"
+                              }, children: "\u30C6\u30AD\u30B9\u30C8" }),
+                              /* @__PURE__ */ jsx3(
+                                "input",
+                                {
+                                  type: "text",
+                                  value: textInput,
+                                  onChange: (e) => handleTextInputChange(e.target.value),
+                                  placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
+                                  style: {
+                                    width: "100%",
+                                    padding: "12px",
+                                    borderRadius: "12px",
+                                    border: "1.5px solid #d2d2d7",
+                                    fontSize: "15px",
+                                    fontFamily: "inherit",
+                                    boxSizing: "border-box"
+                                  }
+                                }
+                              )
+                            ] }),
+                            /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "16px" }, children: [
+                              /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                                /* @__PURE__ */ jsx3("label", { style: {
+                                  display: "block",
+                                  fontSize: "13px",
+                                  fontWeight: "600",
+                                  color: "#1d1d1f",
+                                  marginBottom: "8px"
+                                }, children: "\u8272" }),
+                                /* @__PURE__ */ jsx3(
+                                  "input",
+                                  {
+                                    type: "color",
+                                    value: textColor,
+                                    onChange: (e) => handleChangeTextColor(e.target.value),
+                                    style: {
+                                      width: "100%",
+                                      height: "44px",
+                                      borderRadius: "12px",
+                                      border: "1.5px solid #d2d2d7",
+                                      cursor: "pointer"
+                                    }
+                                  }
+                                )
+                              ] }),
+                              /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                                /* @__PURE__ */ jsxs2("label", { style: {
+                                  display: "block",
+                                  fontSize: "13px",
+                                  fontWeight: "600",
+                                  color: "#1d1d1f",
+                                  marginBottom: "8px"
+                                }, children: [
+                                  "\u30B5\u30A4\u30BA: ",
+                                  fontSize,
+                                  "px"
+                                ] }),
+                                /* @__PURE__ */ jsx3(
+                                  "input",
+                                  {
+                                    type: "range",
+                                    min: "10",
+                                    max: "100",
+                                    value: fontSize,
+                                    onChange: (e) => handleChangeFontSize(Number(e.target.value)),
+                                    style: { width: "100%", height: "44px" }
+                                  }
+                                )
+                              ] })
+                            ] }),
+                            /* @__PURE__ */ jsx3(
+                              "button",
+                              {
+                                onClick: () => {
+                                  handleAddText(), setIsOverlayOpen(!1);
+                                },
+                                disabled: !textInput.trim(),
+                                style: {
+                                  padding: "14px",
+                                  borderRadius: "12px",
+                                  border: "none",
+                                  backgroundColor: textInput.trim() ? "#0071e3" : "#d2d2d7",
+                                  color: "#fff",
+                                  fontSize: "15px",
+                                  fontWeight: "500",
+                                  cursor: textInput.trim() ? "pointer" : "not-allowed"
+                                },
+                                children: "\u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0"
+                              }
+                            )
+                          ] })
+                        ] })
+                      ]
+                    }
+                  )
+                ] }) }),
+                !isMobile && /* @__PURE__ */ jsxs2(
+                  motion.div,
+                  {
+                    style: {
+                      padding: "40px",
+                      borderTop: "1px solid #f0f0f0"
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx3("h3", { style: {
+                        fontSize: "15px",
+                        fontWeight: "600",
+                        color: "#1d1d1f",
+                        marginBottom: "16px"
+                      }, children: "\u7DE8\u96C6\u30C4\u30FC\u30EB" }),
+                      /* @__PURE__ */ jsxs2("div", { style: {
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "12px"
+                      }, children: [
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: undo,
+                            disabled: !canUndo,
+                            whileHover: canUndo ? { scale: 1.05 } : {},
+                            whileTap: canUndo ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: canUndo ? "#fff" : "#f5f5f7",
+                              color: canUndo ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: canUndo ? "pointer" : "not-allowed"
+                            },
+                            children: "\u21B6 \u5143\u306B\u623B\u3059"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: redo,
+                            disabled: !canRedo,
+                            whileHover: canRedo ? { scale: 1.05 } : {},
+                            whileTap: canRedo ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: canRedo ? "#fff" : "#f5f5f7",
+                              color: canRedo ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: canRedo ? "pointer" : "not-allowed"
+                            },
+                            children: "\u21B7 \u3084\u308A\u76F4\u3057"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: centerVertically,
+                            disabled: !selectedObject,
+                            whileHover: selectedObject ? { scale: 1.05 } : {},
+                            whileTap: selectedObject ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                              color: selectedObject ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: selectedObject ? "pointer" : "not-allowed"
+                            },
+                            children: "\u4E0A\u4E0B\u4E2D\u592E"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: centerHorizontally,
+                            disabled: !selectedObject,
+                            whileHover: selectedObject ? { scale: 1.05 } : {},
+                            whileTap: selectedObject ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                              color: selectedObject ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: selectedObject ? "pointer" : "not-allowed"
+                            },
+                            children: "\u5DE6\u53F3\u4E2D\u592E"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: bringForward,
+                            disabled: !selectedObject,
+                            whileHover: selectedObject ? { scale: 1.05 } : {},
+                            whileTap: selectedObject ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                              color: selectedObject ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: selectedObject ? "pointer" : "not-allowed"
+                            },
+                            children: "\u624B\u524D\u3078"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: sendBackward,
+                            disabled: !selectedObject,
+                            whileHover: selectedObject ? { scale: 1.05 } : {},
+                            whileTap: selectedObject ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                              color: selectedObject ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: selectedObject ? "pointer" : "not-allowed"
+                            },
+                            children: "\u5965\u3078"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          motion.button,
+                          {
+                            onClick: fitToPrintArea,
+                            disabled: !selectedObject,
+                            whileHover: selectedObject ? { scale: 1.05 } : {},
+                            whileTap: selectedObject ? { scale: 0.95 } : {},
+                            style: {
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1.5px solid #d2d2d7",
+                              backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                              color: selectedObject ? "#1d1d1f" : "#86868b",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              cursor: selectedObject ? "pointer" : "not-allowed",
+                              gridColumn: "1 / -1"
+                            },
+                            children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927"
+                          }
+                        )
                       ] })
                     ]
                   }
-                )
-              ] }) }),
-              !isMobile && /* @__PURE__ */ jsxs2(
-                motion.div,
-                {
-                  style: {
-                    padding: "40px",
-                    borderTop: "1px solid #f0f0f0"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx3("h3", { style: {
-                      fontSize: "15px",
-                      fontWeight: "600",
-                      color: "#1d1d1f",
-                      marginBottom: "16px"
-                    }, children: "\u7DE8\u96C6\u30C4\u30FC\u30EB" }),
-                    /* @__PURE__ */ jsxs2("div", { style: {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "12px"
-                    }, children: [
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: undo,
-                          disabled: !canUndo,
-                          whileHover: canUndo ? { scale: 1.05 } : {},
-                          whileTap: canUndo ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: canUndo ? "#fff" : "#f5f5f7",
-                            color: canUndo ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: canUndo ? "pointer" : "not-allowed"
-                          },
-                          children: "\u21B6 \u5143\u306B\u623B\u3059"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: redo,
-                          disabled: !canRedo,
-                          whileHover: canRedo ? { scale: 1.05 } : {},
-                          whileTap: canRedo ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: canRedo ? "#fff" : "#f5f5f7",
-                            color: canRedo ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: canRedo ? "pointer" : "not-allowed"
-                          },
-                          children: "\u21B7 \u3084\u308A\u76F4\u3057"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: centerVertically,
-                          disabled: !selectedObject,
-                          whileHover: selectedObject ? { scale: 1.05 } : {},
-                          whileTap: selectedObject ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                            color: selectedObject ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: selectedObject ? "pointer" : "not-allowed"
-                          },
-                          children: "\u4E0A\u4E0B\u4E2D\u592E"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: centerHorizontally,
-                          disabled: !selectedObject,
-                          whileHover: selectedObject ? { scale: 1.05 } : {},
-                          whileTap: selectedObject ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                            color: selectedObject ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: selectedObject ? "pointer" : "not-allowed"
-                          },
-                          children: "\u5DE6\u53F3\u4E2D\u592E"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: bringForward,
-                          disabled: !selectedObject,
-                          whileHover: selectedObject ? { scale: 1.05 } : {},
-                          whileTap: selectedObject ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                            color: selectedObject ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: selectedObject ? "pointer" : "not-allowed"
-                          },
-                          children: "\u624B\u524D\u3078"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: sendBackward,
-                          disabled: !selectedObject,
-                          whileHover: selectedObject ? { scale: 1.05 } : {},
-                          whileTap: selectedObject ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                            color: selectedObject ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: selectedObject ? "pointer" : "not-allowed"
-                          },
-                          children: "\u5965\u3078"
-                        }
-                      ),
-                      /* @__PURE__ */ jsx3(
-                        motion.button,
-                        {
-                          onClick: fitToPrintArea,
-                          disabled: !selectedObject,
-                          whileHover: selectedObject ? { scale: 1.05 } : {},
-                          whileTap: selectedObject ? { scale: 0.95 } : {},
-                          style: {
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1.5px solid #d2d2d7",
-                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
-                            color: selectedObject ? "#1d1d1f" : "#86868b",
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            cursor: selectedObject ? "pointer" : "not-allowed",
-                            gridColumn: "1 / -1"
-                          },
-                          children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927"
-                        }
-                      )
-                    ] })
-                  ]
-                }
-              ),
-              /* @__PURE__ */ jsx3(
-                motion.div,
-                {
-                  style: {
-                    padding: isMobile ? "20px" : "40px",
-                    borderTop: "1px solid #f0f0f0"
-                  },
-                  children: /* @__PURE__ */ jsx3(
-                    motion.button,
-                    {
-                      onClick: () => setIsModalOpen(!0),
-                      whileHover: { scale: 1.02 },
-                      whileTap: { scale: 0.98 },
-                      style: {
-                        width: "100%",
-                        padding: "16px 24px",
-                        borderRadius: "12px",
-                        border: "none",
-                        backgroundColor: "#0071e3",
-                        color: "#ffffff",
-                        fontSize: "17px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        letterSpacing: "-0.01em"
-                      },
-                      children: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
-                    }
-                  )
-                }
-              )
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxs2(
-          motion.div,
-          {
-            initial: { x: 20, opacity: 0 },
-            animate: { x: 0, opacity: 1 },
-            transition: { delay: 0.4, duration: 0.6 },
-            style: {
-              width: isMobile ? "100%" : "60%",
-              height: isMobile ? "60vh" : "100vh",
-              backgroundColor: "#f5f5f7",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              padding: isMobile ? "20px" : "40px"
-            },
-            children: [
-              /* @__PURE__ */ jsx3(
-                "div",
-                {
-                  className: "canvas-container",
-                  style: {
-                    width: "100%",
-                    maxWidth: "min(800px, 100%)",
-                    aspectRatio: isMobile ? "3 / 4" : "1 / 1",
-                    position: "relative"
-                  },
-                  children: /* @__PURE__ */ jsxs2("div", { style: {
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: isMobile ? "10px" : "40px",
-                    width: "100%",
-                    boxSizing: "border-box"
-                  }, children: [
-                    /* @__PURE__ */ jsxs2(
-                      "div",
+                ),
+                /* @__PURE__ */ jsx3(
+                  motion.div,
+                  {
+                    style: {
+                      padding: isMobile ? "20px" : "40px",
+                      borderTop: "1px solid #f0f0f0"
+                    },
+                    children: /* @__PURE__ */ jsx3(
+                      motion.button,
                       {
+                        onClick: () => setIsModalOpen(!0),
+                        whileHover: { scale: 1.02 },
+                        whileTap: { scale: 0.98 },
                         style: {
-                          border: "none",
-                          borderRadius: "0",
-                          overflow: "hidden",
-                          boxShadow: "none",
-                          backgroundColor: "#fafafa",
                           width: "100%",
-                          maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
-                          margin: "0 auto",
-                          position: "relative",
-                          aspectRatio: "1 / 1",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          touchAction: isMobile ? "pan-y" : "auto"
+                          padding: "16px 24px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: "#0071e3",
+                          color: "#ffffff",
+                          fontSize: "17px",
+                          fontWeight: "500",
+                          cursor: "pointer",
+                          letterSpacing: "-0.01em"
                         },
-                        children: [
-                          /* @__PURE__ */ jsx3(
-                            "button",
-                            {
-                              onClick: () => {
-                                if (!fabricCanvasRef.current)
-                                  return;
-                                let canvas = fabricCanvasRef.current;
-                                if (isZoomed)
-                                  canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
-                                else {
-                                  let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
-                                  canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
-                                }
-                                canvas.renderAll();
-                              },
-                              style: {
-                                position: "absolute",
-                                top: "10px",
-                                right: "10px",
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "50%",
-                                border: "none",
-                                backgroundColor: "white",
-                                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                zIndex: 10,
-                                transition: "all 0.2s ease"
-                              },
-                              onMouseEnter: (e) => {
-                                e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-                              },
-                              onMouseLeave: (e) => {
-                                e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                              },
-                              title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u30D7\u30EA\u30F3\u30C8\u30A8\u30EA\u30A2\u3092\u62E1\u5927",
-                              children: /* @__PURE__ */ jsx3(Icon, { type: isZoomed ? "zoomIn" : "zoomOut", size: 20, color: "#667eea" })
-                            }
-                          ),
-                          /* @__PURE__ */ jsx3(
-                            "canvas",
-                            {
-                              ref: canvasRef,
-                              style: {
-                                display: "block",
-                                width: "100%",
-                                height: "100%",
-                                maxWidth: "100%",
-                                maxHeight: "100%",
-                                objectFit: "contain"
+                        children: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                      }
+                    )
+                  }
+                )
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxs2(
+            motion.div,
+            {
+              initial: { x: 20, opacity: 0 },
+              animate: { x: 0, opacity: 1 },
+              transition: { delay: 0.4, duration: 0.6 },
+              style: {
+                width: isMobile ? "100%" : "60%",
+                height: "100%",
+                backgroundColor: "#f5f5f7",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                padding: isMobile ? "20px" : "40px"
+              },
+              children: [
+                /* @__PURE__ */ jsx3(
+                  "div",
+                  {
+                    className: "canvas-container",
+                    style: {
+                      width: "100%",
+                      maxWidth: "min(800px, 100%)",
+                      aspectRatio: isMobile ? "3 / 4" : "1 / 1",
+                      position: "relative"
+                    },
+                    children: /* @__PURE__ */ jsxs2("div", { style: {
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      padding: isMobile ? "10px" : "40px",
+                      width: "100%",
+                      boxSizing: "border-box"
+                    }, children: [
+                      /* @__PURE__ */ jsxs2(
+                        "div",
+                        {
+                          style: {
+                            border: "none",
+                            borderRadius: "0",
+                            overflow: "hidden",
+                            boxShadow: "none",
+                            backgroundColor: "#fafafa",
+                            width: "100%",
+                            maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
+                            margin: "0 auto",
+                            position: "relative",
+                            aspectRatio: "1 / 1",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            touchAction: isMobile ? "pan-y" : "auto"
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx3(
+                              "button",
+                              {
+                                onClick: () => {
+                                  if (!fabricCanvasRef.current)
+                                    return;
+                                  let canvas = fabricCanvasRef.current;
+                                  if (isZoomed)
+                                    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
+                                  else {
+                                    let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
+                                    canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
+                                  }
+                                  canvas.renderAll();
+                                },
+                                style: {
+                                  position: "absolute",
+                                  top: "10px",
+                                  right: "10px",
+                                  width: "40px",
+                                  height: "40px",
+                                  borderRadius: "50%",
+                                  border: "none",
+                                  backgroundColor: "white",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  zIndex: 10,
+                                  transition: "all 0.2s ease"
+                                },
+                                onMouseEnter: (e) => {
+                                  e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                                },
+                                onMouseLeave: (e) => {
+                                  e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+                                },
+                                title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u30D7\u30EA\u30F3\u30C8\u30A8\u30EA\u30A2\u3092\u62E1\u5927",
+                                children: /* @__PURE__ */ jsx3(Icon, { type: isZoomed ? "zoomIn" : "zoomOut", size: 20, color: "#667eea" })
                               }
-                            }
-                          ),
-                          showTrash && /* @__PURE__ */ jsxs2(
-                            "div",
-                            {
-                              style: {
-                                position: "absolute",
-                                bottom: isMobile ? "30px" : "40px",
-                                left: "50%",
-                                transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
-                                width: isMobile ? "70px" : "80px",
-                                height: isMobile ? "70px" : "80px",
-                                borderRadius: "50%",
-                                backgroundColor: isOverTrash ? "#ff4444" : "#666",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
-                                transition: "all 0.2s ease",
-                                zIndex: 15,
-                                animation: "trashBounce 0.3s ease"
-                              },
-                              children: [
-                                /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
-                                /* @__PURE__ */ jsx3("style", { children: `
+                            ),
+                            /* @__PURE__ */ jsx3(
+                              "canvas",
+                              {
+                                ref: canvasRef,
+                                style: {
+                                  display: "block",
+                                  width: "100%",
+                                  height: "100%",
+                                  maxWidth: "100%",
+                                  maxHeight: "100%",
+                                  objectFit: "contain"
+                                }
+                              }
+                            ),
+                            showTrash && /* @__PURE__ */ jsxs2(
+                              "div",
+                              {
+                                style: {
+                                  position: "absolute",
+                                  bottom: isMobile ? "30px" : "40px",
+                                  left: "50%",
+                                  transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
+                                  width: isMobile ? "70px" : "80px",
+                                  height: isMobile ? "70px" : "80px",
+                                  borderRadius: "50%",
+                                  backgroundColor: isOverTrash ? "#ff4444" : "#666",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
+                                  transition: "all 0.2s ease",
+                                  zIndex: 15,
+                                  animation: "trashBounce 0.3s ease"
+                                },
+                                children: [
+                                  /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
+                                  /* @__PURE__ */ jsx3("style", { children: `
                     @keyframes trashBounce {
                       0% {
                         transform: translateX(-50%) scale(0.8);
@@ -3110,694 +3302,695 @@ ${width} \xD7 ${height}px
                       }
                     }
                   ` })
-                              ]
-                            }
-                          ),
-                          (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
-                            "svg",
-                            {
-                              style: {
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "100%",
-                                height: "100%",
-                                pointerEvents: "none",
-                                zIndex: 5
-                              },
-                              children: [
-                                snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
-                                  "line",
-                                  {
-                                    x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
-                                    y1: "0",
-                                    x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
-                                    y2: "100%",
-                                    stroke: "#ff00ff",
-                                    strokeWidth: "1",
-                                    strokeDasharray: "5,5",
-                                    opacity: "0.8"
-                                  }
-                                ),
-                                snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
-                                  "line",
-                                  {
-                                    x1: "0",
-                                    y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
-                                    x2: "100%",
-                                    y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
-                                    stroke: "#ff00ff",
-                                    strokeWidth: "1",
-                                    strokeDasharray: "5,5",
-                                    opacity: "0.8"
-                                  }
-                                )
-                              ]
-                            }
-                          )
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ jsxs2("div", { style: {
-                      marginTop: "15px",
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: isMobile ? "8px" : "10px",
-                      justifyContent: "center",
-                      width: "100%",
-                      maxWidth: isMobile ? "100%" : "800px"
-                    }, children: [
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleUndo,
-                          disabled: !canUndo,
-                          style: {
-                            ...historyButtonStyle(canUndo),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
-                          children: [
-                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                              /* @__PURE__ */ jsx3("path", { d: "M3 7v6h6" }),
-                              /* @__PURE__ */ jsx3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" })
-                            ] }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" })
+                                ]
+                              }
+                            ),
+                            (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
+                              "svg",
+                              {
+                                style: {
+                                  position: "absolute",
+                                  top: 0,
+                                  left: 0,
+                                  width: "100%",
+                                  height: "100%",
+                                  pointerEvents: "none",
+                                  zIndex: 5
+                                },
+                                children: [
+                                  snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
+                                    "line",
+                                    {
+                                      x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                                      y1: "0",
+                                      x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                                      y2: "100%",
+                                      stroke: "#ff00ff",
+                                      strokeWidth: "1",
+                                      strokeDasharray: "5,5",
+                                      opacity: "0.8"
+                                    }
+                                  ),
+                                  snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
+                                    "line",
+                                    {
+                                      x1: "0",
+                                      y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                                      x2: "100%",
+                                      y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                                      stroke: "#ff00ff",
+                                      strokeWidth: "1",
+                                      strokeDasharray: "5,5",
+                                      opacity: "0.8"
+                                    }
+                                  )
+                                ]
+                              }
+                            )
                           ]
                         }
                       ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleRedo,
-                          disabled: !canRedo,
-                          style: {
-                            ...historyButtonStyle(canRedo),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
-                          children: [
-                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                              /* @__PURE__ */ jsx3("path", { d: "M21 7v6h-6" }),
-                              /* @__PURE__ */ jsx3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" })
-                            ] }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleCenterVertical,
-                          disabled: !selectedObject,
-                          style: {
-                            ...historyButtonStyle(!!selectedObject),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u4E0A\u4E0B\u4E2D\u592E",
-                          children: [
-                            /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }) }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleCenterHorizontal,
-                          disabled: !selectedObject,
-                          style: {
-                            ...historyButtonStyle(!!selectedObject),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u5DE6\u53F3\u4E2D\u592E",
-                          children: [
-                            /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }) }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleBringForward,
-                          disabled: !selectedObject,
-                          style: {
-                            ...historyButtonStyle(!!selectedObject),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u624B\u524D\u306B\u79FB\u52D5",
-                          children: [
-                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                              /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
-                              /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" })
-                            ] }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleSendBackwards,
-                          disabled: !selectedObject,
-                          style: {
-                            ...historyButtonStyle(!!selectedObject),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u5965\u306B\u79FB\u52D5",
-                          children: [
-                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                              /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
-                              /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" })
-                            ] }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleFitToPrintArea,
-                          disabled: !selectedObject,
-                          style: {
-                            ...historyButtonStyle(!!selectedObject),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px"
-                          },
-                          title: "\u5370\u5237\u9762\u3092\u8986\u3046",
-                          children: [
-                            /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs2(
-                        "button",
-                        {
-                          onClick: handleRemoveSelected,
-                          disabled: !selectedObject,
-                          style: {
-                            ...historyButtonStyle(!!selectedObject),
-                            padding: isMobile ? "8px 10px" : "10px 12px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "4px",
-                            minWidth: isMobile ? "60px" : "70px",
-                            backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
-                          },
-                          title: "\u524A\u9664 (Delete/Backspace)",
-                          children: [
-                            /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                              /* @__PURE__ */ jsx3("polyline", { points: "3 6 5 6 21 6" }),
-                              /* @__PURE__ */ jsx3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
-                              /* @__PURE__ */ jsx3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
-                              /* @__PURE__ */ jsx3("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
-                            ] }),
-                            /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" })
-                          ]
-                        }
-                      )
-                    ] }),
-                    /* @__PURE__ */ jsxs2("div", { style: {
-                      ...infoBoxStyle,
-                      width: "100%",
-                      maxWidth: isMobile ? "100%" : "800px",
-                      backgroundColor: "#ffffff",
-                      marginTop: isMobile ? "15px" : "20px",
-                      padding: isMobile ? "15px" : "20px"
-                    }, children: [
-                      /* @__PURE__ */ jsx3("h3", { style: {
-                        marginTop: 0,
-                        fontSize: isMobile ? "14px" : "16px"
-                      }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }),
-                      /* @__PURE__ */ jsxs2("ul", { style: {
-                        marginBottom: 0,
-                        lineHeight: 1.6,
-                        paddingLeft: isMobile ? "18px" : "20px",
-                        fontSize: isMobile ? "12px" : "13px"
-                      }, children: [
-                        /* @__PURE__ */ jsx3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }),
-                        /* @__PURE__ */ jsx3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }),
-                        /* @__PURE__ */ jsx3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }),
-                        /* @__PURE__ */ jsx3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }),
-                        /* @__PURE__ */ jsx3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" })
-                      ] })
-                    ] })
-                  ] })
-                }
-              ),
-              /* @__PURE__ */ jsx3("div", { style: {
-                display: isMobile ? "block" : "none",
-                width: "100%",
-                backgroundColor: "#ffffff",
-                overflowY: "auto",
-                overflowX: "hidden"
-              }, children: /* @__PURE__ */ jsxs2("div", { style: {
-                ...panelStyle,
-                padding: isMobile ? "25px 20px" : "40px 30px",
-                wordWrap: "break-word",
-                overflowWrap: "break-word"
-              }, children: [
-                /* @__PURE__ */ jsx3("h2", { style: {
-                  marginTop: 0,
-                  color: "#1a1a1a",
-                  marginBottom: isMobile ? "20px" : "30px",
-                  fontSize: isMobile ? "14px" : "16px",
-                  fontWeight: "400",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase"
-                }, children: "\u5546\u54C1\u8A73\u7D30" }),
-                /* @__PURE__ */ jsx3("div", { style: sectionStyle, children: /* @__PURE__ */ jsxs2("div", { style: {
-                  padding: "0",
-                  backgroundColor: "transparent",
-                  borderRadius: "0",
-                  marginBottom: "20px"
-                }, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: { ...sectionTitleStyle, marginTop: 0 }, children: "\u5546\u54C1\u8AAC\u660E" }),
-                  /* @__PURE__ */ jsx3("p", { style: {
-                    fontSize: "13px",
-                    color: "#666",
-                    lineHeight: "1.8",
-                    margin: 0,
-                    letterSpacing: "0.02em"
-                  }, children: product.description })
-                ] }) }),
-                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u672C\u4F53\u30AB\u30E9\u30FC" }),
-                  /* @__PURE__ */ jsx3("div", { style: { display: "flex", gap: "10px", marginBottom: "20px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxs2(
-                    "button",
-                    {
-                      onClick: () => setSelectedColor(color),
-                      style: {
-                        flex: 1,
-                        padding: "14px 10px",
-                        border: selectedColor.name === color.name ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
-                        borderRadius: "0",
-                        backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
+                      /* @__PURE__ */ jsxs2("div", { style: {
+                        marginTop: "15px",
                         display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "8px"
-                      },
-                      onMouseEnter: (e) => {
-                        selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#888");
-                      },
-                      onMouseLeave: (e) => {
-                        selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#d0d0d0");
-                      },
-                      children: [
-                        /* @__PURE__ */ jsx3(
-                          "div",
+                        flexWrap: "wrap",
+                        gap: isMobile ? "8px" : "10px",
+                        justifyContent: "center",
+                        width: "100%",
+                        maxWidth: isMobile ? "100%" : "800px"
+                      }, children: [
+                        /* @__PURE__ */ jsxs2(
+                          "button",
                           {
+                            onClick: handleUndo,
+                            disabled: !canUndo,
                             style: {
-                              width: "40px",
-                              height: "40px",
-                              borderRadius: "50%",
-                              backgroundColor: color.hex,
-                              border: color.hex === "#FFFFFF" || color.hex === "#F5F5DC" ? "2px solid #e0e0e0" : "none",
-                              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                            }
+                              ...historyButtonStyle(canUndo),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
+                            children: [
+                              /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                                /* @__PURE__ */ jsx3("path", { d: "M3 7v6h6" }),
+                                /* @__PURE__ */ jsx3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" })
+                              ] }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" })
+                            ]
                           }
                         ),
-                        /* @__PURE__ */ jsx3("span", { style: {
-                          fontSize: "12px",
-                          fontWeight: selectedColor.name === color.name ? "bold" : "normal",
-                          color: selectedColor.name === color.name ? "#667eea" : "#666"
-                        }, children: color.name })
-                      ]
-                    },
-                    color.name
-                  )) })
-                ] }),
-                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u30B5\u30A4\u30BA" }),
-                  /* @__PURE__ */ jsx3("div", { style: {
-                    display: "grid",
-                    gridTemplateColumns: "repeat(5, 1fr)",
-                    gap: "8px",
-                    marginBottom: "20px"
-                  }, children: sizes.map((size) => /* @__PURE__ */ jsx3(
-                    "button",
-                    {
-                      onClick: () => setSelectedSize(size),
-                      style: {
-                        padding: "14px 8px",
-                        border: selectedSize === size ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
-                        borderRadius: "0",
-                        backgroundColor: selectedSize === size ? "#1a1a1a" : "white",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        fontWeight: "400",
-                        letterSpacing: "0.05em",
-                        color: selectedSize === size ? "white" : "#666",
-                        transition: "all 0.3s ease"
-                      },
-                      onMouseEnter: (e) => {
-                        selectedSize !== size && (e.currentTarget.style.backgroundColor = "#fafafa", e.currentTarget.style.borderColor = "#888");
-                      },
-                      onMouseLeave: (e) => {
-                        selectedSize !== size && (e.currentTarget.style.backgroundColor = "white", e.currentTarget.style.borderColor = "#d0d0d0");
-                      },
-                      children: size
-                    },
-                    size
-                  )) })
-                ] }),
-                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-                /* @__PURE__ */ jsx3(
-                  "button",
-                  {
-                    onClick: openCartModal,
-                    disabled: isAddingToCart,
-                    style: {
-                      ...buttonStyle("#5c6ac4", !isAddingToCart),
-                      fontSize: isMobile ? "16px" : "18px",
-                      fontWeight: "bold",
-                      padding: isMobile ? "14px" : "16px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      marginBottom: "24px"
-                    },
-                    children: isAddingToCart ? /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }, children: [
-                      /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
-                        /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 20, color: "white" }),
-                        "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D..."
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleRedo,
+                            disabled: !canRedo,
+                            style: {
+                              ...historyButtonStyle(canRedo),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
+                            children: [
+                              /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                                /* @__PURE__ */ jsx3("path", { d: "M21 7v6h-6" }),
+                                /* @__PURE__ */ jsx3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" })
+                              ] }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleCenterVertical,
+                            disabled: !selectedObject,
+                            style: {
+                              ...historyButtonStyle(!!selectedObject),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u4E0A\u4E0B\u4E2D\u592E",
+                            children: [
+                              /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }) }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleCenterHorizontal,
+                            disabled: !selectedObject,
+                            style: {
+                              ...historyButtonStyle(!!selectedObject),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u5DE6\u53F3\u4E2D\u592E",
+                            children: [
+                              /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }) }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleBringForward,
+                            disabled: !selectedObject,
+                            style: {
+                              ...historyButtonStyle(!!selectedObject),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u624B\u524D\u306B\u79FB\u52D5",
+                            children: [
+                              /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                                /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
+                                /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" })
+                              ] }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleSendBackwards,
+                            disabled: !selectedObject,
+                            style: {
+                              ...historyButtonStyle(!!selectedObject),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u5965\u306B\u79FB\u52D5",
+                            children: [
+                              /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                                /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
+                                /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" })
+                              ] }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleFitToPrintArea,
+                            disabled: !selectedObject,
+                            style: {
+                              ...historyButtonStyle(!!selectedObject),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px"
+                            },
+                            title: "\u5370\u5237\u9762\u3092\u8986\u3046",
+                            children: [
+                              /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs2(
+                          "button",
+                          {
+                            onClick: handleRemoveSelected,
+                            disabled: !selectedObject,
+                            style: {
+                              ...historyButtonStyle(!!selectedObject),
+                              padding: isMobile ? "8px 10px" : "10px 12px",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "4px",
+                              minWidth: isMobile ? "60px" : "70px",
+                              backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
+                            },
+                            title: "\u524A\u9664 (Delete/Backspace)",
+                            children: [
+                              /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                                /* @__PURE__ */ jsx3("polyline", { points: "3 6 5 6 21 6" }),
+                                /* @__PURE__ */ jsx3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
+                                /* @__PURE__ */ jsx3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
+                                /* @__PURE__ */ jsx3("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
+                              ] }),
+                              /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" })
+                            ]
+                          }
+                        )
                       ] }),
-                      /* @__PURE__ */ jsx3("span", { style: { fontSize: "13px" }, children: "\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09" })
-                    ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
-                      /* @__PURE__ */ jsx3(Icon, { type: "cart", size: 20, color: "white" }),
-                      " \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                      /* @__PURE__ */ jsxs2("div", { style: {
+                        ...infoBoxStyle,
+                        width: "100%",
+                        maxWidth: isMobile ? "100%" : "800px",
+                        backgroundColor: "#ffffff",
+                        marginTop: isMobile ? "15px" : "20px",
+                        padding: isMobile ? "15px" : "20px"
+                      }, children: [
+                        /* @__PURE__ */ jsx3("h3", { style: {
+                          marginTop: 0,
+                          fontSize: isMobile ? "14px" : "16px"
+                        }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }),
+                        /* @__PURE__ */ jsxs2("ul", { style: {
+                          marginBottom: 0,
+                          lineHeight: 1.6,
+                          paddingLeft: isMobile ? "18px" : "20px",
+                          fontSize: isMobile ? "12px" : "13px"
+                        }, children: [
+                          /* @__PURE__ */ jsx3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }),
+                          /* @__PURE__ */ jsx3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }),
+                          /* @__PURE__ */ jsx3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }),
+                          /* @__PURE__ */ jsx3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }),
+                          /* @__PURE__ */ jsx3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" })
+                        ] })
+                      ] })
                     ] })
                   }
                 ),
-                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-                /* @__PURE__ */ jsx3("h2", { style: { marginTop: 0, color: "#333" }, children: "\u30C7\u30B6\u30A4\u30F3\u7DE8\u96C6" }),
-                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F4F7} \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }),
-                  /* @__PURE__ */ jsx3(
-                    "input",
-                    {
-                      ref: fileInputRef,
-                      type: "file",
-                      accept: "image/*",
-                      multiple: !0,
-                      onChange: handleImageUpload,
-                      style: { display: "none" }
-                    }
-                  ),
+                /* @__PURE__ */ jsx3("div", { style: {
+                  display: isMobile ? "block" : "none",
+                  width: "100%",
+                  backgroundColor: "#ffffff",
+                  overflowY: "auto",
+                  overflowX: "hidden"
+                }, children: /* @__PURE__ */ jsxs2("div", { style: {
+                  ...panelStyle,
+                  padding: isMobile ? "25px 20px" : "40px 30px",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word"
+                }, children: [
+                  /* @__PURE__ */ jsx3("h2", { style: {
+                    marginTop: 0,
+                    color: "#1a1a1a",
+                    marginBottom: isMobile ? "20px" : "30px",
+                    fontSize: isMobile ? "14px" : "16px",
+                    fontWeight: "400",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase"
+                  }, children: "\u5546\u54C1\u8A73\u7D30" }),
+                  /* @__PURE__ */ jsx3("div", { style: sectionStyle, children: /* @__PURE__ */ jsxs2("div", { style: {
+                    padding: "0",
+                    backgroundColor: "transparent",
+                    borderRadius: "0",
+                    marginBottom: "20px"
+                  }, children: [
+                    /* @__PURE__ */ jsx3("h3", { style: { ...sectionTitleStyle, marginTop: 0 }, children: "\u5546\u54C1\u8AAC\u660E" }),
+                    /* @__PURE__ */ jsx3("p", { style: {
+                      fontSize: "13px",
+                      color: "#666",
+                      lineHeight: "1.8",
+                      margin: 0,
+                      letterSpacing: "0.02em"
+                    }, children: product.description })
+                  ] }) }),
+                  /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                    /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u672C\u4F53\u30AB\u30E9\u30FC" }),
+                    /* @__PURE__ */ jsx3("div", { style: { display: "flex", gap: "10px", marginBottom: "20px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxs2(
+                      "button",
+                      {
+                        onClick: () => setSelectedColor(color),
+                        style: {
+                          flex: 1,
+                          padding: "14px 10px",
+                          border: selectedColor.name === color.name ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
+                          borderRadius: "0",
+                          backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "8px"
+                        },
+                        onMouseEnter: (e) => {
+                          selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#888");
+                        },
+                        onMouseLeave: (e) => {
+                          selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#d0d0d0");
+                        },
+                        children: [
+                          /* @__PURE__ */ jsx3(
+                            "div",
+                            {
+                              style: {
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                backgroundColor: color.hex,
+                                border: color.hex === "#FFFFFF" || color.hex === "#F5F5DC" ? "2px solid #e0e0e0" : "none",
+                                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                              }
+                            }
+                          ),
+                          /* @__PURE__ */ jsx3("span", { style: {
+                            fontSize: "12px",
+                            fontWeight: selectedColor.name === color.name ? "bold" : "normal",
+                            color: selectedColor.name === color.name ? "#667eea" : "#666"
+                          }, children: color.name })
+                        ]
+                      },
+                      color.name
+                    )) })
+                  ] }),
+                  /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                    /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u30B5\u30A4\u30BA" }),
+                    /* @__PURE__ */ jsx3("div", { style: {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(5, 1fr)",
+                      gap: "8px",
+                      marginBottom: "20px"
+                    }, children: sizes.map((size) => /* @__PURE__ */ jsx3(
+                      "button",
+                      {
+                        onClick: () => setSelectedSize(size),
+                        style: {
+                          padding: "14px 8px",
+                          border: selectedSize === size ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
+                          borderRadius: "0",
+                          backgroundColor: selectedSize === size ? "#1a1a1a" : "white",
+                          cursor: "pointer",
+                          fontSize: "12px",
+                          fontWeight: "400",
+                          letterSpacing: "0.05em",
+                          color: selectedSize === size ? "white" : "#666",
+                          transition: "all 0.3s ease"
+                        },
+                        onMouseEnter: (e) => {
+                          selectedSize !== size && (e.currentTarget.style.backgroundColor = "#fafafa", e.currentTarget.style.borderColor = "#888");
+                        },
+                        onMouseLeave: (e) => {
+                          selectedSize !== size && (e.currentTarget.style.backgroundColor = "white", e.currentTarget.style.borderColor = "#d0d0d0");
+                        },
+                        children: size
+                      },
+                      size
+                    )) })
+                  ] }),
+                  /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
                   /* @__PURE__ */ jsx3(
                     "button",
                     {
-                      onClick: handleUploadClick,
-                      disabled: isLoading,
+                      onClick: openCartModal,
+                      disabled: isAddingToCart,
                       style: {
-                        ...buttonStyle("#3498db", !isLoading),
+                        ...buttonStyle("#5c6ac4", !isAddingToCart),
+                        fontSize: isMobile ? "16px" : "18px",
+                        fontWeight: "bold",
+                        padding: isMobile ? "14px" : "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        marginBottom: "24px"
+                      },
+                      children: isAddingToCart ? /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }, children: [
+                        /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
+                          /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 20, color: "white" }),
+                          "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D..."
+                        ] }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: "13px" }, children: "\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09" })
+                      ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                        /* @__PURE__ */ jsx3(Icon, { type: "cart", size: 20, color: "white" }),
+                        " \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                      ] })
+                    }
+                  ),
+                  /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                  /* @__PURE__ */ jsx3("h2", { style: { marginTop: 0, color: "#333" }, children: "\u30C7\u30B6\u30A4\u30F3\u7DE8\u96C6" }),
+                  /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                    /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F4F7} \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }),
+                    /* @__PURE__ */ jsx3(
+                      "input",
+                      {
+                        ref: fileInputRef,
+                        type: "file",
+                        accept: "image/*",
+                        multiple: !0,
+                        onChange: handleImageUpload,
+                        style: { display: "none" }
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(
+                      "button",
+                      {
+                        onClick: handleUploadClick,
+                        disabled: isLoading,
+                        style: {
+                          ...buttonStyle("#3498db", !isLoading),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px"
+                        },
+                        children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
+                          /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
+                          " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
+                        ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                          /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
+                          " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+                        ] })
+                      }
+                    )
+                  ] }),
+                  /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                  /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                    /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F916} AI\u753B\u50CF\u751F\u6210" }),
+                    /* @__PURE__ */ jsx3(
+                      "textarea",
+                      {
+                        value: aiPrompt,
+                        onChange: (e) => setAiPrompt(e.target.value),
+                        placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02\u3001\u30AB\u30E9\u30D5\u30EB\u306A\u62BD\u8C61\u753B...",
+                        rows: 3,
+                        style: textareaStyle,
+                        disabled: isGenerating
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(
+                      "button",
+                      {
+                        onClick: handleGenerateAI,
+                        disabled: isGenerating,
+                        style: primaryButtonStyle(isGenerating),
+                        children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
+                      }
+                    ),
+                    lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "12px", color: "#666", marginTop: "10px" }, children: [
+                      '\u6700\u5F8C\u306E\u751F\u6210: "',
+                      lastAIPrompt,
+                      '"'
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                  /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                    /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }),
+                    /* @__PURE__ */ jsx3(
+                      "input",
+                      {
+                        type: "text",
+                        value: textInput,
+                        onChange: (e) => handleTextInputChange(e.target.value),
+                        placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
+                        style: inputStyle
+                      }
+                    ),
+                    /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "10px", marginBottom: "10px" }, children: [
+                      /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                        /* @__PURE__ */ jsx3("label", { style: labelStyle, children: "\u8272" }),
+                        /* @__PURE__ */ jsx3(
+                          "input",
+                          {
+                            type: "color",
+                            value: textColor,
+                            onChange: (e) => handleChangeTextColor(e.target.value),
+                            style: colorInputStyle
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                        /* @__PURE__ */ jsxs2("label", { style: labelStyle, children: [
+                          "\u30B5\u30A4\u30BA: ",
+                          fontSize,
+                          "px"
+                        ] }),
+                        /* @__PURE__ */ jsx3(
+                          "input",
+                          {
+                            type: "range",
+                            min: "10",
+                            max: "100",
+                            value: fontSize,
+                            onChange: (e) => handleChangeFontSize(Number(e.target.value)),
+                            style: { width: "100%" }
+                          }
+                        )
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsx3("label", { style: {
+                      fontSize: isMobile ? "12px" : "13px",
+                      fontWeight: "600",
+                      color: "#333",
+                      marginBottom: "8px",
+                      display: "block"
+                    }, children: "\u30D5\u30A9\u30F3\u30C8\u306E\u9078\u629E" }),
+                    /* @__PURE__ */ jsxs2("div", { ref: fontDropdownRef, style: { position: "relative", width: "100%" }, children: [
+                      /* @__PURE__ */ jsxs2(
+                        "div",
+                        {
+                          onClick: () => setIsFontDropdownOpen(!isFontDropdownOpen),
+                          style: {
+                            ...selectStyle,
+                            cursor: "pointer",
+                            fontFamily: FONT_LIST.find((f) => f.value === fontFamily)?.family || fontFamily,
+                            fontSize: isMobile ? "14px" : "16px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx3("span", { children: FONT_LIST.find((f) => f.value === fontFamily)?.label || fontFamily }),
+                            /* @__PURE__ */ jsx3("span", { style: { fontSize: "12px" }, children: isFontDropdownOpen ? "\u25B2" : "\u25BC" })
+                          ]
+                        }
+                      ),
+                      isFontDropdownOpen && /* @__PURE__ */ jsxs2("div", { style: {
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        right: 0,
+                        backgroundColor: "white",
+                        border: "2px solid #4c51bf",
+                        borderRadius: "8px",
+                        maxHeight: "350px",
+                        overflowY: "auto",
+                        zIndex: 1e3,
+                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                        marginTop: "4px"
+                      }, children: [
+                        /* @__PURE__ */ jsxs2("div", { style: {
+                          display: "flex",
+                          borderBottom: "2px solid #e2e8f0",
+                          position: "sticky",
+                          top: 0,
+                          backgroundColor: "white",
+                          zIndex: 1001
+                        }, children: [
+                          /* @__PURE__ */ jsx3(
+                            "button",
+                            {
+                              onClick: (e) => {
+                                e.stopPropagation(), setActiveFontTab("japanese");
+                              },
+                              style: {
+                                flex: 1,
+                                padding: "12px",
+                                border: "none",
+                                backgroundColor: activeFontTab === "japanese" ? "#4c51bf" : "transparent",
+                                color: activeFontTab === "japanese" ? "white" : "#4a5568",
+                                fontWeight: activeFontTab === "japanese" ? "bold" : "normal",
+                                cursor: "pointer",
+                                transition: "all 0.2s",
+                                fontSize: isMobile ? "14px" : "16px"
+                              },
+                              children: "\u65E5\u672C\u8A9E"
+                            }
+                          ),
+                          /* @__PURE__ */ jsx3(
+                            "button",
+                            {
+                              onClick: (e) => {
+                                e.stopPropagation(), setActiveFontTab("english");
+                              },
+                              style: {
+                                flex: 1,
+                                padding: "12px",
+                                border: "none",
+                                backgroundColor: activeFontTab === "english" ? "#4c51bf" : "transparent",
+                                color: activeFontTab === "english" ? "white" : "#4a5568",
+                                fontWeight: activeFontTab === "english" ? "bold" : "normal",
+                                cursor: "pointer",
+                                transition: "all 0.2s",
+                                fontSize: isMobile ? "14px" : "16px"
+                              },
+                              children: "English"
+                            }
+                          )
+                        ] }),
+                        getFilteredFonts().map((font) => /* @__PURE__ */ jsx3(
+                          "div",
+                          {
+                            onClick: () => {
+                              handleChangeFontFamily(font.value), setIsFontDropdownOpen(!1);
+                            },
+                            style: {
+                              padding: isMobile ? "10px 12px" : "12px 16px",
+                              cursor: "pointer",
+                              fontFamily: font.family,
+                              fontSize: isMobile ? "14px" : "16px",
+                              borderBottom: "1px solid #eee",
+                              backgroundColor: fontFamily === font.value ? "#f0f0ff" : "transparent",
+                              transition: "background-color 0.2s"
+                            },
+                            onMouseEnter: (e) => {
+                              fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "#f9f9f9");
+                            },
+                            onMouseLeave: (e) => {
+                              fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "transparent");
+                            },
+                            children: font.label
+                          },
+                          font.value
+                        ))
+                      ] })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleClearCanvas,
+                      style: {
+                        ...buttonStyle("#ff8c42", !0),
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         gap: "8px"
                       },
-                      children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
-                        /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
-                        " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
-                      ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
-                        /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
-                        " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
-                      ] })
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F916} AI\u753B\u50CF\u751F\u6210" }),
-                  /* @__PURE__ */ jsx3(
-                    "textarea",
-                    {
-                      value: aiPrompt,
-                      onChange: (e) => setAiPrompt(e.target.value),
-                      placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02\u3001\u30AB\u30E9\u30D5\u30EB\u306A\u62BD\u8C61\u753B...",
-                      rows: 3,
-                      style: textareaStyle,
-                      disabled: isGenerating
+                      children: [
+                        /* @__PURE__ */ jsx3(Icon, { type: "refresh", size: 18, color: "white" }),
+                        " \u3059\u3079\u3066\u30AF\u30EA\u30A2"
+                      ]
                     }
                   ),
-                  /* @__PURE__ */ jsx3(
+                  /* @__PURE__ */ jsxs2(
                     "button",
                     {
-                      onClick: handleGenerateAI,
-                      disabled: isGenerating,
-                      style: primaryButtonStyle(isGenerating),
-                      children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
-                    }
-                  ),
-                  lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "12px", color: "#666", marginTop: "10px" }, children: [
-                    '\u6700\u5F8C\u306E\u751F\u6210: "',
-                    lastAIPrompt,
-                    '"'
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }),
-                  /* @__PURE__ */ jsx3(
-                    "input",
-                    {
-                      type: "text",
-                      value: textInput,
-                      onChange: (e) => handleTextInputChange(e.target.value),
-                      placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
-                      style: inputStyle
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "10px", marginBottom: "10px" }, children: [
-                    /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
-                      /* @__PURE__ */ jsx3("label", { style: labelStyle, children: "\u8272" }),
-                      /* @__PURE__ */ jsx3(
-                        "input",
-                        {
-                          type: "color",
-                          value: textColor,
-                          onChange: (e) => handleChangeTextColor(e.target.value),
-                          style: colorInputStyle
-                        }
-                      )
-                    ] }),
-                    /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
-                      /* @__PURE__ */ jsxs2("label", { style: labelStyle, children: [
-                        "\u30B5\u30A4\u30BA: ",
-                        fontSize,
-                        "px"
-                      ] }),
-                      /* @__PURE__ */ jsx3(
-                        "input",
-                        {
-                          type: "range",
-                          min: "10",
-                          max: "100",
-                          value: fontSize,
-                          onChange: (e) => handleChangeFontSize(Number(e.target.value)),
-                          style: { width: "100%" }
-                        }
-                      )
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ jsx3("label", { style: {
-                    fontSize: isMobile ? "12px" : "13px",
-                    fontWeight: "600",
-                    color: "#333",
-                    marginBottom: "8px",
-                    display: "block"
-                  }, children: "\u30D5\u30A9\u30F3\u30C8\u306E\u9078\u629E" }),
-                  /* @__PURE__ */ jsxs2("div", { ref: fontDropdownRef, style: { position: "relative", width: "100%" }, children: [
-                    /* @__PURE__ */ jsxs2(
-                      "div",
-                      {
-                        onClick: () => setIsFontDropdownOpen(!isFontDropdownOpen),
-                        style: {
-                          ...selectStyle,
-                          cursor: "pointer",
-                          fontFamily: FONT_LIST.find((f) => f.value === fontFamily)?.family || fontFamily,
-                          fontSize: isMobile ? "14px" : "16px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center"
-                        },
-                        children: [
-                          /* @__PURE__ */ jsx3("span", { children: FONT_LIST.find((f) => f.value === fontFamily)?.label || fontFamily }),
-                          /* @__PURE__ */ jsx3("span", { style: { fontSize: "12px" }, children: isFontDropdownOpen ? "\u25B2" : "\u25BC" })
-                        ]
-                      }
-                    ),
-                    isFontDropdownOpen && /* @__PURE__ */ jsxs2("div", { style: {
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      right: 0,
-                      backgroundColor: "white",
-                      border: "2px solid #4c51bf",
-                      borderRadius: "8px",
-                      maxHeight: "350px",
-                      overflowY: "auto",
-                      zIndex: 1e3,
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      marginTop: "4px"
-                    }, children: [
-                      /* @__PURE__ */ jsxs2("div", { style: {
+                      onClick: handleSaveDesign,
+                      style: {
+                        ...buttonStyle("#00b894", !0),
                         display: "flex",
-                        borderBottom: "2px solid #e2e8f0",
-                        position: "sticky",
-                        top: 0,
-                        backgroundColor: "white",
-                        zIndex: 1001
-                      }, children: [
-                        /* @__PURE__ */ jsx3(
-                          "button",
-                          {
-                            onClick: (e) => {
-                              e.stopPropagation(), setActiveFontTab("japanese");
-                            },
-                            style: {
-                              flex: 1,
-                              padding: "12px",
-                              border: "none",
-                              backgroundColor: activeFontTab === "japanese" ? "#4c51bf" : "transparent",
-                              color: activeFontTab === "japanese" ? "white" : "#4a5568",
-                              fontWeight: activeFontTab === "japanese" ? "bold" : "normal",
-                              cursor: "pointer",
-                              transition: "all 0.2s",
-                              fontSize: isMobile ? "14px" : "16px"
-                            },
-                            children: "\u65E5\u672C\u8A9E"
-                          }
-                        ),
-                        /* @__PURE__ */ jsx3(
-                          "button",
-                          {
-                            onClick: (e) => {
-                              e.stopPropagation(), setActiveFontTab("english");
-                            },
-                            style: {
-                              flex: 1,
-                              padding: "12px",
-                              border: "none",
-                              backgroundColor: activeFontTab === "english" ? "#4c51bf" : "transparent",
-                              color: activeFontTab === "english" ? "white" : "#4a5568",
-                              fontWeight: activeFontTab === "english" ? "bold" : "normal",
-                              cursor: "pointer",
-                              transition: "all 0.2s",
-                              fontSize: isMobile ? "14px" : "16px"
-                            },
-                            children: "English"
-                          }
-                        )
-                      ] }),
-                      getFilteredFonts().map((font) => /* @__PURE__ */ jsx3(
-                        "div",
-                        {
-                          onClick: () => {
-                            handleChangeFontFamily(font.value), setIsFontDropdownOpen(!1);
-                          },
-                          style: {
-                            padding: isMobile ? "10px 12px" : "12px 16px",
-                            cursor: "pointer",
-                            fontFamily: font.family,
-                            fontSize: isMobile ? "14px" : "16px",
-                            borderBottom: "1px solid #eee",
-                            backgroundColor: fontFamily === font.value ? "#f0f0ff" : "transparent",
-                            transition: "background-color 0.2s"
-                          },
-                          onMouseEnter: (e) => {
-                            fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "#f9f9f9");
-                          },
-                          onMouseLeave: (e) => {
-                            fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "transparent");
-                          },
-                          children: font.label
-                        },
-                        font.value
-                      ))
-                    ] })
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-                /* @__PURE__ */ jsxs2(
-                  "button",
-                  {
-                    onClick: handleClearCanvas,
-                    style: {
-                      ...buttonStyle("#ff8c42", !0),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px"
-                    },
-                    children: [
-                      /* @__PURE__ */ jsx3(Icon, { type: "refresh", size: 18, color: "white" }),
-                      " \u3059\u3079\u3066\u30AF\u30EA\u30A2"
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxs2(
-                  "button",
-                  {
-                    onClick: handleSaveDesign,
-                    style: {
-                      ...buttonStyle("#00b894", !0),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px"
-                    },
-                    children: [
-                      /* @__PURE__ */ jsx3(Icon, { type: "save", size: 18, color: "white" }),
-                      " \u753B\u50CF\u3068\u3057\u3066\u4FDD\u5B58"
-                    ]
-                  }
-                )
-              ] }) })
-            ]
-          }
-        ),
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px"
+                      },
+                      children: [
+                        /* @__PURE__ */ jsx3(Icon, { type: "save", size: 18, color: "white" }),
+                        " \u753B\u50CF\u3068\u3057\u3066\u4FDD\u5B58"
+                      ]
+                    }
+                  )
+                ] }) })
+              ]
+            }
+          )
+        ] }),
         showCopyrightModal && /* @__PURE__ */ jsx3("div", { style: {
           position: "fixed",
           top: 0,
@@ -4685,7 +4878,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-A3XUC6IR.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-4BZ4LMSW.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "a8f8097e", hmr: void 0, url: "/build/manifest-A8F8097E.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-A3XUC6IR.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-6UQP7TDD.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "3444c572", hmr: void 0, url: "/build/manifest-3444C572.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

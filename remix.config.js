@@ -7,6 +7,7 @@ module.exports = {
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*"],
   publicPath: "/build/",
-  server: "./server.js", // Vercel用のサーバーエントリポイント
-  serverBuildPath: "api/index.js", // Vercelのサーバーレス関数パス
+  // ローカル開発時はコメントアウト、Vercelデプロイ時は有効化
+  // server: "./server.js", // Vercel用のサーバーエントリポイント
+  // serverBuildPath: "api/index.js", // Vercelのサーバーレス関数パス
 };
