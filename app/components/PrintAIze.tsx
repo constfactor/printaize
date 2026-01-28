@@ -612,7 +612,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             historyStepRef.current = 0;
             isHistoryInitializedRef.current = true; // 履歴初期化完了
             updateHistoryButtons();
-            console.log('初期化完了 - 履歴保存が有効になりました');
           }
         }, 100);
       },
@@ -779,7 +778,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             // 回転モード判定：累積で15度以上回転したら回転モードON
             if (!rotationEnabled && gestureFrameCount > 3 && Math.abs(cumulativeAngle) > 15) {
               rotationEnabled = true;
-              console.log('🔄 Rotation enabled - cumulative:', cumulativeAngle.toFixed(1));
             }
             
             // 回転モードがONの場合のみ回転を適用（滑らかに）
@@ -1441,13 +1439,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     
     // 履歴が初期化されていない場合は保存しない
     if (!isHistoryInitializedRef.current) {
-      console.log('履歴未初期化のため保存をスキップ');
       return;
     }
-
+    
     // undo/redo実行中は保存しない
     if (isLoadingHistoryRef.current) {
-      console.log('履歴読み込み中のため保存をスキップ');
       return;
     }
 
@@ -1455,11 +1451,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     historyRef.current = historyRef.current.slice(0, historyStepRef.current + 1);
     historyRef.current.push(json);
     historyStepRef.current = historyRef.current.length - 1;
-    
-    console.log('履歴保存:', {
-      step: historyStepRef.current,
-      total: historyRef.current.length
-    });
     
     // 履歴が50を超えた場合、初期状態（インデックス0）を保護して古いものを削除
     if (historyRef.current.length > 50) {
@@ -1474,13 +1465,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   const updateHistoryButtons = () => {
     const newCanUndo = historyStepRef.current > 0;
     const newCanRedo = historyStepRef.current < historyRef.current.length - 1;
-    
-    console.log('履歴更新:', {
-      current: historyStepRef.current,
-      total: historyRef.current.length,
-      canUndo: newCanUndo,
-      canRedo: newCanRedo
-    });
     
     setCanUndo(newCanUndo);
     setCanRedo(newCanRedo);
@@ -2018,14 +2002,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   // ========== Cloudinaryに直接アップロード（お客さんの生データをそのまま保存）==========
   const uploadToSupabaseDirect = async (imageDataUrl: string): Promise<string> => {
     try {
-      console.log('Supabase直接アップロード開始...');
-      
       // ステップ1: Data URLをBlobに変換
       const response = await fetch(imageDataUrl);
       const blob = await response.blob();
-      
-      const fileSizeMB = Math.round(blob.size / 1024 / 1024 * 100) / 100;
-      console.log('アップロードするファイルサイズ:', fileSizeMB, 'MB');
 
       // ステップ2: ファイル名を生成（ユニークID + タイムスタンプ）
       const timestamp = Date.now();
@@ -2042,8 +2021,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       }
 
       const supabase = createClient(supabaseUrl, supabaseKey);
-
-      console.log('Supabaseにアップロード中:', fileName);
 
       const { data, error } = await supabase.storage
         .from('printaize')
@@ -2062,8 +2039,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       const { data: urlData } = supabase.storage
         .from('printaize')
         .getPublicUrl(data.path);
-
-      console.log('Supabase直接アップロード成功:', urlData.publicUrl);
 
       return urlData.publicUrl;
     } catch (error) {
@@ -2092,8 +2067,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         // スケール比率を計算
         const scaleRatio = targetWidth / printArea.width;
 
-        console.log('高解像度出力開始:', { targetWidth, targetHeight, scaleRatio });
-
         // オフスクリーンキャンバスを作成
         const offscreenCanvas = new fabricLib.Canvas(null, {
           width: targetWidth,
@@ -2105,8 +2078,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         const objects = canvas.getObjects();
         const filteredObjects = objects.filter((obj: any) => obj.name !== 'printArea');
         const totalObjects = filteredObjects.length;
-
-        console.log('処理するオブジェクト数:', totalObjects);
 
         if (totalObjects === 0) {
           // オブジェクトがない場合は空の透過画像を返す
@@ -2127,16 +2098,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
         const checkComplete = () => {
           loadedCount++;
-          console.log(`オブジェクト読み込み: ${loadedCount}/${totalObjects}`);
           
           if (loadedCount === totalObjects) {
             clearTimeout(timeout);
             try {
               // z-index（元の順序）でソートしてキャンバスに追加
-              console.log('全オブジェクト読み込み完了。loadedObjects数:', loadedObjects.length);
               loadedObjects.sort((a, b) => a.index - b.index);
-              loadedObjects.forEach((item, i) => {
-                console.log(`キャンバスに追加 [${i}]:`, item.fabricObj.type, 'index:', item.index);
+              loadedObjects.forEach((item) => {
                 offscreenCanvas.add(item.fabricObj);
               });
               
@@ -2147,11 +2115,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 format: 'png',
                 multiplier: 1
               });
-              
-              const sizeKB = Math.round(dataURL.length / 1024);
-              const sizeMB = (sizeKB / 1024).toFixed(2);
-              console.log('高解像度出力完了（PNG透過、300DPI） - サイズ:', sizeKB, 'KB (', sizeMB, 'MB)');
-              console.log('💡 Supabase直接アップロードを使用するため、ファイルサイズ制限なし');
               
               resolve(dataURL);
             } catch (error) {
@@ -2170,8 +2133,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
             if (obj.type === 'image' && (obj as any).originalImageData) {
               // 元の高解像度画像を使用
-              console.log('画像読み込み開始:', (obj as any).originalImageData.substring(0, 50));
-              
               fabricLib.Image.fromURL(
                 (obj as any).originalImageData,
                 (hdImg: any) => {
@@ -2228,7 +2189,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     }
 
                     // z-indexを保持して配列に追加
-                    console.log('画像をloadedObjectsに追加:', index);
                     loadedObjects.push({ index, fabricObj: hdImg });
                     checkComplete();
                   } catch (error) {
@@ -2255,7 +2215,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               });
 
               // z-indexを保持して配列に追加
-              console.log('テキストをloadedObjectsに追加:', index);
               loadedObjects.push({ index, fabricObj: hdText });
               checkComplete();
             } else {
@@ -2378,14 +2337,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // ステップ5: 高解像度版を生成（印刷用、プリント範囲のみ、背景透過）
       let dataURLHD: string;
       try {
-        console.log('高解像度出力を生成中...');
         if (!printArea) {
           throw new Error('プリント範囲が見つかりません');
         }
         dataURLHD = await generateHighResolutionOutput(canvas, printArea);
-        const sizeInKB = Math.round(dataURLHD.length * 0.75 / 1024);
-        const sizeInMB = (sizeInKB / 1024).toFixed(2);
-        console.log(`高解像度出力完了（PNG透過、300DPI） - サイズ: ${sizeInKB} KB ( ${sizeInMB} MB)`);
       } catch (error) {
         console.error('高解像度出力エラー:', error);
         alert(`高解像度出力に失敗しました\n\nエラー: ${error instanceof Error ? error.message : '不明なエラー'}`);
@@ -2397,9 +2352,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // ステップ5: 通常版をSupabaseに直接アップロード
       let designImageUrl: string;
       try {
-        console.log('プレビュー画像を直接アップロード中...');
         designImageUrl = await uploadToSupabaseDirect(dataURL);
-        console.log('プレビューアップロード成功:', designImageUrl);
       } catch (uploadError) {
         console.error('プレビューアップロードエラー:', uploadError);
         alert(`プレビュー画像のアップロードに失敗しました\n\nエラー: ${uploadError instanceof Error ? uploadError.message : '不明なエラー'}`);
@@ -2411,9 +2364,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // ステップ6: 高解像度版をSupabaseに直接アップロード
       let designImageUrlHD: string;
       try {
-        console.log('高解像度画像を直接アップロード中...');
         designImageUrlHD = await uploadToSupabaseDirect(dataURLHD);
-        console.log('高解像度アップロード成功:', designImageUrlHD);
       } catch (uploadError) {
         console.error('高解像度アップロードエラー:', uploadError);
         alert(`高解像度画像のアップロードに失敗しました\n\nエラー: ${uploadError instanceof Error ? uploadError.message : '不明なエラー'}`);
@@ -2449,7 +2400,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             console.error('デザイン画像の記録エラー:', insertError);
           } else if (insertData) {
             designImageId = insertData.id;
-            console.log('デザイン画像を記録しました:', designImageId);
           }
         }
       } catch (dbError) {
@@ -2465,9 +2415,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           { key: "design_image_hd", value: designImageUrlHD },
         ],
       }));
-
-      console.log('カートに追加するアイテム数:', cartItems.length);
-      console.log('カートアイテム:', cartItems);
 
       // ステップ9: 全てのアイテムを1回でカートに追加
       let checkoutUrl = '';
@@ -2499,10 +2446,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         // 注文状態の更新はスキップ
         // カート追加時は ordered: false のまま
         // 30日後に自動削除される（未購入の場合）
-        if (designImageId) {
-          console.log('カート追加成功。design_image_id:', designImageId);
-          console.log('ordered は false のまま（30日後に自動削除される）');
-        }
         
         // Shopifyのチェックアウトページにリダイレクト
         window.location.href = checkoutUrl;
@@ -2562,7 +2505,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         format: "png",
         quality: 1,
       });
-      console.log('プレビュー画像サイズ:', Math.round(dataURL.length / 1024), 'KB');
 
       // 点線を再表示
       if (printAreaRect) {
@@ -2574,9 +2516,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       const printArea = getPrintAreaInPixels(canvas.width!);
 
       // ステップ4: 高解像度版を生成（印刷用 - 元の画像データを使用）
-      console.log('高解像度版を生成中...');
       const dataURLHD = await generateHighResolutionOutput(canvas, printArea);
-      console.log('高解像度版生成完了。サイズ:', Math.round(dataURLHD.length / 1024), 'KB');
 
       // ステップ5: 通常解像度版をCloudinaryにアップロード
       const uploadResponse = await fetch("/api/upload-image", {
@@ -2597,9 +2537,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // ステップ6: 高解像度版をSupabaseに直接アップロード（サーバーを経由しない）
       let designImageUrlHD: string;
       try {
-        console.log('高解像度画像を直接アップロード中...');
         designImageUrlHD = await uploadToSupabaseDirect(dataURLHD);
-        console.log('高解像度アップロード成功:', designImageUrlHD);
       } catch (uploadError) {
         console.error('高解像度アップロードエラー:', uploadError);
         alert(`高解像度画像のアップロードに失敗しました\n\nエラー: ${uploadError instanceof Error ? uploadError.message : '不明なエラー'}`);
@@ -2637,7 +2575,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           
           if (!insertError && insertData) {
             designImageId = insertData.id;
-            console.log('デザイン画像をデータベースに記録:', designImageId);
           } else {
             console.warn('データベース記録エラー（続行）:', insertError);
           }
@@ -2696,10 +2633,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         // 
         // 将来的にShopify Webhookを実装する場合は、
         // 注文完了時に ordered: true に更新する
-        if (designImageId) {
-          console.log('カート追加成功。design_image_id:', designImageId);
-          console.log('ordered は false のまま（30日後に自動削除される）');
-        }
         
         // Shopifyのチェックアウトページにリダイレクト
         window.location.href = data.checkoutUrl;
