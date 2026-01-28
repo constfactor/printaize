@@ -1059,8 +1059,8 @@ function PrintAIze({ product }) {
       } else
         obj._movingStart = null;
       obj.setCoords();
-      let objBounds = obj.getBoundingRect(!0), trashZoneStart = printArea.top + printArea.height, trashZoneThreshold = trashZoneStart + 80, trashZoneActive = trashZoneStart + 120, objectBottom = objBounds.top + objBounds.height;
-      objectBottom > trashZoneThreshold ? (setShowTrash(!0), objectBottom > trashZoneActive ? setIsOverTrash(!0) : setIsOverTrash(!1)) : (setShowTrash(!1), setIsOverTrash(!1));
+      let objBounds = obj.getBoundingRect(!0), trashZoneStart = printArea.top + printArea.height, trashZoneThreshold = trashZoneStart + 20, trashZoneActive = trashZoneStart + 60, objectBottom = objBounds.top + objBounds.height;
+      objectBottom > trashZoneThreshold ? (setShowTrash(!0), objectBottom > trashZoneActive ? setIsOverTrash(!0) : setIsOverTrash(!1)) : (setShowTrash(!1), setIsOverTrash(!1)), canvasRef.current && (canvasRef.current.style.touchAction = "none");
       let snapThreshold = 10, centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, objCenterX = objBounds.left + objBounds.width / 2, objCenterY = objBounds.top + objBounds.height / 2;
       obj._lastPos || (obj._lastPos = { x: obj.left, y: obj.top });
       let moveX = Math.abs(obj.left - obj._lastPos.x), moveY = Math.abs(obj.top - obj._lastPos.y), isHorizontalMove = moveX > moveY * 2, isVerticalMove = moveY > moveX * 2;
@@ -1071,7 +1071,7 @@ function PrintAIze({ product }) {
       (!isHorizontalMove || Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold * 3) && Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold && (obj.left += rightEdge - (objBounds.left + objBounds.width), newGuides.vertical = rightEdge - objBounds.width / 2), (!isVerticalMove || Math.abs(objBounds.top - printArea.top) < snapThreshold * 3) && Math.abs(objBounds.top - printArea.top) < snapThreshold && (obj.top += printArea.top - objBounds.top, newGuides.horizontal = printArea.top + objBounds.height / 2);
       let bottomEdge = printArea.top + printArea.height;
       (!isVerticalMove || Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold * 3) && Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold && (obj.top += bottomEdge - (objBounds.top + objBounds.height), newGuides.horizontal = bottomEdge - objBounds.height / 2), setSnapGuides(newGuides), objBounds.left < printArea.left && (obj.left += printArea.left - objBounds.left), objBounds.left + objBounds.width > printArea.left + printArea.width && (obj.left -= objBounds.left + objBounds.width - (printArea.left + printArea.width)), objBounds.top < printArea.top && (obj.top += printArea.top - objBounds.top);
-      let maxBottom = printArea.top + printArea.height + 200;
+      let maxBottom = printArea.top + printArea.height + 100;
       objBounds.top + objBounds.height > maxBottom && (obj.top -= objBounds.top + objBounds.height - maxBottom);
     }), canvas.on("object:scaling", (e) => {
       let obj = e.target;
@@ -1112,7 +1112,7 @@ function PrintAIze({ product }) {
       let obj = e.target;
       if (obj && obj.name !== "printArea") {
         obj.setCoords();
-        let objBounds = obj.getBoundingRect(!0), trashZoneActive = printArea.top + printArea.height + 120;
+        let objBounds = obj.getBoundingRect(!0), trashZoneActive = printArea.top + printArea.height + 60;
         if (objBounds.top + objBounds.height > trashZoneActive) {
           canvas.remove(obj), setShowTrash(!1), setIsOverTrash(!1), canvas.renderAll();
           return;
@@ -2023,8 +2023,7 @@ ${width} \xD7 ${height}px
                     height: "100%",
                     maxWidth: "100%",
                     maxHeight: "100%",
-                    objectFit: "contain",
-                    touchAction: isMobile ? "pan-y" : "none"
+                    objectFit: "contain"
                   }
                 }
               ),
@@ -2033,23 +2032,23 @@ ${width} \xD7 ${height}px
                 {
                   style: {
                     position: "absolute",
-                    bottom: "20px",
+                    bottom: isMobile ? "30px" : "40px",
                     left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "60px",
-                    height: "60px",
+                    transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
+                    width: isMobile ? "70px" : "80px",
+                    height: isMobile ? "70px" : "80px",
                     borderRadius: "50%",
                     backgroundColor: isOverTrash ? "#ff4444" : "#666",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
                     transition: "all 0.2s ease",
                     zIndex: 15,
                     animation: "trashBounce 0.3s ease"
                   },
                   children: [
-                    /* @__PURE__ */ jsx3(Icon, { type: "trash", size: 28, color: "white" }),
+                    /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
                     /* @__PURE__ */ jsx3("style", { children: `
                     @keyframes trashBounce {
                       0% {
@@ -3694,7 +3693,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-APCDOICC.js", imports: ["/build/_shared/chunk-4G2AVHG4.js", "/build/_shared/chunk-Q3IECNXJ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-C2BYF5BU.js", imports: ["/build/_shared/chunk-PGOH7JLP.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-WRGN5J6B.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-3OAHNCES.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-RGR2YX5K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-SBHTVHCW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-7WMWW6SL.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-HKEEMJ2K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-YYPGWX5C.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "acd29d7c", hmr: void 0, url: "/build/manifest-ACD29D7C.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-APCDOICC.js", imports: ["/build/_shared/chunk-4G2AVHG4.js", "/build/_shared/chunk-Q3IECNXJ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-C2BYF5BU.js", imports: ["/build/_shared/chunk-PGOH7JLP.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-WRGN5J6B.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-3OAHNCES.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-RGR2YX5K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-SBHTVHCW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-7WMWW6SL.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-HKEEMJ2K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-OVA5H57A.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "4c0aaccb", hmr: void 0, url: "/build/manifest-4C0AACCB.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

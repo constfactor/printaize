@@ -924,10 +924,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       obj.setCoords();
       const objBounds = obj.getBoundingRect(true);
       
-      // ゴミ箱エリア判定（プリント範囲下部から100px下）
+      // ゴミ箱エリア判定（Instagram風：プリント範囲からすぐに表示）
       const trashZoneStart = printArea.top + printArea.height;
-      const trashZoneThreshold = trashZoneStart + 80; // ゴミ箱表示の開始位置
-      const trashZoneActive = trashZoneStart + 120; // ゴミ箱がアクティブになる位置
+      const trashZoneThreshold = trashZoneStart + 20; // ゴミ箱表示の開始位置（早めに表示）
+      const trashZoneActive = trashZoneStart + 60; // ゴミ箱がアクティブになる位置
       const objectBottom = objBounds.top + objBounds.height;
       
       // ゴミ箱エリアに入ったら表示
@@ -942,6 +942,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       } else {
         setShowTrash(false);
         setIsOverTrash(false);
+      }
+      
+      // ドラッグ中は画面スクロールを完全に防ぐ
+      if (canvasRef.current) {
+        canvasRef.current.style.touchAction = "none";
       }
       
       // Instagram風スナップガイドライン
@@ -1027,8 +1032,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       if (objBounds.top < printArea.top) {
         obj.top += (printArea.top - objBounds.top);
       }
-      // 下端制限（ゴミ箱エリアまで許可：200px下まで）
-      const maxBottom = printArea.top + printArea.height + 200;
+      // 下端制限（ゴミ箱エリアまで許可：100px下まで）
+      const maxBottom = printArea.top + printArea.height + 100;
       if (objBounds.top + objBounds.height > maxBottom) {
         obj.top -= ((objBounds.top + objBounds.height) - maxBottom);
       }
@@ -1196,7 +1201,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       if (obj && obj.name !== 'printArea') {
         obj.setCoords();
         const objBounds = obj.getBoundingRect(true);
-        const trashZoneActive = printArea.top + printArea.height + 120;
+        const trashZoneActive = printArea.top + printArea.height + 60; // アクティブエリア（赤くなる位置）
         const objectBottom = objBounds.top + objBounds.height;
         
         // ゴミ箱エリアでドロップしたら削除
@@ -3018,7 +3023,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   maxWidth: "100%",
                   maxHeight: "100%",
                   objectFit: "contain",
-                  touchAction: isMobile ? "pan-y" : "none",
                 }} 
               />
               
@@ -3027,23 +3031,23 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <div
                   style={{
                     position: "absolute",
-                    bottom: "20px",
+                    bottom: isMobile ? "30px" : "40px",
                     left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "60px",
-                    height: "60px",
+                    transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
+                    width: isMobile ? "70px" : "80px",
+                    height: isMobile ? "70px" : "80px",
                     borderRadius: "50%",
                     backgroundColor: isOverTrash ? "#ff4444" : "#666",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
                     transition: "all 0.2s ease",
                     zIndex: 15,
                     animation: "trashBounce 0.3s ease",
                   }}
                 >
-                  <Icon type="trash" size={28} color="white" />
+                  <Icon type="trash" size={isMobile ? 32 : 36} color="white" />
                   <style>{`
                     @keyframes trashBounce {
                       0% {
