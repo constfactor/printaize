@@ -792,25 +792,47 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           lastAngle = 0;
           lastCenter = { x: 0, y: 0 };
           
-          // PCの場合のみコントロールを再表示（スマホは最初から非表示）
+          // 最終的な範囲チェック（指を離した時）
           const activeObject = canvas.getActiveObject();
-          if (activeObject && activeObject.name !== 'printArea' && activeObject.hasControls) {
-            activeObject.setControlsVisibility({
-              mt: false,
-              mb: false,
-              ml: false,
-              mr: false,
-              tl: true,
-              tr: true,
-              bl: true,
-              br: true,
-              mtr: true,
-              deleteControl: true,
-            });
-            canvas.renderAll();
-          }
-          
           if (activeObject && activeObject.name !== 'printArea') {
+            // 座標を更新
+            activeObject.setCoords();
+            const objBounds = activeObject.getBoundingRect(true);
+            
+            // プリント範囲を超えていたら範囲内に収める
+            if (objBounds.left < printArea.left) {
+              activeObject.left += (printArea.left - objBounds.left);
+            }
+            if (objBounds.top < printArea.top) {
+              activeObject.top += (printArea.top - objBounds.top);
+            }
+            if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
+              activeObject.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
+            }
+            if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
+              activeObject.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
+            }
+            
+            // 最終的な座標を更新
+            activeObject.setCoords();
+            
+            // PCの場合のみコントロールを再表示（スマホは最初から非表示）
+            if (activeObject.hasControls) {
+              activeObject.setControlsVisibility({
+                mt: false,
+                mb: false,
+                ml: false,
+                mr: false,
+                tl: true,
+                tr: true,
+                bl: true,
+                br: true,
+                mtr: true,
+                deleteControl: true,
+              });
+            }
+            
+            canvas.renderAll();
             saveHistory();
           }
         }
