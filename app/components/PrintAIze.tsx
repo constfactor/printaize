@@ -235,8 +235,9 @@ const FONT_LIST = [
   { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" },
 ];
 
-// キャンバスサイズの定数
-const CANVAS_SIZE = 800;
+// キャンバスサイズの定数（3:4のアスペクト比）
+const CANVAS_WIDTH = 600;
+const CANVAS_HEIGHT = 800;
 
 export default function PrintAIze({ product }: PrintAIzeProps) {
   // ========== ステップ1: 状態管理 ==========
@@ -306,8 +307,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   
   const sizes = ["S", "M", "L", "XL", "XXL"];
 
-  // レスポンシブ対応
-  const [isMobile, setIsMobile] = useState(false);
+  // レスポンシブ対応（Hydration errorを防ぐため、初期値はnull）
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   
   // ズーム表示状態
   const [isZoomed, setIsZoomed] = useState(false);
@@ -432,17 +433,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   // カラーに基づいて商品画像のパスを生成
   const getCurrentMockupImage = () => {
     // カラー名から画像ファイル名を決定
-    const colorSlug = 
-      selectedColor.name === 'ホワイト' || selectedColor.name === 'オフホワイト' 
-        ? 'white' 
-        : 'black';
+    const colorSlug = selectedColor === 'white' ? 'white' : 'black';
     return `/images/products/${product.id}-${colorSlug}.png`;
   };
 
-  // プリント範囲を計算（mm → px変換）
-  const getPrintAreaInPixels = (canvasSize: number) => {
+  // プリント範囲を計算（mm → px変換）- 3:4アスペクト比対応
+  const getPrintAreaInPixels = (canvasWidth: number, canvasHeight?: number) => {
+    const height = canvasHeight || CANVAS_HEIGHT;
+    
     // 商品ごとにプリント範囲のスケールを調整
-    let baseScale = 0.6; // デフォルト: キャンバスの60%
+    let baseScale = 0.6; // デフォルト: キャンバス幅の60%
     let topOffset = 0; // デフォルト: オフセットなし
     
     // Tシャツ系：元の枠線の60%に縮小（0.6 * 0.6 = 0.36）+ 上に20px移動
@@ -455,25 +455,25 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       topOffset = 0; // 中央配置
     }
     
-    const scale = canvasSize * baseScale;
+    const scale = canvasWidth * baseScale;
     const ratio = product.printAreaWidth / product.printAreaHeight;
     
-    let width, height;
+    let width, printHeight;
     if (ratio > 1) {
       // 横長
       width = scale;
-      height = scale / ratio;
+      printHeight = scale / ratio;
     } else {
       // 縦長
-      height = scale;
+      printHeight = scale;
       width = scale * ratio;
     }
     
     return {
       width: Math.round(width),
-      height: Math.round(height),
-      left: Math.round((canvasSize - width) / 2),
-      top: Math.round((canvasSize - height) / 2) + topOffset,
+      height: Math.round(printHeight),
+      left: Math.round((canvasWidth - width) / 2),
+      top: Math.round((height - printHeight) / 2) + topOffset,
     };
   };
 
@@ -516,10 +516,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
     // キャンバスサイズは固定（800x800）- CSS transformでスケーリング
     
-    // キャンバスを作成
+    // キャンバスを作成（3:4アスペクト比）
     const canvas = new fabricLib.Canvas(canvasRef.current, {
-      width: CANVAS_SIZE,
-      height: CANVAS_SIZE,
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
       backgroundColor: "#fafafa",
       selection: true,
       preserveObjectStacking: true, // 選択時にz-orderを変更しない
@@ -640,12 +640,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
         
         // プリント範囲の矩形を描画（点線）
-        const printArea = getPrintAreaInPixels(CANVAS_SIZE);
+        const printArea = getPrintAreaInPixels(CANVAS_WIDTH, CANVAS_HEIGHT);
         
         // 商品の色に応じて点線の色を決定
         const getPrintAreaStrokeColor = () => {
-          const colorName = selectedColor.name.toLowerCase();
-          if (colorName.includes('ブラック') || colorName.includes('black')) {
+          if (selectedColor === 'black') {
             return 'white'; // ブラックの時は白
           } else {
             return '#000000'; // ホワイトの時は黒
@@ -686,7 +685,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     );
 
     // プリント範囲の境界を取得
-    const printArea = getPrintAreaInPixels(CANVAS_SIZE);
+    const printArea = getPrintAreaInPixels(CANVAS_WIDTH, CANVAS_HEIGHT);
     
     // ========== スマホ用：2本指ピンチ＆回転の実装 ==========
     let touchListenersAdded = false;
@@ -737,7 +736,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
           if (!activeObject || activeObject.name === 'printArea') {
             const rect = canvasWrapper.getBoundingClientRect();
-            const canvasScale = CANVAS_SIZE / rect.width;
+            const canvasScale = CANVAS_WIDTH / rect.width;
             const touch1 = e.touches[0];
             const pointer = {
               x: (touch1.clientX - rect.left) * canvasScale,
@@ -804,7 +803,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             // 中心点の移動を計算
             const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
             const rect = canvasWrapper.getBoundingClientRect();
-            const canvasScale = CANVAS_SIZE / rect.width; // キャンバスの実際のスケール
+            const canvasScale = CANVAS_WIDTH / rect.width; // キャンバスの実際のスケール
             
             if (lastCenter.x !== 0) {
               const dx = (currentCenter.x - lastCenter.x) * canvasScale;
@@ -1495,10 +1494,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     const objects = canvas.getObjects();
     objects.forEach((obj: any) => {
       if (obj.name === 'printArea') {
-        const colorName = selectedColor.name.toLowerCase();
-        const newColor = (colorName.includes('ブラック') || colorName.includes('black')) 
-          ? 'white' 
-          : '#000000';
+        const newColor = selectedColor === 'black' ? 'white' : '#000000';
         obj.set('stroke', newColor);
         canvas.renderAll();
       }
@@ -2309,18 +2305,21 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   
   // モーダルを開く
   const openCartModal = () => {
+    // selectedColorを日本語の色名にマッピング
+    const colorNameJa = selectedColor === 'white' ? 'ホワイト' : 'ブラック';
+    
     // 現在選択されているカラーをモーダルのデフォルトに設定
-    setModalColor(selectedColor.name);
+    setModalColor(colorNameJa);
     
     // 現在のカラー・サイズの個数が0の場合のみ1にする
     setModalQuantities(prev => {
-      const currentColorQuantities = prev[selectedColor.name];
+      const currentColorQuantities = prev[colorNameJa];
       const currentSizeQuantity = currentColorQuantities[selectedSize];
       
       if (currentSizeQuantity === 0) {
         return {
           ...prev,
-          [selectedColor.name]: {
+          [colorNameJa]: {
             ...currentColorQuantities,
             [selectedSize]: 1,
           }
@@ -2638,7 +2637,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               metadata: {
                 product_id: product.id,
                 product_name: product.name,
-                color: selectedColor.name,
+                color: selectedColor === 'white' ? 'ホワイト' : 'ブラック',
                 size: selectedSize,
               }
             })
@@ -2674,7 +2673,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       };
 
       // 選択されたカラーとサイズから正しいバリアントIDを取得
-      const colorKey = selectedColor.name.includes("ホワイト") || selectedColor.name.includes("White") ? "ホワイト" : "ブラック";
+      const colorKey = selectedColor === 'white' ? "ホワイト" : "ブラック";
       const variantId = variantMapping[colorKey]?.[selectedSize] || "48602131661024"; // デフォルト: ホワイトM
       const productVariantId = `gid://shopify/ProductVariant/${variantId}`;
 
@@ -2689,7 +2688,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           aiPrompt: lastAIPrompt,
           productId: product.id,
           productName: product.name,
-          color: selectedColor.name,
+          color: selectedColor === 'white' ? 'ホワイト' : 'ブラック',
           size: selectedSize,
           price: product.price,
           productVariantId: productVariantId,
@@ -2962,6 +2961,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     );
   }
   
+  // Hydration errorを防ぐため、isMobileの判定が完了するまで待つ
+  if (isMobile === null) {
+    return <div style={{ minHeight: "100vh", backgroundColor: "#ffffff" }} />;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -3108,8 +3112,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             </motion.div>
           )}
 
-          {/* タブメニュー（モバイル時） */}
-        {isMobile && (
+          {/* タブメニュー（モバイル時） - オブジェクト未選択時のみ表示 */}
+        {isMobile && !selectedObject && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -3157,8 +3161,142 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </motion.div>
         )}
 
-        {/* カラー＆サイズ選択、カートに追加（モバイルのみ） */}
-        {isMobile && (
+        {/* 編集ツールメニュー（モバイル時・オブジェクト選択時） */}
+        {isMobile && selectedObject && (
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -10, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              display: "flex",
+              gap: "6px",
+              padding: "16px 20px",
+              borderBottom: "1px solid #f0f0f0",
+              overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {[
+              { 
+                id: "undo", 
+                label: "元に戻す", 
+                action: undo, 
+                disabled: !canUndo,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 7v6h6" />
+                    <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
+                  </svg>
+                )
+              },
+              { 
+                id: "redo", 
+                label: "やり直し", 
+                action: redo, 
+                disabled: !canRedo,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 7v6h-6" />
+                    <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" />
+                  </svg>
+                )
+              },
+              { 
+                id: "centerV", 
+                label: "上下中央", 
+                action: centerVertically, 
+                disabled: false,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="12" y1="2" x2="12" y2="22" />
+                    <path d="M8 12l4 4 4-4" />
+                    <path d="M8 12l4-4 4 4" />
+                  </svg>
+                )
+              },
+              { 
+                id: "centerH", 
+                label: "左右中央", 
+                action: centerHorizontally, 
+                disabled: false,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 8l-4 4 4 4" />
+                    <path d="M12 8l4 4-4 4" />
+                  </svg>
+                )
+              },
+              { 
+                id: "forward", 
+                label: "手前へ", 
+                action: bringForward, 
+                disabled: false,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="14" y="14" width="8" height="8" rx="2" />
+                    <rect x="2" y="2" width="8" height="8" rx="2" />
+                  </svg>
+                )
+              },
+              { 
+                id: "backward", 
+                label: "奥へ", 
+                action: sendBackward, 
+                disabled: false,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="2" width="8" height="8" rx="2" />
+                    <rect x="14" y="14" width="8" height="8" rx="2" />
+                  </svg>
+                )
+              },
+              { 
+                id: "fitArea", 
+                label: "範囲最大", 
+                action: fitToPrintArea, 
+                disabled: false,
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" />
+                  </svg>
+                )
+              },
+            ].map((tool) => (
+              <motion.button
+                key={tool.id}
+                onClick={tool.action}
+                disabled={tool.disabled}
+                whileHover={{ scale: tool.disabled ? 1 : 1.02 }}
+                whileTap={{ scale: tool.disabled ? 1 : 0.98 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: tool.disabled ? "#f5f5f7" : "#ffffff",
+                  color: tool.disabled ? "#86868b" : "#1d1d1f",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: tool.disabled ? "not-allowed" : "pointer",
+                  transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                  letterSpacing: "-0.01em",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  opacity: tool.disabled ? 0.5 : 1,
+                }}
+              >
+                {tool.icon}
+                {tool.label}
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+
+        {/* カラー＆サイズ選択、カートに追加（モバイルのみ・オブジェクト未選択時のみ） */}
+        {isMobile && !selectedObject && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -4524,7 +4662,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     setIsZoomed(false);
                   } else {
                     // ズームイン：プリントエリアの中心にズーム
-                    const printArea = getPrintAreaInPixels(CANVAS_SIZE);
+                    const printArea = getPrintAreaInPixels(CANVAS_WIDTH, CANVAS_HEIGHT);
                     
                     // プリントエリアの中心座標
                     const centerX = printArea.left + printArea.width / 2;
@@ -4638,9 +4776,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 >
                   {snapGuides.vertical !== null && (
                     <line
-                      x1={`${(snapGuides.vertical / CANVAS_SIZE) * 100}%`}
+                      x1={`${(snapGuides.vertical / CANVAS_WIDTH) * 100}%`}
                       y1="0"
-                      x2={`${(snapGuides.vertical / CANVAS_SIZE) * 100}%`}
+                      x2={`${(snapGuides.vertical / CANVAS_WIDTH) * 100}%`}
                       y2="100%"
                       stroke="#ff00ff"
                       strokeWidth="1"
@@ -4651,9 +4789,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   {snapGuides.horizontal !== null && (
                     <line
                       x1="0"
-                      y1={`${(snapGuides.horizontal / CANVAS_SIZE) * 100}%`}
+                      y1={`${(snapGuides.horizontal / CANVAS_HEIGHT) * 100}%`}
                       x2="100%"
-                      y2={`${(snapGuides.horizontal / CANVAS_SIZE) * 100}%`}
+                      y2={`${(snapGuides.horizontal / CANVAS_HEIGHT) * 100}%`}
                       stroke="#ff00ff"
                       strokeWidth="1"
                       strokeDasharray="5,5"
@@ -4928,15 +5066,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 {product.colors.map((color) => (
                   <button
                     key={color.name}
-                    onClick={() => setSelectedColor(color)}
+                    onClick={() => setModalColor(color.name)}
                     style={{
                       flex: 1,
                       padding: "14px 10px",
-                      border: selectedColor.name === color.name 
+                      border: modalColor === color.name 
                         ? "1px solid #1a1a1a" 
                         : "1px solid #d0d0d0",
                       borderRadius: "0",
-                      backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
+                      backgroundColor: modalColor === color.name ? "#f5f5f5" : "white",
                       cursor: "pointer",
                       transition: "all 0.3s ease",
                       display: "flex",
@@ -4945,12 +5083,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       gap: "8px",
                     }}
                     onMouseEnter={(e) => {
-                      if (selectedColor.name !== color.name) {
+                      if (modalColor !== color.name) {
                         e.currentTarget.style.borderColor = "#888";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (selectedColor.name !== color.name) {
+                      if (modalColor !== color.name) {
                         e.currentTarget.style.borderColor = "#d0d0d0";
                       }
                     }}
@@ -4969,8 +5107,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     />
                     <span style={{ 
                       fontSize: "12px", 
-                      fontWeight: selectedColor.name === color.name ? "bold" : "normal",
-                      color: selectedColor.name === color.name ? "#667eea" : "#666",
+                      fontWeight: modalColor === color.name ? "bold" : "normal",
+                      color: modalColor === color.name ? "#667eea" : "#666",
                     }}>
                       {color.name}
                     </span>
