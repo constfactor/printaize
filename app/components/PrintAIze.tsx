@@ -620,7 +620,14 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     let touchListenersAdded = false;
     const canvasElement = canvasRef.current;
     
-    if (isMobileDevice && canvasElement) {
+    // Fabric.jsのcanvasWrapperを取得（upper-canvasとlower-canvasを含む親要素）
+    const canvasWrapper = canvas.wrapperEl;
+    
+    console.log('📍 Canvas wrapper:', canvasWrapper);
+    console.log('📍 Upper canvas:', canvas.upperCanvasEl);
+    console.log('📍 Lower canvas:', canvasElement);
+    
+    if (isMobileDevice && canvasWrapper) {
       let lastDistance = 0;
       let lastAngle = 0;
       let isGesture = false;
@@ -651,7 +658,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         
         if (e.touches.length === 2) {
           // 2本指タッチ時はページズームを無効化
-          canvasElement.style.touchAction = 'none';
+          canvasWrapper.style.touchAction = 'none';
           
           isGesture = true;
           let activeObject = canvas.getActiveObject();
@@ -662,7 +669,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           
           // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
           if (!activeObject || activeObject.name === 'printArea') {
-            const rect = canvasElement.getBoundingClientRect();
+            const rect = canvasWrapper.getBoundingClientRect();
             const canvasScale = canvasSize / rect.width;
             const touch1 = e.touches[0];
             const pointer = {
@@ -726,7 +733,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             
             // 中心点の移動を計算
             const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
-            const rect = canvasElement.getBoundingClientRect();
+            const rect = canvasWrapper.getBoundingClientRect();
             const canvasScale = canvasSize / rect.width; // キャンバスの実際のスケール
             
             if (lastCenter.x !== 0) {
@@ -791,7 +798,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           console.log('🔵 Touch end - gesture complete');
           
           // touchActionを元に戻す
-          canvasElement.style.touchAction = 'pan-y';
+          canvasWrapper.style.touchAction = 'pan-y';
           
           isGesture = false;
           lastDistance = 0;
@@ -824,26 +831,28 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       
       // デバッグ用：全てのタッチイベントをログ
       const debugTouchStart = (e: TouchEvent) => {
-        console.log('🟡 DEBUG: touchstart on canvas, fingers:', e.touches.length, 'element:', e.currentTarget);
+        console.log('🟡 DEBUG: touchstart on canvasWrapper, fingers:', e.touches.length, 'element:', e.currentTarget);
       };
       
       // キャプチャフェーズで処理（Fabric.jsより先に実行される）
-      canvasElement.addEventListener('touchstart', debugTouchStart, { passive: false, capture: true });
-      canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
-      canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
-      canvasElement.addEventListener('touchend', handleTouchEnd, { capture: true });
+      // canvasWrapperにイベントリスナーを追加（upper-canvasとlower-canvasを両方カバー）
+      canvasWrapper.addEventListener('touchstart', debugTouchStart, { passive: false, capture: true });
+      canvasWrapper.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
+      canvasWrapper.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+      canvasWrapper.addEventListener('touchend', handleTouchEnd, { capture: true });
       touchListenersAdded = true;
       
-      console.log('✅ Touch event listeners added for pinch gestures (with capture phase)');
-      console.log('📍 Canvas element:', canvasElement);
-      console.log('📍 Canvas element ID:', canvasElement.id);
+      console.log('✅ Touch event listeners added to canvasWrapper (with capture phase)');
+      console.log('📍 Canvas wrapper:', canvasWrapper);
+      console.log('📍 Upper canvas:', canvas.upperCanvasEl);
+      console.log('📍 Lower canvas:', canvasElement);
       
       // デバッグ用：ウィンドウ全体でタッチイベントを監視
       const windowTouchDebug = (e: TouchEvent) => {
         if (e.touches.length === 2) {
           console.log('🟠 Window detected 2 fingers!');
           console.log('🟠 Touch target:', e.target);
-          console.log('🟠 Is canvas?', e.target === canvasElement);
+          console.log('🟠 Is canvasWrapper?', e.target === canvasWrapper || canvasWrapper.contains(e.target as Node));
         }
       };
       window.addEventListener('touchstart', windowTouchDebug, { passive: false, capture: true });
@@ -853,10 +862,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       
       // クリーンアップ用の参照を保存
       (canvas as any)._touchHandlers = {
-        element: canvasElement,
+        element: canvasWrapper,
         start: handleTouchStart,
         move: handleTouchMove,
         end: handleTouchEnd,
+        debug: debugTouchStart,
       };
     }
 
@@ -1220,6 +1230,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // タッチイベントリスナーを削除（captureフェーズで追加したので、削除もcaptureで）
       if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._touchHandlers) {
         const handlers = (fabricCanvasRef.current as any)._touchHandlers;
+        if (handlers.debug) {
+          handlers.element.removeEventListener('touchstart', handlers.debug, { capture: true });
+        }
         handlers.element.removeEventListener('touchstart', handlers.start, { capture: true });
         handlers.element.removeEventListener('touchmove', handlers.move, { capture: true });
         handlers.element.removeEventListener('touchend', handlers.end, { capture: true });
