@@ -748,12 +748,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               }
             }
             
-            // 回転（しきい値を設定：5度以上の変化がある場合のみ回転）
+            // 回転（しきい値を設定：2度以上の変化がある場合のみ回転）
             const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
             if (lastAngle !== 0) {
               const angleDiff = currentAngle - lastAngle;
-              // 5度以上の角度変化がある場合のみ回転を適用（Instagram風）
-              if (Math.abs(angleDiff) > 5) {
+              // 2度以上の角度変化がある場合のみ回転を適用
+              if (Math.abs(angleDiff) > 2) {
                 activeObject.angle = (activeObject.angle || 0) + angleDiff;
               }
             }
