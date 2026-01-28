@@ -303,6 +303,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   // ズーム表示状態
   const [isZoomed, setIsZoomed] = useState(false);
   
+  // ゴミ箱表示状態
+  const [showTrash, setShowTrash] = useState(false);
+  const [isOverTrash, setIsOverTrash] = useState(false);
+  
   // ズーム時のESCキーハンドラー
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -914,6 +918,26 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       obj.setCoords();
       const objBounds = obj.getBoundingRect(true);
       
+      // ゴミ箱エリア判定（プリント範囲下部から100px下）
+      const trashZoneStart = printArea.top + printArea.height;
+      const trashZoneThreshold = trashZoneStart + 80; // ゴミ箱表示の開始位置
+      const trashZoneActive = trashZoneStart + 120; // ゴミ箱がアクティブになる位置
+      const objectBottom = objBounds.top + objBounds.height;
+      
+      // ゴミ箱エリアに入ったら表示
+      if (objectBottom > trashZoneThreshold) {
+        setShowTrash(true);
+        // さらに深く入ったらゴミ箱をアクティブ化
+        if (objectBottom > trashZoneActive) {
+          setIsOverTrash(true);
+        } else {
+          setIsOverTrash(false);
+        }
+      } else {
+        setShowTrash(false);
+        setIsOverTrash(false);
+      }
+      
       // 左端制限
       if (objBounds.left < printArea.left) {
         obj.left += (printArea.left - objBounds.left);
@@ -926,9 +950,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       if (objBounds.top < printArea.top) {
         obj.top += (printArea.top - objBounds.top);
       }
-      // 下端制限
-      if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
-        obj.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
+      // 下端制限（ゴミ箱エリアまで許可：200px下まで）
+      const maxBottom = printArea.top + printArea.height + 200;
+      if (objBounds.top + objBounds.height > maxBottom) {
+        obj.top -= ((objBounds.top + objBounds.height) - maxBottom);
       }
     });
 
@@ -1077,6 +1102,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     });
     canvas.on("selection:cleared", () => {
       setSelectedObject(null);
+      // ゴミ箱をリセット
+      setShowTrash(false);
+      setIsOverTrash(false);
       // オブジェクト未選択時はスクロールを許可（モバイルのみ）
       if (canvasRef.current && window.innerWidth < 768) {
         canvasRef.current.style.touchAction = "pan-y";
@@ -1084,6 +1112,27 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     });
     canvas.on("object:modified", (e: any) => {
       const obj = e.target;
+      
+      // ゴミ箱削除チェック（Instagram風）
+      if (obj && obj.name !== 'printArea') {
+        obj.setCoords();
+        const objBounds = obj.getBoundingRect(true);
+        const trashZoneActive = printArea.top + printArea.height + 120;
+        const objectBottom = objBounds.top + objBounds.height;
+        
+        // ゴミ箱エリアでドロップしたら削除
+        if (objectBottom > trashZoneActive) {
+          canvas.remove(obj);
+          setShowTrash(false);
+          setIsOverTrash(false);
+          canvas.renderAll();
+          return; // 削除したので以降の処理をスキップ
+        }
+      }
+      
+      // ゴミ箱表示をリセット
+      setShowTrash(false);
+      setIsOverTrash(false);
       
       // Shift移動の記録をクリア
       if (obj && obj._movingStart) {
@@ -2953,6 +3002,46 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   touchAction: isMobile ? "pan-y" : "none",
                 }} 
               />
+              
+              {/* ゴミ箱（Instagram風） */}
+              {showTrash && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "50%",
+                    backgroundColor: isOverTrash ? "#ff4444" : "#666",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    transition: "all 0.2s ease",
+                    zIndex: 15,
+                    animation: "trashBounce 0.3s ease",
+                  }}
+                >
+                  <Icon type="trash" size={28} color="white" />
+                  <style>{`
+                    @keyframes trashBounce {
+                      0% {
+                        transform: translateX(-50%) scale(0.8);
+                        opacity: 0;
+                      }
+                      50% {
+                        transform: translateX(-50%) scale(1.1);
+                      }
+                      100% {
+                        transform: translateX(-50%) scale(1);
+                        opacity: 1;
+                      }
+                    }
+                  `}</style>
+                </div>
+              )}
             </div>
 
             {/* オブジェクト操作コントロール */}
