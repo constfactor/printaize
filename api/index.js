@@ -1978,40 +1978,433 @@ ${width} \xD7 ${height}px
                   },
                   "item"
                 ),
-                activeTab === "ai" && /* @__PURE__ */ jsx3(
+                activeTab === "ai" && /* @__PURE__ */ jsxs2(
                   motion.div,
                   {
                     initial: { opacity: 0, x: -20 },
                     animate: { opacity: 1, x: 0 },
                     exit: { opacity: 0, x: 20 },
                     transition: { duration: 0.3 },
-                    children: /* @__PURE__ */ jsx3("p", { children: "AI\u753B\u50CF\u751F\u6210\u6A5F\u80FD\uFF08\u5B9F\u88C5\u4E88\u5B9A\uFF09" })
+                    style: { display: "flex", flexDirection: "column", gap: "20px" },
+                    children: [
+                      /* @__PURE__ */ jsxs2("div", { children: [
+                        /* @__PURE__ */ jsx3("label", { style: {
+                          display: "block",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          color: "#1d1d1f",
+                          marginBottom: "8px"
+                        }, children: "\u30D7\u30ED\u30F3\u30D7\u30C8" }),
+                        /* @__PURE__ */ jsx3(
+                          "textarea",
+                          {
+                            value: aiPrompt,
+                            onChange: (e) => setAiPrompt(e.target.value),
+                            placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02...",
+                            rows: 4,
+                            disabled: isGenerating,
+                            style: {
+                              width: "100%",
+                              padding: "12px",
+                              borderRadius: "12px",
+                              border: "1.5px solid #d2d2d7",
+                              fontSize: "15px",
+                              resize: "vertical",
+                              fontFamily: "inherit",
+                              boxSizing: "border-box"
+                            }
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: handleGenerateAI,
+                          disabled: isGenerating || !aiPrompt.trim(),
+                          whileHover: !isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {},
+                          whileTap: !isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {},
+                          style: {
+                            padding: "14px",
+                            borderRadius: "12px",
+                            border: "none",
+                            backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
+                            color: "#fff",
+                            fontSize: "15px",
+                            fontWeight: "500",
+                            cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer"
+                          },
+                          children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
+                        }
+                      ),
+                      lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "13px", color: "#6e6e73", margin: 0 }, children: [
+                        '\u6700\u5F8C\u306E\u751F\u6210: "',
+                        lastAIPrompt,
+                        '"'
+                      ] })
+                    ]
                   },
                   "ai"
                 ),
-                activeTab === "images" && /* @__PURE__ */ jsx3(
+                activeTab === "images" && /* @__PURE__ */ jsxs2(
                   motion.div,
                   {
                     initial: { opacity: 0, x: -20 },
                     animate: { opacity: 1, x: 0 },
                     exit: { opacity: 0, x: 20 },
                     transition: { duration: 0.3 },
-                    children: /* @__PURE__ */ jsx3("p", { children: "\u753B\u50CF\u7BA1\u7406\u6A5F\u80FD\uFF08\u5B9F\u88C5\u4E88\u5B9A\uFF09" })
+                    style: { display: "flex", flexDirection: "column", gap: "20px" },
+                    children: [
+                      /* @__PURE__ */ jsx3(
+                        "input",
+                        {
+                          ref: fileInputRef,
+                          type: "file",
+                          accept: "image/*",
+                          multiple: !0,
+                          onChange: handleImageUpload,
+                          style: { display: "none" }
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: handleUploadClick,
+                          disabled: isLoading,
+                          whileHover: isLoading ? {} : { scale: 1.02 },
+                          whileTap: isLoading ? {} : { scale: 0.98 },
+                          style: {
+                            padding: "14px",
+                            borderRadius: "12px",
+                            border: "none",
+                            backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
+                            color: "#fff",
+                            fontSize: "15px",
+                            fontWeight: "500",
+                            cursor: isLoading ? "not-allowed" : "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px"
+                          },
+                          children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
+                            /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
+                            " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
+                          ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                            /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
+                            " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+                          ] })
+                        }
+                      ),
+                      uploadedImages.length > 0 && /* @__PURE__ */ jsxs2("div", { children: [
+                        /* @__PURE__ */ jsx3("h3", { style: { fontSize: "15px", fontWeight: "600", marginBottom: "12px" }, children: "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6E08\u307F\u753B\u50CF" }),
+                        /* @__PURE__ */ jsx3("div", { style: {
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                          gap: "12px"
+                        }, children: uploadedImages.map((imgUrl, index) => /* @__PURE__ */ jsx3(
+                          "div",
+                          {
+                            style: {
+                              borderRadius: "8px",
+                              overflow: "hidden",
+                              aspectRatio: "1 / 1",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                            },
+                            children: /* @__PURE__ */ jsx3(
+                              "img",
+                              {
+                                src: imgUrl,
+                                alt: `Uploaded ${index + 1}`,
+                                style: {
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover"
+                                }
+                              }
+                            )
+                          },
+                          index
+                        )) })
+                      ] })
+                    ]
                   },
                   "images"
                 ),
-                activeTab === "text" && /* @__PURE__ */ jsx3(
+                activeTab === "text" && /* @__PURE__ */ jsxs2(
                   motion.div,
                   {
                     initial: { opacity: 0, x: -20 },
                     animate: { opacity: 1, x: 0 },
                     exit: { opacity: 0, x: 20 },
                     transition: { duration: 0.3 },
-                    children: /* @__PURE__ */ jsx3("p", { children: "\u30C6\u30AD\u30B9\u30C8\u7DE8\u96C6\u6A5F\u80FD\uFF08\u5B9F\u88C5\u4E88\u5B9A\uFF09" })
+                    style: { display: "flex", flexDirection: "column", gap: "20px" },
+                    children: [
+                      /* @__PURE__ */ jsxs2("div", { children: [
+                        /* @__PURE__ */ jsx3("label", { style: {
+                          display: "block",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          color: "#1d1d1f",
+                          marginBottom: "8px"
+                        }, children: "\u30C6\u30AD\u30B9\u30C8" }),
+                        /* @__PURE__ */ jsx3(
+                          "input",
+                          {
+                            type: "text",
+                            value: textInput,
+                            onChange: (e) => handleTextInputChange(e.target.value),
+                            placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
+                            style: {
+                              width: "100%",
+                              padding: "12px",
+                              borderRadius: "12px",
+                              border: "1.5px solid #d2d2d7",
+                              fontSize: "15px",
+                              fontFamily: "inherit",
+                              boxSizing: "border-box"
+                            }
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "16px" }, children: [
+                        /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                          /* @__PURE__ */ jsx3("label", { style: {
+                            display: "block",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#1d1d1f",
+                            marginBottom: "8px"
+                          }, children: "\u8272" }),
+                          /* @__PURE__ */ jsx3(
+                            "input",
+                            {
+                              type: "color",
+                              value: textColor,
+                              onChange: (e) => handleChangeTextColor(e.target.value),
+                              style: {
+                                width: "100%",
+                                height: "44px",
+                                borderRadius: "12px",
+                                border: "1.5px solid #d2d2d7",
+                                cursor: "pointer"
+                              }
+                            }
+                          )
+                        ] }),
+                        /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                          /* @__PURE__ */ jsxs2("label", { style: {
+                            display: "block",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#1d1d1f",
+                            marginBottom: "8px"
+                          }, children: [
+                            "\u30B5\u30A4\u30BA: ",
+                            fontSize,
+                            "px"
+                          ] }),
+                          /* @__PURE__ */ jsx3(
+                            "input",
+                            {
+                              type: "range",
+                              min: "10",
+                              max: "100",
+                              value: fontSize,
+                              onChange: (e) => handleChangeFontSize(Number(e.target.value)),
+                              style: { width: "100%", height: "44px" }
+                            }
+                          )
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: handleAddText,
+                          disabled: !textInput.trim(),
+                          whileHover: textInput.trim() ? { scale: 1.02 } : {},
+                          whileTap: textInput.trim() ? { scale: 0.98 } : {},
+                          style: {
+                            padding: "14px",
+                            borderRadius: "12px",
+                            border: "none",
+                            backgroundColor: textInput.trim() ? "#0071e3" : "#d2d2d7",
+                            color: "#fff",
+                            fontSize: "15px",
+                            fontWeight: "500",
+                            cursor: textInput.trim() ? "pointer" : "not-allowed"
+                          },
+                          children: "\u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0"
+                        }
+                      )
+                    ]
                   },
                   "text"
                 )
               ] }) }),
+              !isMobile && /* @__PURE__ */ jsxs2(
+                motion.div,
+                {
+                  style: {
+                    padding: "40px",
+                    borderTop: "1px solid #f0f0f0"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx3("h3", { style: {
+                      fontSize: "15px",
+                      fontWeight: "600",
+                      color: "#1d1d1f",
+                      marginBottom: "16px"
+                    }, children: "\u7DE8\u96C6\u30C4\u30FC\u30EB" }),
+                    /* @__PURE__ */ jsxs2("div", { style: {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: "12px"
+                    }, children: [
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: undo,
+                          disabled: !canUndo,
+                          whileHover: canUndo ? { scale: 1.05 } : {},
+                          whileTap: canUndo ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: canUndo ? "#fff" : "#f5f5f7",
+                            color: canUndo ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: canUndo ? "pointer" : "not-allowed"
+                          },
+                          children: "\u21B6 \u5143\u306B\u623B\u3059"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: redo,
+                          disabled: !canRedo,
+                          whileHover: canRedo ? { scale: 1.05 } : {},
+                          whileTap: canRedo ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: canRedo ? "#fff" : "#f5f5f7",
+                            color: canRedo ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: canRedo ? "pointer" : "not-allowed"
+                          },
+                          children: "\u21B7 \u3084\u308A\u76F4\u3057"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: centerVertically,
+                          disabled: !selectedObject,
+                          whileHover: selectedObject ? { scale: 1.05 } : {},
+                          whileTap: selectedObject ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                            color: selectedObject ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: selectedObject ? "pointer" : "not-allowed"
+                          },
+                          children: "\u4E0A\u4E0B\u4E2D\u592E"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: centerHorizontally,
+                          disabled: !selectedObject,
+                          whileHover: selectedObject ? { scale: 1.05 } : {},
+                          whileTap: selectedObject ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                            color: selectedObject ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: selectedObject ? "pointer" : "not-allowed"
+                          },
+                          children: "\u5DE6\u53F3\u4E2D\u592E"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: bringForward,
+                          disabled: !selectedObject,
+                          whileHover: selectedObject ? { scale: 1.05 } : {},
+                          whileTap: selectedObject ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                            color: selectedObject ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: selectedObject ? "pointer" : "not-allowed"
+                          },
+                          children: "\u624B\u524D\u3078"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: sendBackward,
+                          disabled: !selectedObject,
+                          whileHover: selectedObject ? { scale: 1.05 } : {},
+                          whileTap: selectedObject ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                            color: selectedObject ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: selectedObject ? "pointer" : "not-allowed"
+                          },
+                          children: "\u5965\u3078"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: fitToPrintArea,
+                          disabled: !selectedObject,
+                          whileHover: selectedObject ? { scale: 1.05 } : {},
+                          whileTap: selectedObject ? { scale: 0.95 } : {},
+                          style: {
+                            padding: "10px",
+                            borderRadius: "8px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                            color: selectedObject ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: selectedObject ? "pointer" : "not-allowed",
+                            gridColumn: "1 / -1"
+                          },
+                          children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927"
+                        }
+                      )
+                    ] })
+                  ]
+                }
+              ),
               /* @__PURE__ */ jsx3(
                 motion.div,
                 {
@@ -2022,6 +2415,7 @@ ${width} \xD7 ${height}px
                   children: /* @__PURE__ */ jsx3(
                     motion.button,
                     {
+                      onClick: () => setIsModalOpen(!0),
                       whileHover: { scale: 1.02 },
                       whileTap: { scale: 0.98 },
                       style: {
@@ -2458,16 +2852,11 @@ ${width} \xD7 ${height}px
                 ] })
               ] }) }),
               /* @__PURE__ */ jsx3("div", { style: {
-                width: isMobile ? "100%" : "35%",
-                minWidth: "0",
-                maxWidth: isMobile ? "100%" : "35%",
-                flex: isMobile ? "none" : "1 1 35%",
+                display: isMobile ? "block" : "none",
+                width: "100%",
                 backgroundColor: "#ffffff",
                 overflowY: "auto",
-                overflowX: "hidden",
-                height: isMobile ? "auto" : "100vh",
-                position: isMobile ? "relative" : "sticky",
-                top: 0
+                overflowX: "hidden"
               }, children: /* @__PURE__ */ jsxs2("div", { style: {
                 ...panelStyle,
                 padding: isMobile ? "25px 20px" : "40px 30px",
@@ -3765,7 +4154,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-YRAM3FKN.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "ecf96ec4", hmr: void 0, url: "/build/manifest-ECF96EC4.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-2GORV5ZO.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "386eb95c", hmr: void 0, url: "/build/manifest-386EB95C.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

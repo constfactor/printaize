@@ -2978,9 +2978,59 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
+                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
               >
-                {/* AI生成コンテンツは後で追加 */}
-                <p>AI画像生成機能（実装予定）</p>
+                <div>
+                  <label style={{
+                    display: "block",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    color: "#1d1d1f",
+                    marginBottom: "8px",
+                  }}>
+                    プロンプト
+                  </label>
+                  <textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市..."
+                    rows={4}
+                    disabled={isGenerating}
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "12px",
+                      border: "1.5px solid #d2d2d7",
+                      fontSize: "15px",
+                      resize: "vertical",
+                      fontFamily: "inherit",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <motion.button
+                  onClick={handleGenerateAI}
+                  disabled={isGenerating || !aiPrompt.trim()}
+                  whileHover={!isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {}}
+                  whileTap={!isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {}}
+                  style={{
+                    padding: "14px",
+                    borderRadius: "12px",
+                    border: "none",
+                    backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
+                    color: "#fff",
+                    fontSize: "15px",
+                    fontWeight: "500",
+                    cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
+                </motion.button>
+                {lastAIPrompt && (
+                  <p style={{ fontSize: "13px", color: "#6e6e73", margin: 0 }}>
+                    最後の生成: "{lastAIPrompt}"
+                  </p>
+                )}
               </motion.div>
             )}
             {activeTab === "images" && (
@@ -2990,9 +3040,76 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
+                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
               >
-                {/* 画像管理コンテンツは後で追加 */}
-                <p>画像管理機能（実装予定）</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
+                />
+                <motion.button
+                  onClick={handleUploadClick}
+                  disabled={isLoading}
+                  whileHover={!isLoading ? { scale: 1.02 } : {}}
+                  whileTap={!isLoading ? { scale: 0.98 } : {}}
+                  style={{
+                    padding: "14px",
+                    borderRadius: "12px",
+                    border: "none",
+                    backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
+                    color: "#fff",
+                    fontSize: "15px",
+                    fontWeight: "500",
+                    cursor: isLoading ? "not-allowed" : "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  {isLoading ? (
+                    <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
+                  ) : (
+                    <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
+                  )}
+                </motion.button>
+                {uploadedImages.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px" }}>
+                      アップロード済み画像
+                    </h3>
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                      gap: "12px",
+                    }}>
+                      {uploadedImages.map((imgUrl, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            borderRadius: "8px",
+                            overflow: "hidden",
+                            aspectRatio: "1 / 1",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                          }}
+                        >
+                          <img
+                            src={imgUrl}
+                            alt={`Uploaded ${index + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
             {activeTab === "text" && (
@@ -3002,13 +3119,252 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
+                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
               >
-                {/* テキスト編集コンテンツは後で追加 */}
-                <p>テキスト編集機能（実装予定）</p>
+                <div>
+                  <label style={{
+                    display: "block",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    color: "#1d1d1f",
+                    marginBottom: "8px",
+                  }}>
+                    テキスト
+                  </label>
+                  <input
+                    type="text"
+                    value={textInput}
+                    onChange={(e) => handleTextInputChange(e.target.value)}
+                    placeholder="テキストを入力"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "12px",
+                      border: "1.5px solid #d2d2d7",
+                      fontSize: "15px",
+                      fontFamily: "inherit",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "16px" }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{
+                      display: "block",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      color: "#1d1d1f",
+                      marginBottom: "8px",
+                    }}>
+                      色
+                    </label>
+                    <input
+                      type="color"
+                      value={textColor}
+                      onChange={(e) => handleChangeTextColor(e.target.value)}
+                      style={{
+                        width: "100%",
+                        height: "44px",
+                        borderRadius: "12px",
+                        border: "1.5px solid #d2d2d7",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{
+                      display: "block",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      color: "#1d1d1f",
+                      marginBottom: "8px",
+                    }}>
+                      サイズ: {fontSize}px
+                    </label>
+                    <input
+                      type="range"
+                      min="10"
+                      max="100"
+                      value={fontSize}
+                      onChange={(e) => handleChangeFontSize(Number(e.target.value))}
+                      style={{ width: "100%", height: "44px" }}
+                    />
+                  </div>
+                </div>
+                <motion.button
+                  onClick={handleAddText}
+                  disabled={!textInput.trim()}
+                  whileHover={textInput.trim() ? { scale: 1.02 } : {}}
+                  whileTap={textInput.trim() ? { scale: 0.98 } : {}}
+                  style={{
+                    padding: "14px",
+                    borderRadius: "12px",
+                    border: "none",
+                    backgroundColor: !textInput.trim() ? "#d2d2d7" : "#0071e3",
+                    color: "#fff",
+                    fontSize: "15px",
+                    fontWeight: "500",
+                    cursor: !textInput.trim() ? "not-allowed" : "pointer",
+                  }}
+                >
+                  テキストを追加
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        {/* 編集ツール（デスクトップのみ） */}
+        {!isMobile && (
+          <motion.div
+            style={{
+              padding: "40px",
+              borderTop: "1px solid #f0f0f0",
+            }}
+          >
+            <h3 style={{
+              fontSize: "15px",
+              fontWeight: "600",
+              color: "#1d1d1f",
+              marginBottom: "16px",
+            }}>
+              編集ツール
+            </h3>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: "12px",
+            }}>
+              <motion.button
+                onClick={undo}
+                disabled={!canUndo}
+                whileHover={canUndo ? { scale: 1.05 } : {}}
+                whileTap={canUndo ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: canUndo ? "#fff" : "#f5f5f7",
+                  color: canUndo ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: canUndo ? "pointer" : "not-allowed",
+                }}
+              >
+                ↶ 元に戻す
+              </motion.button>
+              <motion.button
+                onClick={redo}
+                disabled={!canRedo}
+                whileHover={canRedo ? { scale: 1.05 } : {}}
+                whileTap={canRedo ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: canRedo ? "#fff" : "#f5f5f7",
+                  color: canRedo ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: canRedo ? "pointer" : "not-allowed",
+                }}
+              >
+                ↷ やり直し
+              </motion.button>
+              <motion.button
+                onClick={centerVertically}
+                disabled={!selectedObject}
+                whileHover={selectedObject ? { scale: 1.05 } : {}}
+                whileTap={selectedObject ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                  color: selectedObject ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: selectedObject ? "pointer" : "not-allowed",
+                }}
+              >
+                上下中央
+              </motion.button>
+              <motion.button
+                onClick={centerHorizontally}
+                disabled={!selectedObject}
+                whileHover={selectedObject ? { scale: 1.05 } : {}}
+                whileTap={selectedObject ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                  color: selectedObject ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: selectedObject ? "pointer" : "not-allowed",
+                }}
+              >
+                左右中央
+              </motion.button>
+              <motion.button
+                onClick={bringForward}
+                disabled={!selectedObject}
+                whileHover={selectedObject ? { scale: 1.05 } : {}}
+                whileTap={selectedObject ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                  color: selectedObject ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: selectedObject ? "pointer" : "not-allowed",
+                }}
+              >
+                手前へ
+              </motion.button>
+              <motion.button
+                onClick={sendBackward}
+                disabled={!selectedObject}
+                whileHover={selectedObject ? { scale: 1.05 } : {}}
+                whileTap={selectedObject ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                  color: selectedObject ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: selectedObject ? "pointer" : "not-allowed",
+                }}
+              >
+                奥へ
+              </motion.button>
+              <motion.button
+                onClick={fitToPrintArea}
+                disabled={!selectedObject}
+                whileHover={selectedObject ? { scale: 1.05 } : {}}
+                whileTap={selectedObject ? { scale: 0.95 } : {}}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: selectedObject ? "#fff" : "#f5f5f7",
+                  color: selectedObject ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: selectedObject ? "pointer" : "not-allowed",
+                  gridColumn: "1 / -1",
+                }}
+              >
+                プリント範囲最大
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
 
         {/* カートに追加ボタン */}
         <motion.div
@@ -3018,6 +3374,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           }}
         >
           <motion.button
+            onClick={() => setIsModalOpen(true)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             style={{
@@ -3449,18 +3806,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </div>
         </div>
 
-        {/* 右側: コントロールパネル */}
+        {/* 右側: コントロールパネル（モバイルのみ表示） */}
         <div style={{ 
-          width: isMobile ? "100%" : "35%", 
-          minWidth: "0",
-          maxWidth: isMobile ? "100%" : "35%",
-          flex: isMobile ? "none" : "1 1 35%",
+          display: isMobile ? "block" : "none",
+          width: "100%", 
           backgroundColor: "#ffffff",
           overflowY: "auto",
           overflowX: "hidden",
-          height: isMobile ? "auto" : "100vh",
-          position: isMobile ? "relative" : "sticky",
-          top: 0,
         }}>
           <div style={{
             ...panelStyle,
