@@ -1947,7 +1947,7 @@ ${width} \xD7 ${height}px
                   ]
                 }
               ),
-              /* @__PURE__ */ jsx3(
+              /* @__PURE__ */ jsxs2(
                 motion.div,
                 {
                   initial: { y: -10, opacity: 0 },
@@ -1958,44 +1958,199 @@ ${width} \xD7 ${height}px
                     gap: "8px",
                     padding: isMobile ? "16px 20px" : "20px 40px",
                     borderBottom: "1px solid #f0f0f0",
-                    flexWrap: "wrap"
+                    flexWrap: "wrap",
+                    overflowX: "auto"
                   },
                   children: [
-                    { id: "item", label: "\u30A2\u30A4\u30C6\u30E0" },
-                    { id: "ai", label: "AI\u753B\u50CF\u751F\u6210" },
-                    { id: "images", label: "\u753B\u50CF\u7BA1\u7406" },
-                    { id: "text", label: "\u30C6\u30AD\u30B9\u30C8" }
-                  ].map((tab) => /* @__PURE__ */ jsx3(
-                    motion.button,
-                    {
-                      onClick: () => {
-                        setActiveTab(tab.id), isMobile && setIsOverlayOpen(!0);
+                    (!isMobile || !selectedObject) && [
+                      { id: "item", label: "\u30A2\u30A4\u30C6\u30E0" },
+                      { id: "ai", label: "AI" },
+                      { id: "images", label: "\u753B\u50CF" },
+                      { id: "text", label: "\u30C6\u30AD\u30B9\u30C8" }
+                    ].map((tab) => /* @__PURE__ */ jsx3(
+                      motion.button,
+                      {
+                        onClick: () => {
+                          setActiveTab(tab.id), isMobile && setIsOverlayOpen(!0);
+                        },
+                        whileHover: { scale: 1.02 },
+                        whileTap: { scale: 0.98 },
+                        style: {
+                          padding: "10px 20px",
+                          borderRadius: "980px",
+                          border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
+                          backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
+                          color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
+                          fontSize: "14px",
+                          fontWeight: "500",
+                          cursor: "pointer",
+                          transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                          letterSpacing: "-0.01em",
+                          whiteSpace: "nowrap"
+                        },
+                        children: tab.label
                       },
-                      whileHover: { scale: 1.02 },
-                      whileTap: { scale: 0.98 },
-                      style: {
-                        padding: "10px 20px",
-                        borderRadius: "980px",
-                        border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
-                        backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
-                        color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
-                        letterSpacing: "-0.01em"
-                      },
-                      children: tab.label
-                    },
-                    tab.id
-                  ))
+                      tab.id
+                    )),
+                    isMobile && selectedObject && /* @__PURE__ */ jsxs2(Fragment, { children: [
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: undo,
+                          disabled: !canUndo,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: canUndo ? "#fff" : "#f5f5f7",
+                            color: canUndo ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: canUndo ? "pointer" : "not-allowed",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u21B6"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: redo,
+                          disabled: !canRedo,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2, delay: 0.05 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: canRedo ? "#fff" : "#f5f5f7",
+                            color: canRedo ? "#1d1d1f" : "#86868b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: canRedo ? "pointer" : "not-allowed",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u21B7"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: centerVertically,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2, delay: 0.1 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: "#fff",
+                            color: "#1d1d1f",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u4E0A\u4E0B"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: centerHorizontally,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2, delay: 0.15 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: "#fff",
+                            color: "#1d1d1f",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u5DE6\u53F3"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: bringForward,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2, delay: 0.2 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: "#fff",
+                            color: "#1d1d1f",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u624B\u524D"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: sendBackward,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2, delay: 0.25 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: "#fff",
+                            color: "#1d1d1f",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u5965"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        motion.button,
+                        {
+                          onClick: fitToPrintArea,
+                          initial: { scale: 0.8, opacity: 0 },
+                          animate: { scale: 1, opacity: 1 },
+                          transition: { duration: 0.2, delay: 0.3 },
+                          style: {
+                            padding: "10px 16px",
+                            borderRadius: "980px",
+                            border: "1.5px solid #d2d2d7",
+                            backgroundColor: "#fff",
+                            color: "#1d1d1f",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap"
+                          },
+                          children: "\u6700\u5927"
+                        }
+                      )
+                    ] })
+                  ]
                 }
               ),
-              /* @__PURE__ */ jsx3("div", { style: {
+              !isMobile && /* @__PURE__ */ jsx3("div", { style: {
                 flex: 1,
                 overflowY: "auto",
                 overflowX: "hidden",
-                padding: isMobile ? "20px" : "40px"
+                padding: "40px"
               }, children: /* @__PURE__ */ jsxs2(AnimatePresence, { mode: "wait", children: [
                 activeTab === "item" && /* @__PURE__ */ jsx3(
                   motion.div,
@@ -2271,6 +2426,295 @@ ${width} \xD7 ${height}px
                   "text"
                 )
               ] }) }),
+              /* @__PURE__ */ jsx3(AnimatePresence, { children: isMobile && isOverlayOpen && /* @__PURE__ */ jsxs2(Fragment, { children: [
+                /* @__PURE__ */ jsx3(
+                  motion.div,
+                  {
+                    initial: { opacity: 0 },
+                    animate: { opacity: 1 },
+                    exit: { opacity: 0 },
+                    transition: { duration: 0.3 },
+                    onClick: () => setIsOverlayOpen(!1),
+                    style: {
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: "rgba(0, 0, 0, 0.4)",
+                      backdropFilter: "blur(10px)",
+                      WebkitBackdropFilter: "blur(10px)",
+                      zIndex: 1e3
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsxs2(
+                  motion.div,
+                  {
+                    initial: { y: "100%", opacity: 0 },
+                    animate: { y: 0, opacity: 1 },
+                    exit: { y: "100%", opacity: 0 },
+                    transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
+                    style: {
+                      position: "fixed",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      maxHeight: "80vh",
+                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      borderTopLeftRadius: "20px",
+                      borderTopRightRadius: "20px",
+                      boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.15)",
+                      zIndex: 1001,
+                      overflowY: "auto",
+                      padding: "24px"
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx3(
+                        "button",
+                        {
+                          onClick: () => setIsOverlayOpen(!1),
+                          style: {
+                            position: "absolute",
+                            top: "16px",
+                            right: "16px",
+                            width: "32px",
+                            height: "32px",
+                            borderRadius: "50%",
+                            border: "none",
+                            backgroundColor: "rgba(0, 0, 0, 0.05)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            fontSize: "20px",
+                            color: "#1d1d1f"
+                          },
+                          children: "\xD7"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxs2("div", { style: { marginTop: "20px" }, children: [
+                        activeTab === "item" && /* @__PURE__ */ jsx3("div", { children: /* @__PURE__ */ jsx3("p", { style: { margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }, children: "\u3053\u3061\u3089\u306F\u30C6\u30B9\u30C8\u30C6\u30AD\u30B9\u30C8\u3067\u3059\u3002\u5546\u54C1\u306E\u8A73\u7D30\u60C5\u5831\u3084\u9078\u629E\u30AA\u30D7\u30B7\u30E7\u30F3\u3092\u5C06\u6765\u7684\u306B\u8FFD\u52A0\u4E88\u5B9A\u3067\u3059\u3002" }) }),
+                        activeTab === "ai" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                          /* @__PURE__ */ jsxs2("div", { children: [
+                            /* @__PURE__ */ jsx3("label", { style: {
+                              display: "block",
+                              fontSize: "13px",
+                              fontWeight: "600",
+                              color: "#1d1d1f",
+                              marginBottom: "8px"
+                            }, children: "\u30D7\u30ED\u30F3\u30D7\u30C8" }),
+                            /* @__PURE__ */ jsx3(
+                              "textarea",
+                              {
+                                value: aiPrompt,
+                                onChange: (e) => setAiPrompt(e.target.value),
+                                placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02...",
+                                rows: 4,
+                                disabled: isGenerating,
+                                style: {
+                                  width: "100%",
+                                  padding: "12px",
+                                  borderRadius: "12px",
+                                  border: "1.5px solid #d2d2d7",
+                                  fontSize: "15px",
+                                  resize: "vertical",
+                                  fontFamily: "inherit",
+                                  boxSizing: "border-box"
+                                }
+                              }
+                            )
+                          ] }),
+                          /* @__PURE__ */ jsx3(
+                            "button",
+                            {
+                              onClick: () => {
+                                handleGenerateAI(), setIsOverlayOpen(!1);
+                              },
+                              disabled: isGenerating || !aiPrompt.trim(),
+                              style: {
+                                padding: "14px",
+                                borderRadius: "12px",
+                                border: "none",
+                                backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
+                                color: "#fff",
+                                fontSize: "15px",
+                                fontWeight: "500",
+                                cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer"
+                              },
+                              children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
+                            }
+                          )
+                        ] }),
+                        activeTab === "images" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                          /* @__PURE__ */ jsx3(
+                            "button",
+                            {
+                              onClick: () => {
+                                handleUploadClick(), setIsOverlayOpen(!1);
+                              },
+                              disabled: isLoading,
+                              style: {
+                                padding: "14px",
+                                borderRadius: "12px",
+                                border: "none",
+                                backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
+                                color: "#fff",
+                                fontSize: "15px",
+                                fontWeight: "500",
+                                cursor: isLoading ? "not-allowed" : "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "8px"
+                              },
+                              children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
+                                /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
+                                " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
+                              ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                                /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
+                                " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+                              ] })
+                            }
+                          ),
+                          uploadedImages.length > 0 && /* @__PURE__ */ jsxs2("div", { children: [
+                            /* @__PURE__ */ jsx3("h3", { style: { fontSize: "15px", fontWeight: "600", marginBottom: "12px" }, children: "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u6E08\u307F\u753B\u50CF" }),
+                            /* @__PURE__ */ jsx3("div", { style: {
+                              display: "grid",
+                              gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                              gap: "12px"
+                            }, children: uploadedImages.map((imgUrl, index) => /* @__PURE__ */ jsx3(
+                              "div",
+                              {
+                                style: {
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  aspectRatio: "1 / 1",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                                },
+                                children: /* @__PURE__ */ jsx3(
+                                  "img",
+                                  {
+                                    src: imgUrl,
+                                    alt: `Uploaded ${index + 1}`,
+                                    style: {
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover"
+                                    }
+                                  }
+                                )
+                              },
+                              index
+                            )) })
+                          ] })
+                        ] }),
+                        activeTab === "text" && /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
+                          /* @__PURE__ */ jsxs2("div", { children: [
+                            /* @__PURE__ */ jsx3("label", { style: {
+                              display: "block",
+                              fontSize: "13px",
+                              fontWeight: "600",
+                              color: "#1d1d1f",
+                              marginBottom: "8px"
+                            }, children: "\u30C6\u30AD\u30B9\u30C8" }),
+                            /* @__PURE__ */ jsx3(
+                              "input",
+                              {
+                                type: "text",
+                                value: textInput,
+                                onChange: (e) => handleTextInputChange(e.target.value),
+                                placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
+                                style: {
+                                  width: "100%",
+                                  padding: "12px",
+                                  borderRadius: "12px",
+                                  border: "1.5px solid #d2d2d7",
+                                  fontSize: "15px",
+                                  fontFamily: "inherit",
+                                  boxSizing: "border-box"
+                                }
+                              }
+                            )
+                          ] }),
+                          /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "16px" }, children: [
+                            /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                              /* @__PURE__ */ jsx3("label", { style: {
+                                display: "block",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                color: "#1d1d1f",
+                                marginBottom: "8px"
+                              }, children: "\u8272" }),
+                              /* @__PURE__ */ jsx3(
+                                "input",
+                                {
+                                  type: "color",
+                                  value: textColor,
+                                  onChange: (e) => handleChangeTextColor(e.target.value),
+                                  style: {
+                                    width: "100%",
+                                    height: "44px",
+                                    borderRadius: "12px",
+                                    border: "1.5px solid #d2d2d7",
+                                    cursor: "pointer"
+                                  }
+                                }
+                              )
+                            ] }),
+                            /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                              /* @__PURE__ */ jsxs2("label", { style: {
+                                display: "block",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                color: "#1d1d1f",
+                                marginBottom: "8px"
+                              }, children: [
+                                "\u30B5\u30A4\u30BA: ",
+                                fontSize,
+                                "px"
+                              ] }),
+                              /* @__PURE__ */ jsx3(
+                                "input",
+                                {
+                                  type: "range",
+                                  min: "10",
+                                  max: "100",
+                                  value: fontSize,
+                                  onChange: (e) => handleChangeFontSize(Number(e.target.value)),
+                                  style: { width: "100%", height: "44px" }
+                                }
+                              )
+                            ] })
+                          ] }),
+                          /* @__PURE__ */ jsx3(
+                            "button",
+                            {
+                              onClick: () => {
+                                handleAddText(), setIsOverlayOpen(!1);
+                              },
+                              disabled: !textInput.trim(),
+                              style: {
+                                padding: "14px",
+                                borderRadius: "12px",
+                                border: "none",
+                                backgroundColor: textInput.trim() ? "#0071e3" : "#d2d2d7",
+                                color: "#fff",
+                                fontSize: "15px",
+                                fontWeight: "500",
+                                cursor: textInput.trim() ? "pointer" : "not-allowed"
+                              },
+                              children: "\u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0"
+                            }
+                          )
+                        ] })
+                      ] })
+                    ]
+                  }
+                )
+              ] }) }),
               !isMobile && /* @__PURE__ */ jsxs2(
                 motion.div,
                 {
@@ -2488,7 +2932,7 @@ ${width} \xD7 ${height}px
               /* @__PURE__ */ jsx3("div", { style: {
                 width: "100%",
                 maxWidth: "min(800px, 100%)",
-                aspectRatio: "1 / 1",
+                aspectRatio: isMobile ? "3 / 4" : "1 / 1",
                 position: "relative"
               }, children: /* @__PURE__ */ jsxs2("div", { style: {
                 display: "flex",
@@ -4184,7 +4628,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-SUW6RUJC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "bf783da9", hmr: void 0, url: "/build/manifest-BF783DA9.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-CCK4M7H6.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "9bc5a36e", hmr: void 0, url: "/build/manifest-9BC5A36E.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

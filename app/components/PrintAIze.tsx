@@ -2978,7 +2978,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </div>
         </motion.div>
 
-        {/* タブメニュー */}
+        {/* タブメニュー / 編集ツール（モバイル時、オブジェクト選択で切り替え） */}
         <motion.div
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -2989,12 +2989,14 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             padding: isMobile ? "16px 20px" : "20px 40px",
             borderBottom: "1px solid #f0f0f0",
             flexWrap: "wrap",
+            overflowX: "auto",
           }}
         >
-          {[
+          {/* デスクトップ or モバイルでオブジェクト未選択時: タブメニュー */}
+          {(!isMobile || !selectedObject) && [
             { id: "item" as TabType, label: "アイテム" },
-            { id: "ai" as TabType, label: "AI画像生成" },
-            { id: "images" as TabType, label: "画像管理" },
+            { id: "ai" as TabType, label: "AI" },
+            { id: "images" as TabType, label: "画像" },
             { id: "text" as TabType, label: "テキスト" },
           ].map((tab) => (
             <motion.button
@@ -3016,21 +3018,164 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 cursor: "pointer",
                 transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
                 letterSpacing: "-0.01em",
+                whiteSpace: "nowrap",
               }}
             >
               {tab.label}
             </motion.button>
           ))}
+          
+          {/* モバイルでオブジェクト選択時: 編集ツール */}
+          {isMobile && selectedObject && (
+            <>
+              <motion.button
+                onClick={undo}
+                disabled={!canUndo}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: canUndo ? "#fff" : "#f5f5f7",
+                  color: canUndo ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: canUndo ? "pointer" : "not-allowed",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ↶
+              </motion.button>
+              <motion.button
+                onClick={redo}
+                disabled={!canRedo}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.05 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: canRedo ? "#fff" : "#f5f5f7",
+                  color: canRedo ? "#1d1d1f" : "#86868b",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: canRedo ? "pointer" : "not-allowed",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ↷
+              </motion.button>
+              <motion.button
+                onClick={centerVertically}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: "#fff",
+                  color: "#1d1d1f",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                上下
+              </motion.button>
+              <motion.button
+                onClick={centerHorizontally}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.15 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: "#fff",
+                  color: "#1d1d1f",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                左右
+              </motion.button>
+              <motion.button
+                onClick={bringForward}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.2 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: "#fff",
+                  color: "#1d1d1f",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                手前
+              </motion.button>
+              <motion.button
+                onClick={sendBackward}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.25 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: "#fff",
+                  color: "#1d1d1f",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                奥
+              </motion.button>
+              <motion.button
+                onClick={fitToPrintArea}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.3 }}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "980px",
+                  border: "1.5px solid #d2d2d7",
+                  backgroundColor: "#fff",
+                  color: "#1d1d1f",
+                  fontSize: "13px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                最大
+              </motion.button>
+            </>
+          )}
         </motion.div>
 
-        {/* タブコンテンツ（スクロール可能） */}
-        <div style={{
-          flex: 1,
-          overflowY: "auto",
-          overflowX: "hidden",
-          padding: isMobile ? "20px" : "40px",
-        }}>
-          <AnimatePresence mode="wait">
+        {/* タブコンテンツ（スクロール可能） - デスクトップのみ */}
+        {!isMobile && (
+          <div style={{
+            flex: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            padding: "40px",
+          }}>
+            <AnimatePresence mode="wait">
             {activeTab === "item" && (
               <motion.div
                 key="item"
@@ -3285,7 +3430,302 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+          </div>
+        )}
+
+        {/* モバイルオーバーレイ */}
+        <AnimatePresence>
+          {isMobile && isOverlayOpen && (
+            <>
+              {/* 背景（backdrop） */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setIsOverlayOpen(false)}
+                style={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  zIndex: 1000,
+                }}
+              />
+              
+              {/* オーバーレイコンテンツ */}
+              <motion.div
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                style={{
+                  position: "fixed",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  maxHeight: "80vh",
+                  backgroundColor: "rgba(255, 255, 255, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  borderTopLeftRadius: "20px",
+                  borderTopRightRadius: "20px",
+                  boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.15)",
+                  zIndex: 1001,
+                  overflowY: "auto",
+                  padding: "24px",
+                }}
+              >
+                {/* 閉じるボタン */}
+                <button
+                  onClick={() => setIsOverlayOpen(false)}
+                  style={{
+                    position: "absolute",
+                    top: "16px",
+                    right: "16px",
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    border: "none",
+                    backgroundColor: "rgba(0, 0, 0, 0.05)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    fontSize: "20px",
+                    color: "#1d1d1f",
+                  }}
+                >
+                  ×
+                </button>
+
+                {/* タブコンテンツ */}
+                <div style={{ marginTop: "20px" }}>
+                  {activeTab === "item" && (
+                    <div>
+                      <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }}>
+                        こちらはテストテキストです。商品の詳細情報や選択オプションを将来的に追加予定です。
+                      </p>
+                    </div>
+                  )}
+                  {activeTab === "ai" && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                      <div>
+                        <label style={{
+                          display: "block",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          color: "#1d1d1f",
+                          marginBottom: "8px",
+                        }}>
+                          プロンプト
+                        </label>
+                        <textarea
+                          value={aiPrompt}
+                          onChange={(e) => setAiPrompt(e.target.value)}
+                          placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市..."
+                          rows={4}
+                          disabled={isGenerating}
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "12px",
+                            border: "1.5px solid #d2d2d7",
+                            fontSize: "15px",
+                            resize: "vertical",
+                            fontFamily: "inherit",
+                            boxSizing: "border-box",
+                          }}
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleGenerateAI();
+                          setIsOverlayOpen(false);
+                        }}
+                        disabled={isGenerating || !aiPrompt.trim()}
+                        style={{
+                          padding: "14px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
+                          color: "#fff",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
+                      </button>
+                    </div>
+                  )}
+                  {activeTab === "images" && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                      <button
+                        onClick={() => {
+                          handleUploadClick();
+                          setIsOverlayOpen(false);
+                        }}
+                        disabled={isLoading}
+                        style={{
+                          padding: "14px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
+                          color: "#fff",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          cursor: isLoading ? "not-allowed" : "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        {isLoading ? (
+                          <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
+                        ) : (
+                          <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
+                        )}
+                      </button>
+                      {uploadedImages.length > 0 && (
+                        <div>
+                          <h3 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px" }}>
+                            アップロード済み画像
+                          </h3>
+                          <div style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+                            gap: "12px",
+                          }}>
+                            {uploadedImages.map((imgUrl, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  aspectRatio: "1 / 1",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                }}
+                              >
+                                <img
+                                  src={imgUrl}
+                                  alt={`Uploaded ${index + 1}`}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {activeTab === "text" && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                      <div>
+                        <label style={{
+                          display: "block",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          color: "#1d1d1f",
+                          marginBottom: "8px",
+                        }}>
+                          テキスト
+                        </label>
+                        <input
+                          type="text"
+                          value={textInput}
+                          onChange={(e) => handleTextInputChange(e.target.value)}
+                          placeholder="テキストを入力"
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "12px",
+                            border: "1.5px solid #d2d2d7",
+                            fontSize: "15px",
+                            fontFamily: "inherit",
+                            boxSizing: "border-box",
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: "flex", gap: "16px" }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{
+                            display: "block",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#1d1d1f",
+                            marginBottom: "8px",
+                          }}>
+                            色
+                          </label>
+                          <input
+                            type="color"
+                            value={textColor}
+                            onChange={(e) => handleChangeTextColor(e.target.value)}
+                            style={{
+                              width: "100%",
+                              height: "44px",
+                              borderRadius: "12px",
+                              border: "1.5px solid #d2d2d7",
+                              cursor: "pointer",
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{
+                            display: "block",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#1d1d1f",
+                            marginBottom: "8px",
+                          }}>
+                            サイズ: {fontSize}px
+                          </label>
+                          <input
+                            type="range"
+                            min="10"
+                            max="100"
+                            value={fontSize}
+                            onChange={(e) => handleChangeFontSize(Number(e.target.value))}
+                            style={{ width: "100%", height: "44px" }}
+                          />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleAddText();
+                          setIsOverlayOpen(false);
+                        }}
+                        disabled={!textInput.trim()}
+                        style={{
+                          padding: "14px",
+                          borderRadius: "12px",
+                          border: "none",
+                          backgroundColor: !textInput.trim() ? "#d2d2d7" : "#0071e3",
+                          color: "#fff",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          cursor: !textInput.trim() ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        テキストを追加
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* 編集ツール（デスクトップのみ） */}
         {!isMobile && (
@@ -3488,7 +3928,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         <div style={{
           width: "100%",
           maxWidth: "min(800px, 100%)",
-          aspectRatio: "1 / 1",
+          aspectRatio: isMobile ? "3 / 4" : "1 / 1",
           position: "relative",
         }}>
           <div style={{ 
