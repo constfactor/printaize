@@ -635,10 +635,12 @@ __export(customize_exports, {
   meta: () => meta
 });
 import { json as json7 } from "@remix-run/node";
-import { useLoaderData as useLoaderData2, Link } from "@remix-run/react";
+import { useLoaderData as useLoaderData2 } from "@remix-run/react";
+import { motion as motion2 } from "framer-motion";
 
 // app/components/PrintAIze.tsx
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Fragment, jsx as jsx3, jsxs as jsxs2 } from "react/jsx-runtime";
 var Icon = ({ type, size = 20, color = "currentColor" }) => /* @__PURE__ */ jsx3("span", { style: { display: "inline-flex", alignItems: "center", verticalAlign: "middle" }, children: {
   clipboard: /* @__PURE__ */ jsx3("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "2", children: /* @__PURE__ */ jsx3("path", { d: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" }) }),
@@ -812,7 +814,7 @@ function PrintAIze({ product }) {
         XXL: 0
       };
     }), initial;
-  }), [selectedColor, setSelectedColor] = useState(product.colors[0]), [selectedSize, setSelectedSize] = useState("M"), sizes = ["S", "M", "L", "XL", "XXL"], [isMobile, setIsMobile] = useState(!1), [isZoomed, setIsZoomed] = useState(!1), [showTrash, setShowTrash] = useState(!1), [isOverTrash, setIsOverTrash] = useState(!1), [snapGuides, setSnapGuides] = useState({ vertical: null, horizontal: null });
+  }), [selectedColor, setSelectedColor] = useState(product.colors[0]), [selectedSize, setSelectedSize] = useState("M"), sizes = ["S", "M", "L", "XL", "XXL"], [isMobile, setIsMobile] = useState(!1), [isZoomed, setIsZoomed] = useState(!1), [showTrash, setShowTrash] = useState(!1), [isOverTrash, setIsOverTrash] = useState(!1), [snapGuides, setSnapGuides] = useState({ vertical: null, horizontal: null }), [activeTab, setActiveTab] = useState("item"), [isOverlayOpen, setIsOverlayOpen] = useState(!1);
   useEffect(() => {
     let handleEscape = (e) => {
       e.key === "Escape" && isZoomed && fabricCanvasRef.current && (fabricCanvasRef.current.setViewportTransform([1, 0, 0, 1, 0, 0]), fabricCanvasRef.current.renderAll(), setIsZoomed(!1));
@@ -1846,210 +1848,331 @@ ${width} \xD7 ${height}px
       link.download = "tshirt-design.png", link.href = dataURL, link.click();
     }
   };
-  return fabricLoaded ? /* @__PURE__ */ jsxs2("div", { style: {
-    width: "100%",
-    maxWidth: "1600px",
-    margin: "0 auto",
-    padding: 0
-  }, children: [
-    /* @__PURE__ */ jsxs2("div", { style: {
-      backgroundColor: "white",
-      borderRadius: "0",
-      padding: isMobile ? "20px" : "40px 30px",
-      marginBottom: "0",
-      borderBottom: "1px solid #e0e0e0",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: isMobile ? "flex-start" : "center",
-      flexWrap: "wrap",
-      gap: "20px"
-    }, children: [
-      /* @__PURE__ */ jsxs2("div", { style: { flex: "1 1 300px" }, children: [
-        /* @__PURE__ */ jsx3("h2", { style: {
-          margin: 0,
-          fontSize: isMobile ? "16px" : "18px",
-          fontWeight: "400",
-          letterSpacing: "0.05em",
-          color: "#1a1a1a",
-          textTransform: "uppercase"
-        }, children: product.name }),
-        /* @__PURE__ */ jsxs2("div", { style: {
-          marginTop: "15px",
-          display: "flex",
-          gap: "20px",
-          alignItems: "center",
-          fontSize: "12px",
-          letterSpacing: "0.03em"
-        }, children: [
-          /* @__PURE__ */ jsxs2("div", { style: {
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
-          }, children: [
-            /* @__PURE__ */ jsx3(
-              "div",
-              {
-                style: {
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  backgroundColor: selectedColor.hex,
-                  border: selectedColor.hex === "#FFFFFF" || selectedColor.hex === "#F5F5DC" ? "1px solid #d0d0d0" : "1px solid rgba(0,0,0,0.1)"
-                }
-              }
-            ),
-            /* @__PURE__ */ jsx3("span", { style: { color: "#4a4a4a", fontWeight: "400" }, children: selectedColor.name })
-          ] }),
-          /* @__PURE__ */ jsxs2("div", { style: {
-            color: "#4a4a4a",
-            fontWeight: "400"
-          }, children: [
-            "\u30B5\u30A4\u30BA: ",
-            selectedSize
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxs2("div", { style: { textAlign: "right" }, children: [
-        /* @__PURE__ */ jsxs2("div", { style: {
-          fontSize: isMobile ? "20px" : "24px",
-          fontWeight: "300",
-          letterSpacing: "0.02em",
-          color: "#1a1a1a"
-        }, children: [
-          "\xA5",
-          product.price.toLocaleString()
-        ] }),
-        /* @__PURE__ */ jsx3("div", { style: {
-          fontSize: "11px",
-          color: "#888",
-          marginTop: "6px",
-          letterSpacing: "0.05em"
-        }, children: "\u7A0E\u8FBC" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs2("div", { style: {
-      display: "flex",
-      flexDirection: isMobile ? "column" : "row",
-      gap: "0",
-      width: "100%",
-      margin: 0,
-      alignItems: "flex-start",
-      backgroundColor: "white",
-      overflowX: "hidden",
-      overflowY: "auto"
-    }, children: [
-      /* @__PURE__ */ jsx3("div", { style: {
-        flex: isMobile ? "none" : "1 1 65%",
-        minWidth: "0",
-        width: isMobile ? "100%" : "65%",
-        backgroundColor: "white"
-      }, children: /* @__PURE__ */ jsxs2("div", { style: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: isMobile ? "10px" : "40px",
+  return fabricLoaded ? /* @__PURE__ */ jsxs2(
+    motion.div,
+    {
+      initial: { opacity: 0, scale: 0.95 },
+      animate: { opacity: 1, scale: 1 },
+      transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
+      style: {
         width: "100%",
-        boxSizing: "border-box"
-      }, children: [
+        height: "100vh",
+        margin: "0 auto",
+        padding: 0,
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        overflow: "hidden",
+        backgroundColor: "#ffffff"
+      },
+      children: [
         /* @__PURE__ */ jsxs2(
-          "div",
+          motion.div,
           {
             style: {
-              border: "none",
-              borderRadius: "0",
-              overflow: "hidden",
-              boxShadow: "none",
-              backgroundColor: "#fafafa",
-              width: "100%",
-              maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
-              margin: "0 auto",
-              position: "relative",
-              aspectRatio: "1 / 1",
+              width: isMobile ? "100%" : "40%",
+              height: isMobile ? "auto" : "100vh",
+              backgroundColor: "#ffffff",
+              borderRight: isMobile ? "none" : "1px solid #f0f0f0",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden"
+            },
+            children: [
+              /* @__PURE__ */ jsxs2(
+                motion.div,
+                {
+                  initial: { y: -20, opacity: 0 },
+                  animate: { y: 0, opacity: 1 },
+                  transition: { delay: 0.2, duration: 0.5 },
+                  style: {
+                    padding: isMobile ? "24px 20px" : "40px",
+                    borderBottom: "1px solid #f0f0f0"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx3("h1", { style: {
+                      margin: 0,
+                      fontSize: isMobile ? "24px" : "32px",
+                      fontWeight: "600",
+                      letterSpacing: "-0.02em",
+                      color: "#1d1d1f",
+                      lineHeight: 1.2
+                    }, children: product.name }),
+                    /* @__PURE__ */ jsx3("div", { style: {
+                      marginTop: "8px",
+                      fontSize: isMobile ? "14px" : "16px",
+                      color: "#6e6e73",
+                      lineHeight: 1.5
+                    }, children: product.description }),
+                    /* @__PURE__ */ jsxs2("div", { style: {
+                      marginTop: "16px",
+                      fontSize: isMobile ? "28px" : "32px",
+                      fontWeight: "600",
+                      color: "#1d1d1f",
+                      letterSpacing: "-0.01em"
+                    }, children: [
+                      "\xA5",
+                      product.price.toLocaleString(),
+                      /* @__PURE__ */ jsx3("span", { style: { fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }, children: "\u7A0E\u8FBC" })
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsx3(
+                motion.div,
+                {
+                  initial: { y: -10, opacity: 0 },
+                  animate: { y: 0, opacity: 1 },
+                  transition: { delay: 0.3, duration: 0.5 },
+                  style: {
+                    display: "flex",
+                    gap: "8px",
+                    padding: isMobile ? "16px 20px" : "20px 40px",
+                    borderBottom: "1px solid #f0f0f0",
+                    flexWrap: "wrap"
+                  },
+                  children: [
+                    { id: "item", label: "\u30A2\u30A4\u30C6\u30E0" },
+                    { id: "ai", label: "AI\u753B\u50CF\u751F\u6210" },
+                    { id: "images", label: "\u753B\u50CF\u7BA1\u7406" },
+                    { id: "text", label: "\u30C6\u30AD\u30B9\u30C8" }
+                  ].map((tab) => /* @__PURE__ */ jsx3(
+                    motion.button,
+                    {
+                      onClick: () => {
+                        setActiveTab(tab.id), isMobile && setIsOverlayOpen(!0);
+                      },
+                      whileHover: { scale: 1.02 },
+                      whileTap: { scale: 0.98 },
+                      style: {
+                        padding: "10px 20px",
+                        borderRadius: "980px",
+                        border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
+                        backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
+                        color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                        letterSpacing: "-0.01em"
+                      },
+                      children: tab.label
+                    },
+                    tab.id
+                  ))
+                }
+              ),
+              /* @__PURE__ */ jsx3("div", { style: {
+                flex: 1,
+                overflowY: "auto",
+                overflowX: "hidden",
+                padding: isMobile ? "20px" : "40px"
+              }, children: /* @__PURE__ */ jsxs2(AnimatePresence, { mode: "wait", children: [
+                activeTab === "item" && /* @__PURE__ */ jsx3(
+                  motion.div,
+                  {
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    exit: { opacity: 0, x: 20 },
+                    transition: { duration: 0.3 },
+                    children: /* @__PURE__ */ jsx3("p", { style: { margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }, children: "\u3053\u3061\u3089\u306F\u30C6\u30B9\u30C8\u30C6\u30AD\u30B9\u30C8\u3067\u3059\u3002\u5546\u54C1\u306E\u8A73\u7D30\u60C5\u5831\u3084\u9078\u629E\u30AA\u30D7\u30B7\u30E7\u30F3\u3092\u5C06\u6765\u7684\u306B\u8FFD\u52A0\u4E88\u5B9A\u3067\u3059\u3002" })
+                  },
+                  "item"
+                ),
+                activeTab === "ai" && /* @__PURE__ */ jsx3(
+                  motion.div,
+                  {
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    exit: { opacity: 0, x: 20 },
+                    transition: { duration: 0.3 },
+                    children: /* @__PURE__ */ jsx3("p", { children: "AI\u753B\u50CF\u751F\u6210\u6A5F\u80FD\uFF08\u5B9F\u88C5\u4E88\u5B9A\uFF09" })
+                  },
+                  "ai"
+                ),
+                activeTab === "images" && /* @__PURE__ */ jsx3(
+                  motion.div,
+                  {
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    exit: { opacity: 0, x: 20 },
+                    transition: { duration: 0.3 },
+                    children: /* @__PURE__ */ jsx3("p", { children: "\u753B\u50CF\u7BA1\u7406\u6A5F\u80FD\uFF08\u5B9F\u88C5\u4E88\u5B9A\uFF09" })
+                  },
+                  "images"
+                ),
+                activeTab === "text" && /* @__PURE__ */ jsx3(
+                  motion.div,
+                  {
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    exit: { opacity: 0, x: 20 },
+                    transition: { duration: 0.3 },
+                    children: /* @__PURE__ */ jsx3("p", { children: "\u30C6\u30AD\u30B9\u30C8\u7DE8\u96C6\u6A5F\u80FD\uFF08\u5B9F\u88C5\u4E88\u5B9A\uFF09" })
+                  },
+                  "text"
+                )
+              ] }) }),
+              /* @__PURE__ */ jsx3(
+                motion.div,
+                {
+                  style: {
+                    padding: isMobile ? "20px" : "40px",
+                    borderTop: "1px solid #f0f0f0"
+                  },
+                  children: /* @__PURE__ */ jsx3(
+                    motion.button,
+                    {
+                      whileHover: { scale: 1.02 },
+                      whileTap: { scale: 0.98 },
+                      style: {
+                        width: "100%",
+                        padding: "16px 24px",
+                        borderRadius: "12px",
+                        border: "none",
+                        backgroundColor: "#0071e3",
+                        color: "#ffffff",
+                        fontSize: "17px",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        letterSpacing: "-0.01em"
+                      },
+                      children: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                    }
+                  )
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxs2(
+          motion.div,
+          {
+            initial: { x: 20, opacity: 0 },
+            animate: { x: 0, opacity: 1 },
+            transition: { delay: 0.4, duration: 0.6 },
+            style: {
+              width: isMobile ? "100%" : "60%",
+              height: isMobile ? "60vh" : "100vh",
+              backgroundColor: "#f5f5f7",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              touchAction: isMobile ? "pan-y" : "auto"
+              position: "relative",
+              padding: isMobile ? "20px" : "40px"
             },
             children: [
-              /* @__PURE__ */ jsx3(
-                "button",
-                {
-                  onClick: () => {
-                    if (!fabricCanvasRef.current)
-                      return;
-                    let canvas = fabricCanvasRef.current;
-                    if (isZoomed)
-                      canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
-                    else {
-                      let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
-                      canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
-                    }
-                    canvas.renderAll();
-                  },
-                  style: {
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    border: "none",
-                    backgroundColor: "white",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 10,
-                    transition: "all 0.2s ease"
-                  },
-                  onMouseEnter: (e) => {
-                    e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-                  },
-                  onMouseLeave: (e) => {
-                    e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                  },
-                  title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u30D7\u30EA\u30F3\u30C8\u30A8\u30EA\u30A2\u3092\u62E1\u5927",
-                  children: /* @__PURE__ */ jsx3(Icon, { type: isZoomed ? "zoomIn" : "zoomOut", size: 20, color: "#667eea" })
-                }
-              ),
-              /* @__PURE__ */ jsx3(
-                "canvas",
-                {
-                  ref: canvasRef,
-                  style: {
-                    display: "block",
-                    width: "100%",
-                    height: "100%",
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "contain"
-                  }
-                }
-              ),
-              showTrash && /* @__PURE__ */ jsxs2(
-                "div",
-                {
-                  style: {
-                    position: "absolute",
-                    bottom: isMobile ? "30px" : "40px",
-                    left: "50%",
-                    transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
-                    width: isMobile ? "70px" : "80px",
-                    height: isMobile ? "70px" : "80px",
-                    borderRadius: "50%",
-                    backgroundColor: isOverTrash ? "#ff4444" : "#666",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
-                    transition: "all 0.2s ease",
-                    zIndex: 15,
-                    animation: "trashBounce 0.3s ease"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
-                    /* @__PURE__ */ jsx3("style", { children: `
+              /* @__PURE__ */ jsx3("div", { style: {
+                width: "100%",
+                maxWidth: "min(800px, 100%)",
+                aspectRatio: "1 / 1",
+                position: "relative"
+              }, children: /* @__PURE__ */ jsxs2("div", { style: {
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: isMobile ? "10px" : "40px",
+                width: "100%",
+                boxSizing: "border-box"
+              }, children: [
+                /* @__PURE__ */ jsxs2(
+                  "div",
+                  {
+                    style: {
+                      border: "none",
+                      borderRadius: "0",
+                      overflow: "hidden",
+                      boxShadow: "none",
+                      backgroundColor: "#fafafa",
+                      width: "100%",
+                      maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
+                      margin: "0 auto",
+                      position: "relative",
+                      aspectRatio: "1 / 1",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      touchAction: isMobile ? "pan-y" : "auto"
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx3(
+                        "button",
+                        {
+                          onClick: () => {
+                            if (!fabricCanvasRef.current)
+                              return;
+                            let canvas = fabricCanvasRef.current;
+                            if (isZoomed)
+                              canvas.setViewportTransform([1, 0, 0, 1, 0, 0]), setIsZoomed(!1);
+                            else {
+                              let printArea = getPrintAreaInPixels(CANVAS_SIZE), centerX = printArea.left + printArea.width / 2, centerY = printArea.top + printArea.height / 2, zoom = isMobile ? 2 : 1.7, point = new window.fabric.Point(centerX, centerY);
+                              canvas.zoomToPoint(point, zoom), setIsZoomed(!0);
+                            }
+                            canvas.renderAll();
+                          },
+                          style: {
+                            position: "absolute",
+                            top: "10px",
+                            right: "10px",
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
+                            border: "none",
+                            backgroundColor: "white",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            zIndex: 10,
+                            transition: "all 0.2s ease"
+                          },
+                          onMouseEnter: (e) => {
+                            e.currentTarget.style.transform = "scale(1.1)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                          },
+                          onMouseLeave: (e) => {
+                            e.currentTarget.style.transform = "scale(1)", e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+                          },
+                          title: isZoomed ? "\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059" : "\u30D7\u30EA\u30F3\u30C8\u30A8\u30EA\u30A2\u3092\u62E1\u5927",
+                          children: /* @__PURE__ */ jsx3(Icon, { type: isZoomed ? "zoomIn" : "zoomOut", size: 20, color: "#667eea" })
+                        }
+                      ),
+                      /* @__PURE__ */ jsx3(
+                        "canvas",
+                        {
+                          ref: canvasRef,
+                          style: {
+                            display: "block",
+                            width: "100%",
+                            height: "100%",
+                            maxWidth: "100%",
+                            maxHeight: "100%",
+                            objectFit: "contain"
+                          }
+                        }
+                      ),
+                      showTrash && /* @__PURE__ */ jsxs2(
+                        "div",
+                        {
+                          style: {
+                            position: "absolute",
+                            bottom: isMobile ? "30px" : "40px",
+                            left: "50%",
+                            transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
+                            width: isMobile ? "70px" : "80px",
+                            height: isMobile ? "70px" : "80px",
+                            borderRadius: "50%",
+                            backgroundColor: isOverTrash ? "#ff4444" : "#666",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
+                            transition: "all 0.2s ease",
+                            zIndex: 15,
+                            animation: "trashBounce 0.3s ease"
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx3(Icon, { type: "trash", size: isMobile ? 32 : 36, color: "white" }),
+                            /* @__PURE__ */ jsx3("style", { children: `
                     @keyframes trashBounce {
                       0% {
                         transform: translateX(-50%) scale(0.8);
@@ -2064,1067 +2187,1071 @@ ${width} \xD7 ${height}px
                       }
                     }
                   ` })
-                  ]
-                }
-              ),
-              (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
-                "svg",
-                {
-                  style: {
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
-                    zIndex: 5
-                  },
-                  children: [
-                    snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
-                      "line",
+                          ]
+                        }
+                      ),
+                      (snapGuides.vertical !== null || snapGuides.horizontal !== null) && /* @__PURE__ */ jsxs2(
+                        "svg",
+                        {
+                          style: {
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            pointerEvents: "none",
+                            zIndex: 5
+                          },
+                          children: [
+                            snapGuides.vertical !== null && /* @__PURE__ */ jsx3(
+                              "line",
+                              {
+                                x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                                y1: "0",
+                                x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
+                                y2: "100%",
+                                stroke: "#ff00ff",
+                                strokeWidth: "1",
+                                strokeDasharray: "5,5",
+                                opacity: "0.8"
+                              }
+                            ),
+                            snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
+                              "line",
+                              {
+                                x1: "0",
+                                y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                                x2: "100%",
+                                y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
+                                stroke: "#ff00ff",
+                                strokeWidth: "1",
+                                strokeDasharray: "5,5",
+                                opacity: "0.8"
+                              }
+                            )
+                          ]
+                        }
+                      )
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ jsxs2("div", { style: {
+                  marginTop: "15px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: isMobile ? "8px" : "10px",
+                  justifyContent: "center",
+                  width: "100%",
+                  maxWidth: isMobile ? "100%" : "800px"
+                }, children: [
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleUndo,
+                      disabled: !canUndo,
+                      style: {
+                        ...historyButtonStyle(canUndo),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
+                      children: [
+                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                          /* @__PURE__ */ jsx3("path", { d: "M3 7v6h6" }),
+                          /* @__PURE__ */ jsx3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" })
+                        ] }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleRedo,
+                      disabled: !canRedo,
+                      style: {
+                        ...historyButtonStyle(canRedo),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
+                      children: [
+                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                          /* @__PURE__ */ jsx3("path", { d: "M21 7v6h-6" }),
+                          /* @__PURE__ */ jsx3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" })
+                        ] }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleCenterVertical,
+                      disabled: !selectedObject,
+                      style: {
+                        ...historyButtonStyle(!!selectedObject),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u4E0A\u4E0B\u4E2D\u592E",
+                      children: [
+                        /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }) }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleCenterHorizontal,
+                      disabled: !selectedObject,
+                      style: {
+                        ...historyButtonStyle(!!selectedObject),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u5DE6\u53F3\u4E2D\u592E",
+                      children: [
+                        /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }) }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleBringForward,
+                      disabled: !selectedObject,
+                      style: {
+                        ...historyButtonStyle(!!selectedObject),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u624B\u524D\u306B\u79FB\u52D5",
+                      children: [
+                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                          /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
+                          /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" })
+                        ] }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleSendBackwards,
+                      disabled: !selectedObject,
+                      style: {
+                        ...historyButtonStyle(!!selectedObject),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u5965\u306B\u79FB\u52D5",
+                      children: [
+                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                          /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
+                          /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" })
+                        ] }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleFitToPrintArea,
+                      disabled: !selectedObject,
+                      style: {
+                        ...historyButtonStyle(!!selectedObject),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px"
+                      },
+                      title: "\u5370\u5237\u9762\u3092\u8986\u3046",
+                      children: [
+                        /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: handleRemoveSelected,
+                      disabled: !selectedObject,
+                      style: {
+                        ...historyButtonStyle(!!selectedObject),
+                        padding: isMobile ? "8px 10px" : "10px 12px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px",
+                        minWidth: isMobile ? "60px" : "70px",
+                        backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
+                      },
+                      title: "\u524A\u9664 (Delete/Backspace)",
+                      children: [
+                        /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                          /* @__PURE__ */ jsx3("polyline", { points: "3 6 5 6 21 6" }),
+                          /* @__PURE__ */ jsx3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
+                          /* @__PURE__ */ jsx3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
+                          /* @__PURE__ */ jsx3("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
+                        ] }),
+                        /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" })
+                      ]
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxs2("div", { style: {
+                  ...infoBoxStyle,
+                  width: "100%",
+                  maxWidth: isMobile ? "100%" : "800px",
+                  backgroundColor: "#ffffff",
+                  marginTop: isMobile ? "15px" : "20px",
+                  padding: isMobile ? "15px" : "20px"
+                }, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: {
+                    marginTop: 0,
+                    fontSize: isMobile ? "14px" : "16px"
+                  }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }),
+                  /* @__PURE__ */ jsxs2("ul", { style: {
+                    marginBottom: 0,
+                    lineHeight: 1.6,
+                    paddingLeft: isMobile ? "18px" : "20px",
+                    fontSize: isMobile ? "12px" : "13px"
+                  }, children: [
+                    /* @__PURE__ */ jsx3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }),
+                    /* @__PURE__ */ jsx3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }),
+                    /* @__PURE__ */ jsx3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }),
+                    /* @__PURE__ */ jsx3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }),
+                    /* @__PURE__ */ jsx3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" })
+                  ] })
+                ] })
+              ] }) }),
+              /* @__PURE__ */ jsx3("div", { style: {
+                width: isMobile ? "100%" : "35%",
+                minWidth: "0",
+                maxWidth: isMobile ? "100%" : "35%",
+                flex: isMobile ? "none" : "1 1 35%",
+                backgroundColor: "#ffffff",
+                overflowY: "auto",
+                overflowX: "hidden",
+                height: isMobile ? "auto" : "100vh",
+                position: isMobile ? "relative" : "sticky",
+                top: 0
+              }, children: /* @__PURE__ */ jsxs2("div", { style: {
+                ...panelStyle,
+                padding: isMobile ? "25px 20px" : "40px 30px",
+                wordWrap: "break-word",
+                overflowWrap: "break-word"
+              }, children: [
+                /* @__PURE__ */ jsx3("h2", { style: {
+                  marginTop: 0,
+                  color: "#1a1a1a",
+                  marginBottom: isMobile ? "20px" : "30px",
+                  fontSize: isMobile ? "14px" : "16px",
+                  fontWeight: "400",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase"
+                }, children: "\u5546\u54C1\u8A73\u7D30" }),
+                /* @__PURE__ */ jsx3("div", { style: sectionStyle, children: /* @__PURE__ */ jsxs2("div", { style: {
+                  padding: "0",
+                  backgroundColor: "transparent",
+                  borderRadius: "0",
+                  marginBottom: "20px"
+                }, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: { ...sectionTitleStyle, marginTop: 0 }, children: "\u5546\u54C1\u8AAC\u660E" }),
+                  /* @__PURE__ */ jsx3("p", { style: {
+                    fontSize: "13px",
+                    color: "#666",
+                    lineHeight: "1.8",
+                    margin: 0,
+                    letterSpacing: "0.02em"
+                  }, children: product.description })
+                ] }) }),
+                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u672C\u4F53\u30AB\u30E9\u30FC" }),
+                  /* @__PURE__ */ jsx3("div", { style: { display: "flex", gap: "10px", marginBottom: "20px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxs2(
+                    "button",
+                    {
+                      onClick: () => setSelectedColor(color),
+                      style: {
+                        flex: 1,
+                        padding: "14px 10px",
+                        border: selectedColor.name === color.name ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
+                        borderRadius: "0",
+                        backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "8px"
+                      },
+                      onMouseEnter: (e) => {
+                        selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#888");
+                      },
+                      onMouseLeave: (e) => {
+                        selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#d0d0d0");
+                      },
+                      children: [
+                        /* @__PURE__ */ jsx3(
+                          "div",
+                          {
+                            style: {
+                              width: "40px",
+                              height: "40px",
+                              borderRadius: "50%",
+                              backgroundColor: color.hex,
+                              border: color.hex === "#FFFFFF" || color.hex === "#F5F5DC" ? "2px solid #e0e0e0" : "none",
+                              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                            }
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3("span", { style: {
+                          fontSize: "12px",
+                          fontWeight: selectedColor.name === color.name ? "bold" : "normal",
+                          color: selectedColor.name === color.name ? "#667eea" : "#666"
+                        }, children: color.name })
+                      ]
+                    },
+                    color.name
+                  )) })
+                ] }),
+                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u30B5\u30A4\u30BA" }),
+                  /* @__PURE__ */ jsx3("div", { style: {
+                    display: "grid",
+                    gridTemplateColumns: "repeat(5, 1fr)",
+                    gap: "8px",
+                    marginBottom: "20px"
+                  }, children: sizes.map((size) => /* @__PURE__ */ jsx3(
+                    "button",
+                    {
+                      onClick: () => setSelectedSize(size),
+                      style: {
+                        padding: "14px 8px",
+                        border: selectedSize === size ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
+                        borderRadius: "0",
+                        backgroundColor: selectedSize === size ? "#1a1a1a" : "white",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: "400",
+                        letterSpacing: "0.05em",
+                        color: selectedSize === size ? "white" : "#666",
+                        transition: "all 0.3s ease"
+                      },
+                      onMouseEnter: (e) => {
+                        selectedSize !== size && (e.currentTarget.style.backgroundColor = "#fafafa", e.currentTarget.style.borderColor = "#888");
+                      },
+                      onMouseLeave: (e) => {
+                        selectedSize !== size && (e.currentTarget.style.backgroundColor = "white", e.currentTarget.style.borderColor = "#d0d0d0");
+                      },
+                      children: size
+                    },
+                    size
+                  )) })
+                ] }),
+                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                /* @__PURE__ */ jsx3(
+                  "button",
+                  {
+                    onClick: openCartModal,
+                    disabled: isAddingToCart,
+                    style: {
+                      ...buttonStyle("#5c6ac4", !isAddingToCart),
+                      fontSize: isMobile ? "16px" : "18px",
+                      fontWeight: "bold",
+                      padding: isMobile ? "14px" : "16px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      marginBottom: "24px"
+                    },
+                    children: isAddingToCart ? /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }, children: [
+                      /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
+                        /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 20, color: "white" }),
+                        "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D..."
+                      ] }),
+                      /* @__PURE__ */ jsx3("span", { style: { fontSize: "13px" }, children: "\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09" })
+                    ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                      /* @__PURE__ */ jsx3(Icon, { type: "cart", size: 20, color: "white" }),
+                      " \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                    ] })
+                  }
+                ),
+                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                /* @__PURE__ */ jsx3("h2", { style: { marginTop: 0, color: "#333" }, children: "\u30C7\u30B6\u30A4\u30F3\u7DE8\u96C6" }),
+                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F4F7} \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }),
+                  /* @__PURE__ */ jsx3(
+                    "input",
+                    {
+                      ref: fileInputRef,
+                      type: "file",
+                      accept: "image/*",
+                      multiple: !0,
+                      onChange: handleImageUpload,
+                      style: { display: "none" }
+                    }
+                  ),
+                  /* @__PURE__ */ jsx3(
+                    "button",
+                    {
+                      onClick: handleUploadClick,
+                      disabled: isLoading,
+                      style: {
+                        ...buttonStyle("#3498db", !isLoading),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px"
+                      },
+                      children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
+                        /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
+                        " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
+                      ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
+                        /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
+                        " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+                      ] })
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F916} AI\u753B\u50CF\u751F\u6210" }),
+                  /* @__PURE__ */ jsx3(
+                    "textarea",
+                    {
+                      value: aiPrompt,
+                      onChange: (e) => setAiPrompt(e.target.value),
+                      placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02\u3001\u30AB\u30E9\u30D5\u30EB\u306A\u62BD\u8C61\u753B...",
+                      rows: 3,
+                      style: textareaStyle,
+                      disabled: isGenerating
+                    }
+                  ),
+                  /* @__PURE__ */ jsx3(
+                    "button",
+                    {
+                      onClick: handleGenerateAI,
+                      disabled: isGenerating,
+                      style: primaryButtonStyle(isGenerating),
+                      children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
+                    }
+                  ),
+                  lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "12px", color: "#666", marginTop: "10px" }, children: [
+                    '\u6700\u5F8C\u306E\u751F\u6210: "',
+                    lastAIPrompt,
+                    '"'
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
+                  /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }),
+                  /* @__PURE__ */ jsx3(
+                    "input",
+                    {
+                      type: "text",
+                      value: textInput,
+                      onChange: (e) => handleTextInputChange(e.target.value),
+                      placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
+                      style: inputStyle
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "10px", marginBottom: "10px" }, children: [
+                    /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                      /* @__PURE__ */ jsx3("label", { style: labelStyle, children: "\u8272" }),
+                      /* @__PURE__ */ jsx3(
+                        "input",
+                        {
+                          type: "color",
+                          value: textColor,
+                          onChange: (e) => handleChangeTextColor(e.target.value),
+                          style: colorInputStyle
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
+                      /* @__PURE__ */ jsxs2("label", { style: labelStyle, children: [
+                        "\u30B5\u30A4\u30BA: ",
+                        fontSize,
+                        "px"
+                      ] }),
+                      /* @__PURE__ */ jsx3(
+                        "input",
+                        {
+                          type: "range",
+                          min: "10",
+                          max: "100",
+                          value: fontSize,
+                          onChange: (e) => handleChangeFontSize(Number(e.target.value)),
+                          style: { width: "100%" }
+                        }
+                      )
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsx3("label", { style: {
+                    fontSize: isMobile ? "12px" : "13px",
+                    fontWeight: "600",
+                    color: "#333",
+                    marginBottom: "8px",
+                    display: "block"
+                  }, children: "\u30D5\u30A9\u30F3\u30C8\u306E\u9078\u629E" }),
+                  /* @__PURE__ */ jsxs2("div", { ref: fontDropdownRef, style: { position: "relative", width: "100%" }, children: [
+                    /* @__PURE__ */ jsxs2(
+                      "div",
                       {
-                        x1: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
-                        y1: "0",
-                        x2: `${snapGuides.vertical / CANVAS_SIZE * 100}%`,
-                        y2: "100%",
-                        stroke: "#ff00ff",
-                        strokeWidth: "1",
-                        strokeDasharray: "5,5",
-                        opacity: "0.8"
+                        onClick: () => setIsFontDropdownOpen(!isFontDropdownOpen),
+                        style: {
+                          ...selectStyle,
+                          cursor: "pointer",
+                          fontFamily: FONT_LIST.find((f) => f.value === fontFamily)?.family || fontFamily,
+                          fontSize: isMobile ? "14px" : "16px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center"
+                        },
+                        children: [
+                          /* @__PURE__ */ jsx3("span", { children: FONT_LIST.find((f) => f.value === fontFamily)?.label || fontFamily }),
+                          /* @__PURE__ */ jsx3("span", { style: { fontSize: "12px" }, children: isFontDropdownOpen ? "\u25B2" : "\u25BC" })
+                        ]
                       }
                     ),
-                    snapGuides.horizontal !== null && /* @__PURE__ */ jsx3(
-                      "line",
-                      {
-                        x1: "0",
-                        y1: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
-                        x2: "100%",
-                        y2: `${snapGuides.horizontal / CANVAS_SIZE * 100}%`,
-                        stroke: "#ff00ff",
-                        strokeWidth: "1",
-                        strokeDasharray: "5,5",
-                        opacity: "0.8"
-                      }
-                    )
-                  ]
-                }
-              )
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxs2("div", { style: {
-          marginTop: "15px",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: isMobile ? "8px" : "10px",
-          justifyContent: "center",
-          width: "100%",
-          maxWidth: isMobile ? "100%" : "800px"
-        }, children: [
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleUndo,
-              disabled: !canUndo,
-              style: {
-                ...historyButtonStyle(canUndo),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u5143\u306B\u623B\u3059 (Cmd/Ctrl+Z)",
-              children: [
-                /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                  /* @__PURE__ */ jsx3("path", { d: "M3 7v6h6" }),
-                  /* @__PURE__ */ jsx3("path", { d: "M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" })
+                    isFontDropdownOpen && /* @__PURE__ */ jsxs2("div", { style: {
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      right: 0,
+                      backgroundColor: "white",
+                      border: "2px solid #4c51bf",
+                      borderRadius: "8px",
+                      maxHeight: "350px",
+                      overflowY: "auto",
+                      zIndex: 1e3,
+                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      marginTop: "4px"
+                    }, children: [
+                      /* @__PURE__ */ jsxs2("div", { style: {
+                        display: "flex",
+                        borderBottom: "2px solid #e2e8f0",
+                        position: "sticky",
+                        top: 0,
+                        backgroundColor: "white",
+                        zIndex: 1001
+                      }, children: [
+                        /* @__PURE__ */ jsx3(
+                          "button",
+                          {
+                            onClick: (e) => {
+                              e.stopPropagation(), setActiveFontTab("japanese");
+                            },
+                            style: {
+                              flex: 1,
+                              padding: "12px",
+                              border: "none",
+                              backgroundColor: activeFontTab === "japanese" ? "#4c51bf" : "transparent",
+                              color: activeFontTab === "japanese" ? "white" : "#4a5568",
+                              fontWeight: activeFontTab === "japanese" ? "bold" : "normal",
+                              cursor: "pointer",
+                              transition: "all 0.2s",
+                              fontSize: isMobile ? "14px" : "16px"
+                            },
+                            children: "\u65E5\u672C\u8A9E"
+                          }
+                        ),
+                        /* @__PURE__ */ jsx3(
+                          "button",
+                          {
+                            onClick: (e) => {
+                              e.stopPropagation(), setActiveFontTab("english");
+                            },
+                            style: {
+                              flex: 1,
+                              padding: "12px",
+                              border: "none",
+                              backgroundColor: activeFontTab === "english" ? "#4c51bf" : "transparent",
+                              color: activeFontTab === "english" ? "white" : "#4a5568",
+                              fontWeight: activeFontTab === "english" ? "bold" : "normal",
+                              cursor: "pointer",
+                              transition: "all 0.2s",
+                              fontSize: isMobile ? "14px" : "16px"
+                            },
+                            children: "English"
+                          }
+                        )
+                      ] }),
+                      getFilteredFonts().map((font) => /* @__PURE__ */ jsx3(
+                        "div",
+                        {
+                          onClick: () => {
+                            handleChangeFontFamily(font.value), setIsFontDropdownOpen(!1);
+                          },
+                          style: {
+                            padding: isMobile ? "10px 12px" : "12px 16px",
+                            cursor: "pointer",
+                            fontFamily: font.family,
+                            fontSize: isMobile ? "14px" : "16px",
+                            borderBottom: "1px solid #eee",
+                            backgroundColor: fontFamily === font.value ? "#f0f0ff" : "transparent",
+                            transition: "background-color 0.2s"
+                          },
+                          onMouseEnter: (e) => {
+                            fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "#f9f9f9");
+                          },
+                          onMouseLeave: (e) => {
+                            fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "transparent");
+                          },
+                          children: font.label
+                        },
+                        font.value
+                      ))
+                    ] })
+                  ] })
                 ] }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5143\u306B\u623B\u3059" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleRedo,
-              disabled: !canRedo,
-              style: {
-                ...historyButtonStyle(canRedo),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u3084\u308A\u76F4\u3057 (Cmd/Ctrl+Shift+Z)",
-              children: [
-                /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                  /* @__PURE__ */ jsx3("path", { d: "M21 7v6h-6" }),
-                  /* @__PURE__ */ jsx3("path", { d: "M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" })
-                ] }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u3084\u308A\u76F4\u3057" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleCenterVertical,
-              disabled: !selectedObject,
-              style: {
-                ...historyButtonStyle(!!selectedObject),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u4E0A\u4E0B\u4E2D\u592E",
-              children: [
-                /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" }) }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u4E0A\u4E0B\u4E2D\u592E" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleCenterHorizontal,
-              disabled: !selectedObject,
-              style: {
-                ...historyButtonStyle(!!selectedObject),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u5DE6\u53F3\u4E2D\u592E",
-              children: [
-                /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" }) }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5DE6\u53F3\u4E2D\u592E" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleBringForward,
-              disabled: !selectedObject,
-              style: {
-                ...historyButtonStyle(!!selectedObject),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u624B\u524D\u306B\u79FB\u52D5",
-              children: [
-                /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                  /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
-                  /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2" })
-                ] }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u624B\u524D\u3078" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleSendBackwards,
-              disabled: !selectedObject,
-              style: {
-                ...historyButtonStyle(!!selectedObject),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u5965\u306B\u79FB\u52D5",
-              children: [
-                /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                  /* @__PURE__ */ jsx3("rect", { x: "5", y: "1", width: "10", height: "10", rx: "2", ry: "2", opacity: "0.5" }),
-                  /* @__PURE__ */ jsx3("rect", { x: "9", y: "13", width: "10", height: "10", rx: "2", ry: "2" })
-                ] }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u5965\u3078" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleFitToPrintArea,
-              disabled: !selectedObject,
-              style: {
-                ...historyButtonStyle(!!selectedObject),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px"
-              },
-              title: "\u5370\u5237\u9762\u3092\u8986\u3046",
-              children: [
-                /* @__PURE__ */ jsx3("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx3("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2\u6700\u5927" })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: handleRemoveSelected,
-              disabled: !selectedObject,
-              style: {
-                ...historyButtonStyle(!!selectedObject),
-                padding: isMobile ? "8px 10px" : "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                minWidth: isMobile ? "60px" : "70px",
-                backgroundColor: selectedObject ? "#e74c3c" : "#cccccc"
-              },
-              title: "\u524A\u9664 (Delete/Backspace)",
-              children: [
-                /* @__PURE__ */ jsxs2("svg", { width: isMobile ? "18" : "20", height: isMobile ? "18" : "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                  /* @__PURE__ */ jsx3("polyline", { points: "3 6 5 6 21 6" }),
-                  /* @__PURE__ */ jsx3("path", { d: "M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
-                  /* @__PURE__ */ jsx3("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
-                  /* @__PURE__ */ jsx3("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
-                ] }),
-                /* @__PURE__ */ jsx3("span", { style: { fontSize: isMobile ? "9px" : "10px" }, children: "\u524A\u9664" })
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxs2("div", { style: {
-          ...infoBoxStyle,
-          width: "100%",
-          maxWidth: isMobile ? "100%" : "800px",
-          backgroundColor: "#ffffff",
-          marginTop: isMobile ? "15px" : "20px",
-          padding: isMobile ? "15px" : "20px"
-        }, children: [
-          /* @__PURE__ */ jsx3("h3", { style: {
-            marginTop: 0,
-            fontSize: isMobile ? "14px" : "16px"
-          }, children: "\u{1F4DD} \u4F7F\u3044\u65B9" }),
-          /* @__PURE__ */ jsxs2("ul", { style: {
-            marginBottom: 0,
-            lineHeight: 1.6,
-            paddingLeft: isMobile ? "18px" : "20px",
-            fontSize: isMobile ? "12px" : "13px"
-          }, children: [
-            /* @__PURE__ */ jsx3("li", { children: "\u{1F916} AI\u306B\u753B\u50CF\u3092\u751F\u6210\u3055\u305B\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059" }),
-            /* @__PURE__ */ jsx3("li", { children: "\u{1F4F7} \u753B\u50CF\u3092\u8907\u6570\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u91CD\u306D\u5408\u308F\u305B\u3067\u304D\u307E\u3059" }),
-            /* @__PURE__ */ jsx3("li", { children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u3066\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u3067\u304D\u307E\u3059" }),
-            /* @__PURE__ */ jsx3("li", { children: "\u{1F3A8} \u753B\u50CF\u306B\u30D5\u30A3\u30EB\u30BF\u30FC\u3092\u9069\u7528\u3067\u304D\u307E\u3059" }),
-            /* @__PURE__ */ jsx3("li", { children: "\u{1F6D2} \u5B8C\u6210\u3057\u305F\u3089Shopify\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u3067\u304D\u307E\u3059" })
-          ] })
-        ] })
-      ] }) }),
-      /* @__PURE__ */ jsx3("div", { style: {
-        width: isMobile ? "100%" : "35%",
-        minWidth: "0",
-        maxWidth: isMobile ? "100%" : "35%",
-        flex: isMobile ? "none" : "1 1 35%",
-        backgroundColor: "#ffffff",
-        overflowY: "auto",
-        overflowX: "hidden",
-        height: isMobile ? "auto" : "100vh",
-        position: isMobile ? "relative" : "sticky",
-        top: 0
-      }, children: /* @__PURE__ */ jsxs2("div", { style: {
-        ...panelStyle,
-        padding: isMobile ? "25px 20px" : "40px 30px",
-        wordWrap: "break-word",
-        overflowWrap: "break-word"
-      }, children: [
-        /* @__PURE__ */ jsx3("h2", { style: {
-          marginTop: 0,
-          color: "#1a1a1a",
-          marginBottom: isMobile ? "20px" : "30px",
-          fontSize: isMobile ? "14px" : "16px",
-          fontWeight: "400",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase"
-        }, children: "\u5546\u54C1\u8A73\u7D30" }),
-        /* @__PURE__ */ jsx3("div", { style: sectionStyle, children: /* @__PURE__ */ jsxs2("div", { style: {
-          padding: "0",
-          backgroundColor: "transparent",
-          borderRadius: "0",
-          marginBottom: "20px"
-        }, children: [
-          /* @__PURE__ */ jsx3("h3", { style: { ...sectionTitleStyle, marginTop: 0 }, children: "\u5546\u54C1\u8AAC\u660E" }),
-          /* @__PURE__ */ jsx3("p", { style: {
-            fontSize: "13px",
-            color: "#666",
-            lineHeight: "1.8",
-            margin: 0,
-            letterSpacing: "0.02em"
-          }, children: product.description })
-        ] }) }),
-        /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-          /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u672C\u4F53\u30AB\u30E9\u30FC" }),
-          /* @__PURE__ */ jsx3("div", { style: { display: "flex", gap: "10px", marginBottom: "20px" }, children: product.colors.map((color) => /* @__PURE__ */ jsxs2(
-            "button",
-            {
-              onClick: () => setSelectedColor(color),
-              style: {
-                flex: 1,
-                padding: "14px 10px",
-                border: selectedColor.name === color.name ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
-                borderRadius: "0",
-                backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "8px"
-              },
-              onMouseEnter: (e) => {
-                selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#888");
-              },
-              onMouseLeave: (e) => {
-                selectedColor.name !== color.name && (e.currentTarget.style.borderColor = "#d0d0d0");
-              },
-              children: [
-                /* @__PURE__ */ jsx3(
-                  "div",
-                  {
-                    style: {
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                      backgroundColor: color.hex,
-                      border: color.hex === "#FFFFFF" || color.hex === "#F5F5DC" ? "2px solid #e0e0e0" : "none",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                    }
-                  }
-                ),
-                /* @__PURE__ */ jsx3("span", { style: {
-                  fontSize: "12px",
-                  fontWeight: selectedColor.name === color.name ? "bold" : "normal",
-                  color: selectedColor.name === color.name ? "#667eea" : "#666"
-                }, children: color.name })
-              ]
-            },
-            color.name
-          )) })
-        ] }),
-        /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-          /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u30B5\u30A4\u30BA" }),
-          /* @__PURE__ */ jsx3("div", { style: {
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap: "8px",
-            marginBottom: "20px"
-          }, children: sizes.map((size) => /* @__PURE__ */ jsx3(
-            "button",
-            {
-              onClick: () => setSelectedSize(size),
-              style: {
-                padding: "14px 8px",
-                border: selectedSize === size ? "1px solid #1a1a1a" : "1px solid #d0d0d0",
-                borderRadius: "0",
-                backgroundColor: selectedSize === size ? "#1a1a1a" : "white",
-                cursor: "pointer",
-                fontSize: "12px",
-                fontWeight: "400",
-                letterSpacing: "0.05em",
-                color: selectedSize === size ? "white" : "#666",
-                transition: "all 0.3s ease"
-              },
-              onMouseEnter: (e) => {
-                selectedSize !== size && (e.currentTarget.style.backgroundColor = "#fafafa", e.currentTarget.style.borderColor = "#888");
-              },
-              onMouseLeave: (e) => {
-                selectedSize !== size && (e.currentTarget.style.backgroundColor = "white", e.currentTarget.style.borderColor = "#d0d0d0");
-              },
-              children: size
-            },
-            size
-          )) })
-        ] }),
-        /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-        /* @__PURE__ */ jsx3(
-          "button",
-          {
-            onClick: openCartModal,
-            disabled: isAddingToCart,
-            style: {
-              ...buttonStyle("#5c6ac4", !isAddingToCart),
-              fontSize: isMobile ? "16px" : "18px",
-              fontWeight: "bold",
-              padding: isMobile ? "14px" : "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              marginBottom: "24px"
-            },
-            children: isAddingToCart ? /* @__PURE__ */ jsxs2("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }, children: [
-              /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
-                /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 20, color: "white" }),
-                "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0\u4E2D..."
-              ] }),
-              /* @__PURE__ */ jsx3("span", { style: { fontSize: "13px" }, children: "\uFF08\u5C11\u3057\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\uFF09" })
-            ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
-              /* @__PURE__ */ jsx3(Icon, { type: "cart", size: 20, color: "white" }),
-              " \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
-            ] })
-          }
-        ),
-        /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-        /* @__PURE__ */ jsx3("h2", { style: { marginTop: 0, color: "#333" }, children: "\u30C7\u30B6\u30A4\u30F3\u7DE8\u96C6" }),
-        /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-          /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F4F7} \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }),
-          /* @__PURE__ */ jsx3(
-            "input",
-            {
-              ref: fileInputRef,
-              type: "file",
-              accept: "image/*",
-              multiple: !0,
-              onChange: handleImageUpload,
-              style: { display: "none" }
-            }
-          ),
-          /* @__PURE__ */ jsx3(
-            "button",
-            {
-              onClick: handleUploadClick,
-              disabled: isLoading,
-              style: {
-                ...buttonStyle("#3498db", !isLoading),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px"
-              },
-              children: isLoading ? /* @__PURE__ */ jsxs2(Fragment, { children: [
-                /* @__PURE__ */ jsx3(Icon, { type: "loading", size: 18, color: "white" }),
-                " \u8AAD\u307F\u8FBC\u307F\u4E2D..."
-              ] }) : /* @__PURE__ */ jsxs2(Fragment, { children: [
-                /* @__PURE__ */ jsx3(Icon, { type: "upload", size: 18, color: "white" }),
-                " \u753B\u50CF\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
-              ] })
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-        /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-          /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u{1F916} AI\u753B\u50CF\u751F\u6210" }),
-          /* @__PURE__ */ jsx3(
-            "textarea",
-            {
-              value: aiPrompt,
-              onChange: (e) => setAiPrompt(e.target.value),
-              placeholder: "\u4F8B: \u5B87\u5B99\u3092\u98DB\u3076\u732B\u3001\u30B5\u30A4\u30D0\u30FC\u30D1\u30F3\u30AF\u306A\u90FD\u5E02\u3001\u30AB\u30E9\u30D5\u30EB\u306A\u62BD\u8C61\u753B...",
-              rows: 3,
-              style: textareaStyle,
-              disabled: isGenerating
-            }
-          ),
-          /* @__PURE__ */ jsx3(
-            "button",
-            {
-              onClick: handleGenerateAI,
-              disabled: isGenerating,
-              style: primaryButtonStyle(isGenerating),
-              children: isGenerating ? "\u23F3 \u751F\u6210\u4E2D..." : "\u2728 AI\u3067\u753B\u50CF\u751F\u6210"
-            }
-          ),
-          lastAIPrompt && /* @__PURE__ */ jsxs2("p", { style: { fontSize: "12px", color: "#666", marginTop: "10px" }, children: [
-            '\u6700\u5F8C\u306E\u751F\u6210: "',
-            lastAIPrompt,
-            '"'
-          ] })
-        ] }),
-        /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-        /* @__PURE__ */ jsxs2("div", { style: sectionStyle, children: [
-          /* @__PURE__ */ jsx3("h3", { style: sectionTitleStyle, children: "\u270F\uFE0F \u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }),
-          /* @__PURE__ */ jsx3(
-            "input",
-            {
-              type: "text",
-              value: textInput,
-              onChange: (e) => handleTextInputChange(e.target.value),
-              placeholder: "\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B",
-              style: inputStyle
-            }
-          ),
-          /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "10px", marginBottom: "10px" }, children: [
-            /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsx3("label", { style: labelStyle, children: "\u8272" }),
-              /* @__PURE__ */ jsx3(
-                "input",
-                {
-                  type: "color",
-                  value: textColor,
-                  onChange: (e) => handleChangeTextColor(e.target.value),
-                  style: colorInputStyle
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxs2("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsxs2("label", { style: labelStyle, children: [
-                "\u30B5\u30A4\u30BA: ",
-                fontSize,
-                "px"
-              ] }),
-              /* @__PURE__ */ jsx3(
-                "input",
-                {
-                  type: "range",
-                  min: "10",
-                  max: "100",
-                  value: fontSize,
-                  onChange: (e) => handleChangeFontSize(Number(e.target.value)),
-                  style: { width: "100%" }
-                }
-              )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsx3("label", { style: {
-            fontSize: isMobile ? "12px" : "13px",
-            fontWeight: "600",
-            color: "#333",
-            marginBottom: "8px",
-            display: "block"
-          }, children: "\u30D5\u30A9\u30F3\u30C8\u306E\u9078\u629E" }),
-          /* @__PURE__ */ jsxs2("div", { ref: fontDropdownRef, style: { position: "relative", width: "100%" }, children: [
-            /* @__PURE__ */ jsxs2(
-              "div",
-              {
-                onClick: () => setIsFontDropdownOpen(!isFontDropdownOpen),
-                style: {
-                  ...selectStyle,
-                  cursor: "pointer",
-                  fontFamily: FONT_LIST.find((f) => f.value === fontFamily)?.family || fontFamily,
-                  fontSize: isMobile ? "14px" : "16px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center"
-                },
-                children: [
-                  /* @__PURE__ */ jsx3("span", { children: FONT_LIST.find((f) => f.value === fontFamily)?.label || fontFamily }),
-                  /* @__PURE__ */ jsx3("span", { style: { fontSize: "12px" }, children: isFontDropdownOpen ? "\u25B2" : "\u25BC" })
-                ]
-              }
-            ),
-            isFontDropdownOpen && /* @__PURE__ */ jsxs2("div", { style: {
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              right: 0,
-              backgroundColor: "white",
-              border: "2px solid #4c51bf",
-              borderRadius: "8px",
-              maxHeight: "350px",
-              overflowY: "auto",
-              zIndex: 1e3,
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              marginTop: "4px"
-            }, children: [
-              /* @__PURE__ */ jsxs2("div", { style: {
-                display: "flex",
-                borderBottom: "2px solid #e2e8f0",
-                position: "sticky",
-                top: 0,
-                backgroundColor: "white",
-                zIndex: 1001
-              }, children: [
-                /* @__PURE__ */ jsx3(
+                /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
+                /* @__PURE__ */ jsxs2(
                   "button",
                   {
-                    onClick: (e) => {
-                      e.stopPropagation(), setActiveFontTab("japanese");
-                    },
+                    onClick: handleClearCanvas,
                     style: {
-                      flex: 1,
-                      padding: "12px",
-                      border: "none",
-                      backgroundColor: activeFontTab === "japanese" ? "#4c51bf" : "transparent",
-                      color: activeFontTab === "japanese" ? "white" : "#4a5568",
-                      fontWeight: activeFontTab === "japanese" ? "bold" : "normal",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      fontSize: isMobile ? "14px" : "16px"
+                      ...buttonStyle("#ff8c42", !0),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px"
                     },
-                    children: "\u65E5\u672C\u8A9E"
+                    children: [
+                      /* @__PURE__ */ jsx3(Icon, { type: "refresh", size: 18, color: "white" }),
+                      " \u3059\u3079\u3066\u30AF\u30EA\u30A2"
+                    ]
                   }
                 ),
-                /* @__PURE__ */ jsx3(
+                /* @__PURE__ */ jsxs2(
                   "button",
                   {
-                    onClick: (e) => {
-                      e.stopPropagation(), setActiveFontTab("english");
-                    },
+                    onClick: handleSaveDesign,
                     style: {
-                      flex: 1,
-                      padding: "12px",
-                      border: "none",
-                      backgroundColor: activeFontTab === "english" ? "#4c51bf" : "transparent",
-                      color: activeFontTab === "english" ? "white" : "#4a5568",
-                      fontWeight: activeFontTab === "english" ? "bold" : "normal",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      fontSize: isMobile ? "14px" : "16px"
+                      ...buttonStyle("#00b894", !0),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px"
                     },
-                    children: "English"
+                    children: [
+                      /* @__PURE__ */ jsx3(Icon, { type: "save", size: 18, color: "white" }),
+                      " \u753B\u50CF\u3068\u3057\u3066\u4FDD\u5B58"
+                    ]
                   }
                 )
-              ] }),
-              getFilteredFonts().map((font) => /* @__PURE__ */ jsx3(
-                "div",
-                {
-                  onClick: () => {
-                    handleChangeFontFamily(font.value), setIsFontDropdownOpen(!1);
-                  },
-                  style: {
-                    padding: isMobile ? "10px 12px" : "12px 16px",
-                    cursor: "pointer",
-                    fontFamily: font.family,
-                    fontSize: isMobile ? "14px" : "16px",
-                    borderBottom: "1px solid #eee",
-                    backgroundColor: fontFamily === font.value ? "#f0f0ff" : "transparent",
-                    transition: "background-color 0.2s"
-                  },
-                  onMouseEnter: (e) => {
-                    fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "#f9f9f9");
-                  },
-                  onMouseLeave: (e) => {
-                    fontFamily !== font.value && (e.currentTarget.style.backgroundColor = "transparent");
-                  },
-                  children: font.label
-                },
-                font.value
-              ))
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsx3("hr", { style: dividerStyle }),
-        /* @__PURE__ */ jsxs2(
-          "button",
-          {
-            onClick: handleClearCanvas,
-            style: {
-              ...buttonStyle("#ff8c42", !0),
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px"
-            },
-            children: [
-              /* @__PURE__ */ jsx3(Icon, { type: "refresh", size: 18, color: "white" }),
-              " \u3059\u3079\u3066\u30AF\u30EA\u30A2"
+              ] }) })
             ]
           }
         ),
-        /* @__PURE__ */ jsxs2(
-          "button",
-          {
-            onClick: handleSaveDesign,
-            style: {
-              ...buttonStyle("#00b894", !0),
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px"
-            },
-            children: [
-              /* @__PURE__ */ jsx3(Icon, { type: "save", size: 18, color: "white" }),
-              " \u753B\u50CF\u3068\u3057\u3066\u4FDD\u5B58"
-            ]
-          }
-        )
-      ] }) })
-    ] }),
-    showCopyrightModal && /* @__PURE__ */ jsx3("div", { style: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 1e4,
-      padding: "20px"
-    }, children: /* @__PURE__ */ jsxs2("div", { style: {
-      backgroundColor: "white",
-      borderRadius: "16px",
-      padding: isMobile ? "24px" : "40px",
-      maxWidth: "600px",
-      width: "100%",
-      maxHeight: "80vh",
-      overflowY: "auto",
-      boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)"
-    }, children: [
-      /* @__PURE__ */ jsxs2("h2", { style: {
-        fontSize: isMobile ? "20px" : "24px",
-        marginBottom: "20px",
-        color: "#333",
-        fontWeight: "bold",
-        display: "flex",
-        alignItems: "center",
-        gap: "8px"
-      }, children: [
-        /* @__PURE__ */ jsx3(Icon, { type: "clipboard", size: 24, color: "#333" }),
-        " \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u524D\u306E\u3054\u78BA\u8A8D"
-      ] }),
-      /* @__PURE__ */ jsxs2("div", { style: {
-        marginBottom: "24px",
-        fontSize: isMobile ? "14px" : "15px",
-        lineHeight: "1.8",
-        color: "#555"
-      }, children: [
-        /* @__PURE__ */ jsxs2("h3", { style: { fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ jsx3(Icon, { type: "check", size: 18, color: "#28a745" }),
-          " \u63A8\u5968\u753B\u50CF\u30B5\u30A4\u30BA"
-        ] }),
-        /* @__PURE__ */ jsxs2("p", { style: { marginBottom: "16px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "8px" }, children: [
-          /* @__PURE__ */ jsx3("strong", { children: "300 DPI\u4EE5\u4E0A" }),
-          "\u306E\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u63A8\u5968\u3057\u307E\u3059\u3002",
-          /* @__PURE__ */ jsx3("br", {}),
-          "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2: 250mm \xD7 312mm"
-        ] }),
-        /* @__PURE__ */ jsxs2("h3", { style: { fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ jsx3(Icon, { type: "warning", size: 18, color: "#ffc107" }),
-          " \u8457\u4F5C\u6A29\u30FB\u5229\u7528\u898F\u7D04"
-        ] }),
-        /* @__PURE__ */ jsxs2("ul", { style: { paddingLeft: "20px", marginBottom: "16px" }, children: [
-          /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
-            /* @__PURE__ */ jsx3("strong", { children: "\u7B2C\u4E09\u8005\u306E\u8457\u4F5C\u6A29\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF" }),
-            "\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u306A\u3044\u3067\u304F\u3060\u3055\u3044"
-          ] }),
-          /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
-            /* @__PURE__ */ jsx3("strong", { children: "\u8096\u50CF\u6A29" }),
-            "\u3084",
-            /* @__PURE__ */ jsx3("strong", { children: "\u30D7\u30E9\u30A4\u30D0\u30B7\u30FC\u6A29" }),
-            "\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF\u306F\u4F7F\u7528\u3067\u304D\u307E\u305B\u3093"
-          ] }),
-          /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
-            /* @__PURE__ */ jsx3("strong", { children: "\u5546\u6A19\u6A29" }),
-            "\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF\uFF08\u4F01\u696D\u30ED\u30B4\u306A\u3069\uFF09\u306F\u4F7F\u7528\u3067\u304D\u307E\u305B\u3093"
-          ] }),
-          /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
-            "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3055\u308C\u305F\u753B\u50CF\u306F",
-            /* @__PURE__ */ jsx3("strong", { children: "\u304A\u5BA2\u69D8\u306E\u8CAC\u4EFB" }),
-            "\u3067\u7BA1\u7406\u3055\u308C\u307E\u3059"
-          ] }),
-          /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
-            "\u4E0D\u9069\u5207\u306A\u753B\u50CF\u304C\u767A\u898B\u3055\u308C\u305F\u5834\u5408\u3001",
-            /* @__PURE__ */ jsx3("strong", { children: "\u4E88\u544A\u306A\u304F\u524A\u9664" }),
-            "\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059"
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "12px", flexDirection: isMobile ? "column" : "row" }, children: [
-        /* @__PURE__ */ jsx3(
-          "button",
-          {
-            onClick: () => {
-              setShowCopyrightModal(!1), pendingImageRef.current = null, fileInputRef.current && (fileInputRef.current.value = "");
-            },
-            style: {
-              flex: 1,
-              padding: "14px 24px",
-              backgroundColor: "#6c757d",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer"
-            },
-            children: "\u30AD\u30E3\u30F3\u30BB\u30EB"
-          }
-        ),
-        /* @__PURE__ */ jsx3(
-          "button",
-          {
-            onClick: handleCopyrightAgree,
-            style: {
-              flex: 1,
-              padding: "14px 24px",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer"
-            },
-            children: "\u540C\u610F\u3057\u3066\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
-          }
-        )
-      ] })
-    ] }) }),
-    imageQualityWarning && (() => {
-      let isWarning = imageQualityWarning.includes("[WARNING]"), isInfo = imageQualityWarning.includes("[INFO]"), isSuccess = imageQualityWarning.includes("[SUCCESS]"), message = imageQualityWarning.replace("[WARNING]", "").replace("[INFO]", "").replace("[SUCCESS]", "").trim();
-      return /* @__PURE__ */ jsxs2("div", { style: {
-        position: "fixed",
-        bottom: "20px",
-        right: "20px",
-        backgroundColor: isWarning ? "#fff3cd" : isInfo ? "#d1ecf1" : "#d4edda",
-        border: `1px solid ${isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745"}`,
-        borderRadius: "8px",
-        padding: "16px 20px",
-        maxWidth: "400px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-        zIndex: 9999,
-        fontSize: "13px",
-        whiteSpace: "pre-line",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px"
-      }, children: [
-        /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "flex-start", gap: "8px" }, children: [
-          /* @__PURE__ */ jsx3(Icon, { type: isWarning ? "warning" : isInfo ? "info" : "check", size: 20, color: isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745" }),
-          /* @__PURE__ */ jsx3("div", { style: { flex: 1 }, children: message })
-        ] }),
-        /* @__PURE__ */ jsx3(
-          "button",
-          {
-            onClick: () => setImageQualityWarning(null),
-            style: {
-              padding: "8px 16px",
-              backgroundColor: "#6c757d",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: "12px",
-              fontWeight: "600"
-            },
-            children: "\u9589\u3058\u308B"
-          }
-        )
-      ] });
-    })(),
-    isModalOpen && /* @__PURE__ */ jsx3(
-      "div",
-      {
-        style: {
+        showCopyrightModal && /* @__PURE__ */ jsx3("div", { style: {
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
           display: "flex",
-          alignItems: "center",
           justifyContent: "center",
+          alignItems: "center",
           zIndex: 1e4,
           padding: "20px"
-        },
-        onClick: closeCartModal,
-        children: /* @__PURE__ */ jsxs2(
+        }, children: /* @__PURE__ */ jsxs2("div", { style: {
+          backgroundColor: "white",
+          borderRadius: "16px",
+          padding: isMobile ? "24px" : "40px",
+          maxWidth: "600px",
+          width: "100%",
+          maxHeight: "80vh",
+          overflowY: "auto",
+          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)"
+        }, children: [
+          /* @__PURE__ */ jsxs2("h2", { style: {
+            fontSize: isMobile ? "20px" : "24px",
+            marginBottom: "20px",
+            color: "#333",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }, children: [
+            /* @__PURE__ */ jsx3(Icon, { type: "clipboard", size: 24, color: "#333" }),
+            " \u753B\u50CF\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u524D\u306E\u3054\u78BA\u8A8D"
+          ] }),
+          /* @__PURE__ */ jsxs2("div", { style: {
+            marginBottom: "24px",
+            fontSize: isMobile ? "14px" : "15px",
+            lineHeight: "1.8",
+            color: "#555"
+          }, children: [
+            /* @__PURE__ */ jsxs2("h3", { style: { fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ jsx3(Icon, { type: "check", size: 18, color: "#28a745" }),
+              " \u63A8\u5968\u753B\u50CF\u30B5\u30A4\u30BA"
+            ] }),
+            /* @__PURE__ */ jsxs2("p", { style: { marginBottom: "16px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "8px" }, children: [
+              /* @__PURE__ */ jsx3("strong", { children: "300 DPI\u4EE5\u4E0A" }),
+              "\u306E\u9AD8\u89E3\u50CF\u5EA6\u753B\u50CF\u3092\u63A8\u5968\u3057\u307E\u3059\u3002",
+              /* @__PURE__ */ jsx3("br", {}),
+              "\u30D7\u30EA\u30F3\u30C8\u7BC4\u56F2: 250mm \xD7 312mm"
+            ] }),
+            /* @__PURE__ */ jsxs2("h3", { style: { fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ jsx3(Icon, { type: "warning", size: 18, color: "#ffc107" }),
+              " \u8457\u4F5C\u6A29\u30FB\u5229\u7528\u898F\u7D04"
+            ] }),
+            /* @__PURE__ */ jsxs2("ul", { style: { paddingLeft: "20px", marginBottom: "16px" }, children: [
+              /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
+                /* @__PURE__ */ jsx3("strong", { children: "\u7B2C\u4E09\u8005\u306E\u8457\u4F5C\u6A29\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF" }),
+                "\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u306A\u3044\u3067\u304F\u3060\u3055\u3044"
+              ] }),
+              /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
+                /* @__PURE__ */ jsx3("strong", { children: "\u8096\u50CF\u6A29" }),
+                "\u3084",
+                /* @__PURE__ */ jsx3("strong", { children: "\u30D7\u30E9\u30A4\u30D0\u30B7\u30FC\u6A29" }),
+                "\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF\u306F\u4F7F\u7528\u3067\u304D\u307E\u305B\u3093"
+              ] }),
+              /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
+                /* @__PURE__ */ jsx3("strong", { children: "\u5546\u6A19\u6A29" }),
+                "\u3092\u4FB5\u5BB3\u3059\u308B\u753B\u50CF\uFF08\u4F01\u696D\u30ED\u30B4\u306A\u3069\uFF09\u306F\u4F7F\u7528\u3067\u304D\u307E\u305B\u3093"
+              ] }),
+              /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
+                "\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3055\u308C\u305F\u753B\u50CF\u306F",
+                /* @__PURE__ */ jsx3("strong", { children: "\u304A\u5BA2\u69D8\u306E\u8CAC\u4EFB" }),
+                "\u3067\u7BA1\u7406\u3055\u308C\u307E\u3059"
+              ] }),
+              /* @__PURE__ */ jsxs2("li", { style: { marginBottom: "8px" }, children: [
+                "\u4E0D\u9069\u5207\u306A\u753B\u50CF\u304C\u767A\u898B\u3055\u308C\u305F\u5834\u5408\u3001",
+                /* @__PURE__ */ jsx3("strong", { children: "\u4E88\u544A\u306A\u304F\u524A\u9664" }),
+                "\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059"
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "12px", flexDirection: isMobile ? "column" : "row" }, children: [
+            /* @__PURE__ */ jsx3(
+              "button",
+              {
+                onClick: () => {
+                  setShowCopyrightModal(!1), pendingImageRef.current = null, fileInputRef.current && (fileInputRef.current.value = "");
+                },
+                style: {
+                  flex: 1,
+                  padding: "14px 24px",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                },
+                children: "\u30AD\u30E3\u30F3\u30BB\u30EB"
+              }
+            ),
+            /* @__PURE__ */ jsx3(
+              "button",
+              {
+                onClick: handleCopyrightAgree,
+                style: {
+                  flex: 1,
+                  padding: "14px 24px",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                },
+                children: "\u540C\u610F\u3057\u3066\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9"
+              }
+            )
+          ] })
+        ] }) }),
+        imageQualityWarning && (() => {
+          let isWarning = imageQualityWarning.includes("[WARNING]"), isInfo = imageQualityWarning.includes("[INFO]"), isSuccess = imageQualityWarning.includes("[SUCCESS]"), message = imageQualityWarning.replace("[WARNING]", "").replace("[INFO]", "").replace("[SUCCESS]", "").trim();
+          return /* @__PURE__ */ jsxs2("div", { style: {
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: isWarning ? "#fff3cd" : isInfo ? "#d1ecf1" : "#d4edda",
+            border: `1px solid ${isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745"}`,
+            borderRadius: "8px",
+            padding: "16px 20px",
+            maxWidth: "400px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            zIndex: 9999,
+            fontSize: "13px",
+            whiteSpace: "pre-line",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px"
+          }, children: [
+            /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "flex-start", gap: "8px" }, children: [
+              /* @__PURE__ */ jsx3(Icon, { type: isWarning ? "warning" : isInfo ? "info" : "check", size: 20, color: isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745" }),
+              /* @__PURE__ */ jsx3("div", { style: { flex: 1 }, children: message })
+            ] }),
+            /* @__PURE__ */ jsx3(
+              "button",
+              {
+                onClick: () => setImageQualityWarning(null),
+                style: {
+                  padding: "8px 16px",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: "600"
+                },
+                children: "\u9589\u3058\u308B"
+              }
+            )
+          ] });
+        })(),
+        isModalOpen && /* @__PURE__ */ jsx3(
           "div",
           {
             style: {
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: isMobile ? "24px" : "32px",
-              maxWidth: "500px",
-              width: "100%",
-              maxHeight: "90vh",
-              overflow: "auto",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)"
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1e4,
+              padding: "20px"
             },
-            onClick: (e) => e.stopPropagation(),
-            children: [
-              /* @__PURE__ */ jsxs2("div", { style: { marginBottom: "24px" }, children: [
-                /* @__PURE__ */ jsx3("h2", { style: { margin: 0, fontSize: "24px", color: "#333" }, children: "\u{1F6D2} \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0" }),
-                /* @__PURE__ */ jsx3("p", { style: { margin: "8px 0 0 0", fontSize: "14px", color: "#666" }, children: "\u30B5\u30A4\u30BA\u3068\u500B\u6570\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044" })
-              ] }),
-              /* @__PURE__ */ jsxs2("div", { style: { marginBottom: "24px" }, children: [
-                /* @__PURE__ */ jsx3("label", { style: { display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }, children: "\u30AB\u30E9\u30FC" }),
-                /* @__PURE__ */ jsx3("div", { style: { display: "flex", gap: "12px" }, children: product.colors.map((color) => /* @__PURE__ */ jsx3(
-                  "button",
-                  {
-                    onClick: () => setModalColor(color.name),
-                    style: {
-                      flex: 1,
-                      padding: "12px",
-                      border: modalColor === color.name ? "2px solid #5c6ac4" : "2px solid #ddd",
-                      borderRadius: "8px",
-                      backgroundColor: modalColor === color.name ? "#f0f2ff" : "white",
-                      color: modalColor === color.name ? "#5c6ac4" : "#333",
-                      fontWeight: modalColor === color.name ? "bold" : "normal",
-                      cursor: "pointer",
-                      fontSize: "15px",
-                      transition: "all 0.2s"
-                    },
-                    children: color.name
-                  },
-                  color.name
-                )) })
-              ] }),
-              /* @__PURE__ */ jsxs2("div", { style: { marginBottom: "24px" }, children: [
-                /* @__PURE__ */ jsx3("label", { style: { display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }, children: "\u30B5\u30A4\u30BA\u3068\u500B\u6570" }),
-                ["S", "M", "L", "XL", "XXL"].map((size) => {
-                  let currentQuantity = modalQuantities[modalColor]?.[size] || 0;
-                  return /* @__PURE__ */ jsxs2(
+            onClick: closeCartModal,
+            children: /* @__PURE__ */ jsxs2(
+              "div",
+              {
+                style: {
+                  backgroundColor: "white",
+                  borderRadius: "12px",
+                  padding: isMobile ? "24px" : "32px",
+                  maxWidth: "500px",
+                  width: "100%",
+                  maxHeight: "90vh",
+                  overflow: "auto",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)"
+                },
+                onClick: (e) => e.stopPropagation(),
+                children: [
+                  /* @__PURE__ */ jsxs2("div", { style: { marginBottom: "24px" }, children: [
+                    /* @__PURE__ */ jsx3("h2", { style: { margin: 0, fontSize: "24px", color: "#333" }, children: "\u{1F6D2} \u30AB\u30FC\u30C8\u306B\u8FFD\u52A0" }),
+                    /* @__PURE__ */ jsx3("p", { style: { margin: "8px 0 0 0", fontSize: "14px", color: "#666" }, children: "\u30B5\u30A4\u30BA\u3068\u500B\u6570\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044" })
+                  ] }),
+                  /* @__PURE__ */ jsxs2("div", { style: { marginBottom: "24px" }, children: [
+                    /* @__PURE__ */ jsx3("label", { style: { display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }, children: "\u30AB\u30E9\u30FC" }),
+                    /* @__PURE__ */ jsx3("div", { style: { display: "flex", gap: "12px" }, children: product.colors.map((color) => /* @__PURE__ */ jsx3(
+                      "button",
+                      {
+                        onClick: () => setModalColor(color.name),
+                        style: {
+                          flex: 1,
+                          padding: "12px",
+                          border: modalColor === color.name ? "2px solid #5c6ac4" : "2px solid #ddd",
+                          borderRadius: "8px",
+                          backgroundColor: modalColor === color.name ? "#f0f2ff" : "white",
+                          color: modalColor === color.name ? "#5c6ac4" : "#333",
+                          fontWeight: modalColor === color.name ? "bold" : "normal",
+                          cursor: "pointer",
+                          fontSize: "15px",
+                          transition: "all 0.2s"
+                        },
+                        children: color.name
+                      },
+                      color.name
+                    )) })
+                  ] }),
+                  /* @__PURE__ */ jsxs2("div", { style: { marginBottom: "24px" }, children: [
+                    /* @__PURE__ */ jsx3("label", { style: { display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }, children: "\u30B5\u30A4\u30BA\u3068\u500B\u6570" }),
+                    ["S", "M", "L", "XL", "XXL"].map((size) => {
+                      let currentQuantity = modalQuantities[modalColor]?.[size] || 0;
+                      return /* @__PURE__ */ jsxs2(
+                        "div",
+                        {
+                          style: {
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "12px 16px",
+                            marginBottom: "8px",
+                            backgroundColor: currentQuantity > 0 ? "#f0f2ff" : "#f8f9fa",
+                            borderRadius: "8px",
+                            border: currentQuantity > 0 ? "2px solid #5c6ac4" : "2px solid transparent"
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx3("span", { style: { fontWeight: "500", fontSize: "16px", color: "#333" }, children: size }),
+                            /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+                              /* @__PURE__ */ jsx3(
+                                "button",
+                                {
+                                  onClick: () => {
+                                    setModalQuantities((prev) => ({
+                                      ...prev,
+                                      [modalColor]: {
+                                        ...prev[modalColor],
+                                        [size]: Math.max(0, (prev[modalColor]?.[size] || 0) - 1)
+                                      }
+                                    }));
+                                  },
+                                  style: {
+                                    width: "32px",
+                                    height: "32px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "6px",
+                                    backgroundColor: "white",
+                                    cursor: "pointer",
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    color: "#666"
+                                  },
+                                  children: "-"
+                                }
+                              ),
+                              /* @__PURE__ */ jsx3("span", { style: {
+                                minWidth: "24px",
+                                textAlign: "center",
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                color: currentQuantity > 0 ? "#5c6ac4" : "#999"
+                              }, children: currentQuantity }),
+                              /* @__PURE__ */ jsx3(
+                                "button",
+                                {
+                                  onClick: () => {
+                                    setModalQuantities((prev) => ({
+                                      ...prev,
+                                      [modalColor]: {
+                                        ...prev[modalColor],
+                                        [size]: Math.min(99, (prev[modalColor]?.[size] || 0) + 1)
+                                      }
+                                    }));
+                                  },
+                                  style: {
+                                    width: "32px",
+                                    height: "32px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "6px",
+                                    backgroundColor: "white",
+                                    cursor: "pointer",
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    color: "#666"
+                                  },
+                                  children: "+"
+                                }
+                              )
+                            ] })
+                          ]
+                        },
+                        size
+                      );
+                    })
+                  ] }),
+                  /* @__PURE__ */ jsx3(
                     "div",
                     {
                       style: {
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "12px 16px",
-                        marginBottom: "8px",
-                        backgroundColor: currentQuantity > 0 ? "#f0f2ff" : "#f8f9fa",
+                        padding: "16px",
+                        backgroundColor: "#f0f2ff",
                         borderRadius: "8px",
-                        border: currentQuantity > 0 ? "2px solid #5c6ac4" : "2px solid transparent"
+                        marginBottom: "24px"
                       },
-                      children: [
-                        /* @__PURE__ */ jsx3("span", { style: { fontWeight: "500", fontSize: "16px", color: "#333" }, children: size }),
-                        /* @__PURE__ */ jsxs2("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-                          /* @__PURE__ */ jsx3(
-                            "button",
-                            {
-                              onClick: () => {
-                                setModalQuantities((prev) => ({
-                                  ...prev,
-                                  [modalColor]: {
-                                    ...prev[modalColor],
-                                    [size]: Math.max(0, (prev[modalColor]?.[size] || 0) - 1)
-                                  }
-                                }));
-                              },
-                              style: {
-                                width: "32px",
-                                height: "32px",
-                                border: "1px solid #ddd",
-                                borderRadius: "6px",
-                                backgroundColor: "white",
-                                cursor: "pointer",
-                                fontSize: "18px",
-                                fontWeight: "bold",
-                                color: "#666"
-                              },
-                              children: "-"
-                            }
-                          ),
-                          /* @__PURE__ */ jsx3("span", { style: {
-                            minWidth: "24px",
-                            textAlign: "center",
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            color: currentQuantity > 0 ? "#5c6ac4" : "#999"
-                          }, children: currentQuantity }),
-                          /* @__PURE__ */ jsx3(
-                            "button",
-                            {
-                              onClick: () => {
-                                setModalQuantities((prev) => ({
-                                  ...prev,
-                                  [modalColor]: {
-                                    ...prev[modalColor],
-                                    [size]: Math.min(99, (prev[modalColor]?.[size] || 0) + 1)
-                                  }
-                                }));
-                              },
-                              style: {
-                                width: "32px",
-                                height: "32px",
-                                border: "1px solid #ddd",
-                                borderRadius: "6px",
-                                backgroundColor: "white",
-                                cursor: "pointer",
-                                fontSize: "18px",
-                                fontWeight: "bold",
-                                color: "#666"
-                              },
-                              children: "+"
-                            }
-                          )
+                      children: /* @__PURE__ */ jsxs2("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
+                        /* @__PURE__ */ jsx3("span", { style: { fontWeight: "bold", fontSize: "16px", color: "#333" }, children: "\u5408\u8A08" }),
+                        /* @__PURE__ */ jsxs2("span", { style: { fontWeight: "bold", fontSize: "20px", color: "#5c6ac4" }, children: [
+                          Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0),
+                          " \u70B9"
                         ] })
-                      ]
-                    },
-                    size
-                  );
-                })
-              ] }),
-              /* @__PURE__ */ jsx3(
-                "div",
-                {
-                  style: {
-                    padding: "16px",
-                    backgroundColor: "#f0f2ff",
-                    borderRadius: "8px",
-                    marginBottom: "24px"
-                  },
-                  children: /* @__PURE__ */ jsxs2("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
-                    /* @__PURE__ */ jsx3("span", { style: { fontWeight: "bold", fontSize: "16px", color: "#333" }, children: "\u5408\u8A08" }),
-                    /* @__PURE__ */ jsxs2("span", { style: { fontWeight: "bold", fontSize: "20px", color: "#5c6ac4" }, children: [
-                      Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0),
-                      " \u70B9"
-                    ] })
+                      ] })
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "12px" }, children: [
+                    /* @__PURE__ */ jsx3(
+                      "button",
+                      {
+                        onClick: closeCartModal,
+                        style: {
+                          flex: 1,
+                          padding: "14px",
+                          border: "2px solid #ddd",
+                          borderRadius: "8px",
+                          backgroundColor: "white",
+                          color: "#666",
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                          cursor: "pointer"
+                        },
+                        children: "\u30AD\u30E3\u30F3\u30BB\u30EB"
+                      }
+                    ),
+                    /* @__PURE__ */ jsx3(
+                      "button",
+                      {
+                        onClick: handleAddToCartMultiple,
+                        disabled: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0,
+                        style: {
+                          flex: 1,
+                          padding: "14px",
+                          border: "none",
+                          borderRadius: "8px",
+                          backgroundColor: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0 ? "#ccc" : "#5c6ac4",
+                          color: "white",
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                          cursor: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0 ? "not-allowed" : "pointer"
+                        },
+                        children: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
+                      }
+                    )
                   ] })
-                }
-              ),
-              /* @__PURE__ */ jsxs2("div", { style: { display: "flex", gap: "12px" }, children: [
-                /* @__PURE__ */ jsx3(
-                  "button",
-                  {
-                    onClick: closeCartModal,
-                    style: {
-                      flex: 1,
-                      padding: "14px",
-                      border: "2px solid #ddd",
-                      borderRadius: "8px",
-                      backgroundColor: "white",
-                      color: "#666",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      cursor: "pointer"
-                    },
-                    children: "\u30AD\u30E3\u30F3\u30BB\u30EB"
-                  }
-                ),
-                /* @__PURE__ */ jsx3(
-                  "button",
-                  {
-                    onClick: handleAddToCartMultiple,
-                    disabled: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0,
-                    style: {
-                      flex: 1,
-                      padding: "14px",
-                      border: "none",
-                      borderRadius: "8px",
-                      backgroundColor: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0 ? "#ccc" : "#5c6ac4",
-                      color: "white",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      cursor: Object.values(modalQuantities).reduce((colorQty, sizes2) => colorQty + Object.values(sizes2).reduce((sum, qty) => sum + qty, 0), 0) === 0 ? "not-allowed" : "pointer"
-                    },
-                    children: "\u30AB\u30FC\u30C8\u306B\u8FFD\u52A0"
-                  }
-                )
-              ] })
-            ]
+                ]
+              }
+            )
           }
         )
-      }
-    )
-  ] }) : /* @__PURE__ */ jsxs2("div", { style: { padding: "60px", textAlign: "center" }, children: [
+      ]
+    }
+  ) : /* @__PURE__ */ jsxs2("div", { style: { padding: "60px", textAlign: "center" }, children: [
     /* @__PURE__ */ jsx3("h2", { children: "\u23F3 \u8AAD\u307F\u8FBC\u307F\u4E2D..." }),
     /* @__PURE__ */ jsx3("p", { style: { color: "#666", marginTop: "20px" }, children: "Fabric.js\u30E9\u30A4\u30D6\u30E9\u30EA\u3092\u8AAD\u307F\u8FBC\u3093\u3067\u3044\u307E\u3059..." }),
     /* @__PURE__ */ jsx3("div", { style: {
@@ -3322,7 +3449,7 @@ function getProductById(id) {
 }
 
 // app/routes/customize.tsx
-import { jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
+import { jsx as jsx4 } from "react/jsx-runtime";
 var meta = () => [
   { title: "\u30C7\u30B6\u30A4\u30F3\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA | PrintAIze" },
   {
@@ -3341,74 +3468,19 @@ async function loader2({ request }) {
 }
 function Customize() {
   let { product } = useLoaderData2();
-  return /* @__PURE__ */ jsxs3(
-    "div",
+  return /* @__PURE__ */ jsx4(
+    motion2.div,
     {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
       style: {
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif",
         minHeight: "100vh",
-        backgroundColor: "#f5f5f5"
+        backgroundColor: "#ffffff",
+        position: "relative"
       },
-      children: [
-        /* @__PURE__ */ jsx4(
-          "header",
-          {
-            style: {
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              padding: "20px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
-            },
-            children: /* @__PURE__ */ jsxs3("div", { style: { maxWidth: "1600px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
-              /* @__PURE__ */ jsxs3("div", { children: [
-                /* @__PURE__ */ jsxs3("h1", { style: { margin: 0, fontSize: "24px", fontWeight: "bold" }, children: [
-                  "\u{1F3A8} ",
-                  product.name
-                ] }),
-                /* @__PURE__ */ jsx4("p", { style: { margin: "5px 0 0", opacity: 0.95, fontSize: "14px" }, children: product.description })
-              ] }),
-              /* @__PURE__ */ jsx4(
-                Link,
-                {
-                  to: "/",
-                  style: {
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    color: "white",
-                    padding: "10px 20px",
-                    borderRadius: "8px",
-                    textDecoration: "none",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    transition: "all 0.2s"
-                  },
-                  onMouseEnter: (e) => {
-                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.3)";
-                  },
-                  onMouseLeave: (e) => {
-                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.2)";
-                  },
-                  children: "\u2190 \u5546\u54C1\u3092\u5909\u66F4"
-                }
-              )
-            ] })
-          }
-        ),
-        /* @__PURE__ */ jsx4("main", { style: { padding: "20px 0" }, children: /* @__PURE__ */ jsx4(PrintAIze, { product }) }),
-        /* @__PURE__ */ jsx4(
-          "footer",
-          {
-            style: {
-              background: "linear-gradient(135deg, #434343 0%, #000000 100%)",
-              color: "white",
-              padding: "30px 20px",
-              textAlign: "center",
-              marginTop: "60px"
-            },
-            children: /* @__PURE__ */ jsx4("div", { style: { maxWidth: "1600px", margin: "0 auto" }, children: /* @__PURE__ */ jsx4("p", { style: { margin: 0, opacity: 0.8 }, children: "\xA9 2026 PrintAIze | Powered by AI & Shopify" }) })
-          }
-        )
-      ]
+      children: /* @__PURE__ */ jsx4(PrintAIze, { product })
     }
   );
 }
@@ -3419,8 +3491,8 @@ __export(index_exports, {
   default: () => Index,
   meta: () => meta2
 });
-import { Link as Link2 } from "@remix-run/react";
-import { jsx as jsx5, jsxs as jsxs4 } from "react/jsx-runtime";
+import { Link } from "@remix-run/react";
+import { jsx as jsx5, jsxs as jsxs3 } from "react/jsx-runtime";
 var meta2 = () => [
   { title: "\u5546\u54C1\u3092\u9078\u629E | PrintAIze" },
   {
@@ -3429,7 +3501,7 @@ var meta2 = () => [
   }
 ];
 function Index() {
-  return /* @__PURE__ */ jsxs4(
+  return /* @__PURE__ */ jsxs3(
     "div",
     {
       style: {
@@ -3447,14 +3519,14 @@ function Index() {
               padding: "40px 20px",
               boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
             },
-            children: /* @__PURE__ */ jsxs4("div", { style: { maxWidth: "1200px", margin: "0 auto", textAlign: "center" }, children: [
+            children: /* @__PURE__ */ jsxs3("div", { style: { maxWidth: "1200px", margin: "0 auto", textAlign: "center" }, children: [
               /* @__PURE__ */ jsx5("h1", { style: { margin: 0, fontSize: "36px", fontWeight: "bold" }, children: "\u{1F3A8} PrintAIze" }),
               /* @__PURE__ */ jsx5("p", { style: { margin: "15px 0 0", opacity: 0.95, fontSize: "18px" }, children: "\u4E16\u754C\u306B\u4E00\u3064\u3060\u3051\u306E\u30AA\u30EA\u30B8\u30CA\u30EB\u30C7\u30B6\u30A4\u30F3\u3092\u4F5C\u6210\u3057\u3088\u3046" })
             ] })
           }
         ),
-        /* @__PURE__ */ jsxs4("main", { style: { padding: "60px 20px", maxWidth: "1200px", margin: "0 auto" }, children: [
-          /* @__PURE__ */ jsxs4("div", { style: { textAlign: "center", marginBottom: "50px" }, children: [
+        /* @__PURE__ */ jsxs3("main", { style: { padding: "60px 20px", maxWidth: "1200px", margin: "0 auto" }, children: [
+          /* @__PURE__ */ jsxs3("div", { style: { textAlign: "center", marginBottom: "50px" }, children: [
             /* @__PURE__ */ jsx5("h2", { style: { fontSize: "28px", color: "#333", marginBottom: "15px" }, children: "\u5546\u54C1\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044" }),
             /* @__PURE__ */ jsx5("p", { style: { color: "#666", fontSize: "16px" }, children: "T\u30B7\u30E3\u30C4\u30FB\u30B9\u30A6\u30A7\u30C3\u30C8\u5546\u54C1\u306F\u7537\u5973\u517C\u7528\uFF08\u30E6\u30CB\u30BB\u30C3\u30AF\u30B9\uFF09\u3067\u3059" })
           ] }),
@@ -3468,11 +3540,11 @@ function Index() {
                 marginBottom: "60px"
               },
               children: products.map((product) => /* @__PURE__ */ jsx5(
-                Link2,
+                Link,
                 {
                   to: `/customize?product=${product.id}`,
                   style: { textDecoration: "none" },
-                  children: /* @__PURE__ */ jsxs4(
+                  children: /* @__PURE__ */ jsxs3(
                     "div",
                     {
                       style: {
@@ -3491,7 +3563,7 @@ function Index() {
                         e.currentTarget.style.transform = "translateY(0)", e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)", e.currentTarget.style.borderColor = "transparent";
                       },
                       children: [
-                        /* @__PURE__ */ jsxs4(
+                        /* @__PURE__ */ jsxs3(
                           "div",
                           {
                             style: {
@@ -3542,7 +3614,7 @@ function Index() {
                             ]
                           }
                         ),
-                        /* @__PURE__ */ jsxs4("div", { style: { padding: "24px" }, children: [
+                        /* @__PURE__ */ jsxs3("div", { style: { padding: "24px" }, children: [
                           /* @__PURE__ */ jsx5(
                             "h3",
                             {
@@ -3567,7 +3639,7 @@ function Index() {
                               children: product.description
                             }
                           ),
-                          /* @__PURE__ */ jsxs4("div", { style: { marginBottom: "15px" }, children: [
+                          /* @__PURE__ */ jsxs3("div", { style: { marginBottom: "15px" }, children: [
                             /* @__PURE__ */ jsx5("div", { style: { fontSize: "12px", color: "#999", marginBottom: "8px" }, children: "\u30AB\u30E9\u30FC:" }),
                             /* @__PURE__ */ jsx5("div", { style: { display: "flex", gap: "8px" }, children: product.colors.map((color) => /* @__PURE__ */ jsx5(
                               "div",
@@ -3585,7 +3657,7 @@ function Index() {
                               color.name
                             )) })
                           ] }),
-                          /* @__PURE__ */ jsxs4(
+                          /* @__PURE__ */ jsxs3(
                             "div",
                             {
                               style: {
@@ -3596,7 +3668,7 @@ function Index() {
                                 borderTop: "1px solid #eee"
                               },
                               children: [
-                                /* @__PURE__ */ jsxs4("span", { style: { fontSize: "24px", fontWeight: "bold", color: "#667eea" }, children: [
+                                /* @__PURE__ */ jsxs3("span", { style: { fontSize: "24px", fontWeight: "bold", color: "#667eea" }, children: [
                                   "\xA5",
                                   product.price.toLocaleString()
                                 ] }),
@@ -3623,7 +3695,7 @@ function Index() {
               ))
             }
           ),
-          /* @__PURE__ */ jsxs4(
+          /* @__PURE__ */ jsxs3(
             "div",
             {
               style: {
@@ -3634,7 +3706,7 @@ function Index() {
               },
               children: [
                 /* @__PURE__ */ jsx5("h3", { style: { textAlign: "center", fontSize: "24px", marginBottom: "40px", color: "#333" }, children: "\u2728 \u30AB\u30B9\u30BF\u30DE\u30A4\u30BA\u6A5F\u80FD" }),
-                /* @__PURE__ */ jsxs4(
+                /* @__PURE__ */ jsxs3(
                   "div",
                   {
                     style: {
@@ -3643,22 +3715,22 @@ function Index() {
                       gap: "30px"
                     },
                     children: [
-                      /* @__PURE__ */ jsxs4("div", { style: { textAlign: "center" }, children: [
+                      /* @__PURE__ */ jsxs3("div", { style: { textAlign: "center" }, children: [
                         /* @__PURE__ */ jsx5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u{1F916}" }),
                         /* @__PURE__ */ jsx5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "AI\u753B\u50CF\u751F\u6210" }),
                         /* @__PURE__ */ jsx5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u30C6\u30AD\u30B9\u30C8\u304B\u3089\u753B\u50CF\u3092\u751F\u6210\u3057\u3066\u3001\u30AA\u30EA\u30B8\u30CA\u30EB\u30C7\u30B6\u30A4\u30F3\u3092\u4F5C\u6210" })
                       ] }),
-                      /* @__PURE__ */ jsxs4("div", { style: { textAlign: "center" }, children: [
+                      /* @__PURE__ */ jsxs3("div", { style: { textAlign: "center" }, children: [
                         /* @__PURE__ */ jsx5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u{1F4F7}" }),
                         /* @__PURE__ */ jsx5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "\u5199\u771F\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9" }),
                         /* @__PURE__ */ jsx5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u304A\u6C17\u306B\u5165\u308A\u306E\u5199\u771F\u3092\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u3057\u3066\u81EA\u7531\u306B\u914D\u7F6E" })
                       ] }),
-                      /* @__PURE__ */ jsxs4("div", { style: { textAlign: "center" }, children: [
+                      /* @__PURE__ */ jsxs3("div", { style: { textAlign: "center" }, children: [
                         /* @__PURE__ */ jsx5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u270F\uFE0F" }),
                         /* @__PURE__ */ jsx5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "\u30C6\u30AD\u30B9\u30C8\u8FFD\u52A0" }),
                         /* @__PURE__ */ jsx5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u30D5\u30A9\u30F3\u30C8\u30FB\u30B5\u30A4\u30BA\u30FB\u8272\u3092\u81EA\u7531\u306B\u30AB\u30B9\u30BF\u30DE\u30A4\u30BA" })
                       ] }),
-                      /* @__PURE__ */ jsxs4("div", { style: { textAlign: "center" }, children: [
+                      /* @__PURE__ */ jsxs3("div", { style: { textAlign: "center" }, children: [
                         /* @__PURE__ */ jsx5("div", { style: { fontSize: "48px", marginBottom: "15px" }, children: "\u{1F3A8}" }),
                         /* @__PURE__ */ jsx5("h4", { style: { fontSize: "18px", marginBottom: "10px", color: "#333" }, children: "\u30D5\u30A3\u30EB\u30BF\u30FC\u52B9\u679C" }),
                         /* @__PURE__ */ jsx5("p", { style: { fontSize: "14px", color: "#666", lineHeight: "1.6" }, children: "\u30B0\u30EC\u30FC\u30B9\u30B1\u30FC\u30EB\u3001\u30BB\u30D4\u30A2\u3001\u660E\u308B\u3055\u8ABF\u6574\u306A\u3069" })
@@ -3680,7 +3752,7 @@ function Index() {
               textAlign: "center",
               marginTop: "60px"
             },
-            children: /* @__PURE__ */ jsxs4("div", { style: { maxWidth: "1200px", margin: "0 auto" }, children: [
+            children: /* @__PURE__ */ jsxs3("div", { style: { maxWidth: "1200px", margin: "0 auto" }, children: [
               /* @__PURE__ */ jsx5("h3", { style: { marginTop: 0, fontSize: "20px" }, children: "\u2728 AI\u753B\u50CF\u751F\u6210 \xD7 Shopify" }),
               /* @__PURE__ */ jsx5("p", { style: { margin: "10px 0", opacity: 0.8 }, children: "Powered by Replicate AI & Shopify Storefront API" }),
               /* @__PURE__ */ jsx5("p", { style: { margin: "20px 0 0", fontSize: "14px", opacity: 0.6 }, children: "\xA9 2026 PrintAIze | All Rights Reserved" })
@@ -3693,7 +3765,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-APCDOICC.js", imports: ["/build/_shared/chunk-4G2AVHG4.js", "/build/_shared/chunk-Q3IECNXJ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-C2BYF5BU.js", imports: ["/build/_shared/chunk-PGOH7JLP.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-WRGN5J6B.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-3OAHNCES.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-RGR2YX5K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-SBHTVHCW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-7WMWW6SL.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-HKEEMJ2K.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-OVA5H57A.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "4c0aaccb", hmr: void 0, url: "/build/manifest-4C0AACCB.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-ZIWZUGLD.js", imports: ["/build/_shared/chunk-PPZXRGV2.js", "/build/_shared/chunk-2QEWK57A.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-JG2XVTTD.js", imports: ["/build/_shared/chunk-5VJRENMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-EULQR4BC.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-5PJLXWBB.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart-multiple": { id: "routes/api.add-to-cart-multiple", parentId: "root", path: "api/add-to-cart-multiple", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-multiple-NSM6XVZW.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cloudinary-signature": { id: "routes/api.cloudinary-signature", parentId: "root", path: "api/cloudinary-signature", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cloudinary-signature-PYFPVBJG.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.generate-image": { id: "routes/api.generate-image", parentId: "root", path: "api/generate-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.generate-image-S34GWRTD.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.upload-image": { id: "routes/api.upload-image", parentId: "root", path: "api/upload-image", index: void 0, caseSensitive: void 0, module: "/build/routes/api.upload-image-5NVESI3N.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/customize": { id: "routes/customize", parentId: "root", path: "customize", index: void 0, caseSensitive: void 0, module: "/build/routes/customize-YRAM3FKN.js", imports: ["/build/_shared/chunk-MW6VZF3Z.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "ecf96ec4", hmr: void 0, url: "/build/manifest-ECF96EC4.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "production", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

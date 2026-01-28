@@ -1,6 +1,6 @@
 /**
  * PrintAIze カスタマイザーコンポーネント
- * AIを活用したオリジナルプリントデザイン作成ツール
+ * Apple風インタラクティブデザイン
  * 
  * 機能:
  * - 画像アップロード＆編集
@@ -9,9 +9,15 @@
  * - フィルター適用
  * - 履歴管理（元に戻す/やり直し）
  * - Shopifyカートに追加
+ * 
+ * デザイン:
+ * - 2カラムレイアウト（デスクトップ）
+ * - タブ切り替え（Framer Motion）
+ * - Apple風アニメーション
  */
 
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Product } from "~/lib/products";
 
 interface PrintAIzeProps {
@@ -315,6 +321,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     vertical: number | null;   // 縦ガイドのX座標
     horizontal: number | null; // 横ガイドのY座標
   }>({ vertical: null, horizontal: null });
+  
+  // タブ状態（Apple風デザイン用）
+  type TabType = "item" | "ai" | "images" | "text";
+  const [activeTab, setActiveTab] = useState<TabType>("item");
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   
   // ズーム時のESCキーハンドラー
   useEffect(() => {
@@ -2825,109 +2836,230 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   }
   
   return (
-    <div style={{ 
-      width: "100%", 
-      maxWidth: "1600px",
-      margin: "0 auto", 
-      padding: 0 
-    }}>
-      {/* 商品情報バナー */}
-      <div style={{
-        backgroundColor: "white",
-        borderRadius: "0",
-        padding: isMobile ? "20px" : "40px 30px",
-        marginBottom: "0",
-        borderBottom: "1px solid #e0e0e0",
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+      style={{ 
+        width: "100%", 
+        height: "100vh",
+        margin: "0 auto", 
+        padding: 0,
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: isMobile ? "flex-start" : "center",
-        flexWrap: "wrap",
-        gap: "20px",
-      }}>
-        <div style={{ flex: "1 1 300px" }}>
-          <h2 style={{ 
+        flexDirection: isMobile ? "column" : "row",
+        overflow: "hidden",
+        backgroundColor: "#ffffff",
+      }}
+    >
+      {/* 左カラム: タブ + コンテンツ */}
+      <motion.div
+        style={{
+          width: isMobile ? "100%" : "40%",
+          height: isMobile ? "auto" : "100vh",
+          backgroundColor: "#ffffff",
+          borderRight: isMobile ? "none" : "1px solid #f0f0f0",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        {/* 商品情報ヘッダー */}
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          style={{
+            padding: isMobile ? "24px 20px" : "40px",
+            borderBottom: "1px solid #f0f0f0",
+          }}
+        >
+          <h1 style={{ 
             margin: 0, 
-            fontSize: isMobile ? "16px" : "18px",
-            fontWeight: "400",
-            letterSpacing: "0.05em",
-            color: "#1a1a1a",
-            textTransform: "uppercase"
+            fontSize: isMobile ? "24px" : "32px",
+            fontWeight: "600",
+            letterSpacing: "-0.02em",
+            color: "#1d1d1f",
+            lineHeight: 1.2,
           }}>
             {product.name}
-          </h2>
+          </h1>
           <div style={{ 
-            marginTop: "15px", 
-            display: "flex", 
-            gap: "20px", 
-            alignItems: "center",
-            fontSize: "12px",
-            letterSpacing: "0.03em",
+            marginTop: "8px", 
+            fontSize: isMobile ? "14px" : "16px",
+            color: "#6e6e73",
+            lineHeight: 1.5,
           }}>
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "8px",
-            }}>
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  backgroundColor: selectedColor.hex,
-                  border: selectedColor.hex === '#FFFFFF' || selectedColor.hex === '#F5F5DC'
-                    ? '1px solid #d0d0d0' 
-                    : '1px solid rgba(0,0,0,0.1)',
-                }}
-              />
-              <span style={{ color: "#4a4a4a", fontWeight: "400" }}>
-                {selectedColor.name}
-              </span>
-            </div>
-            <div style={{ 
-              color: "#4a4a4a",
-              fontWeight: "400",
-            }}>
-              サイズ: {selectedSize}
-            </div>
+            {product.description}
           </div>
-        </div>
-        <div style={{ textAlign: "right" }}>
           <div style={{ 
-            fontSize: isMobile ? "20px" : "24px", 
-            fontWeight: "300", 
-            letterSpacing: "0.02em",
-            color: "#1a1a1a" 
+            marginTop: "16px", 
+            fontSize: isMobile ? "28px" : "32px", 
+            fontWeight: "600", 
+            color: "#1d1d1f",
+            letterSpacing: "-0.01em",
           }}>
             ¥{product.price.toLocaleString()}
+            <span style={{ fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }}>
+              税込
+            </span>
           </div>
-          <div style={{ 
-            fontSize: "11px", 
-            color: "#888", 
-            marginTop: "6px",
-            letterSpacing: "0.05em" 
-          }}>
-            税込
-          </div>
-        </div>
-      </div>
+        </motion.div>
 
-      <div style={{ 
-        display: "flex", 
-        flexDirection: isMobile ? "column" : "row",
-        gap: "0", 
-        width: "100%", 
-        margin: 0, 
-        alignItems: "flex-start",
-        backgroundColor: "white",
-        overflowX: "hidden",
-        overflowY: "auto",
-      }}>
-        {/* 左側: キャンバスエリア */}
-        <div style={{ 
-          flex: isMobile ? "none" : "1 1 65%", 
-          minWidth: "0", 
-          width: isMobile ? "100%" : "65%",
-          backgroundColor: "white" 
+        {/* タブメニュー */}
+        <motion.div
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          style={{
+            display: "flex",
+            gap: "8px",
+            padding: isMobile ? "16px 20px" : "20px 40px",
+            borderBottom: "1px solid #f0f0f0",
+            flexWrap: "wrap",
+          }}
+        >
+          {[
+            { id: "item" as TabType, label: "アイテム" },
+            { id: "ai" as TabType, label: "AI画像生成" },
+            { id: "images" as TabType, label: "画像管理" },
+            { id: "text" as TabType, label: "テキスト" },
+          ].map((tab) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                if (isMobile) setIsOverlayOpen(true);
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "980px",
+                border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
+                backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
+                color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
+                fontSize: "14px",
+                fontWeight: "500",
+                cursor: "pointer",
+                transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {tab.label}
+            </motion.button>
+          ))}
+        </motion.div>
+
+        {/* タブコンテンツ（スクロール可能） */}
+        <div style={{
+          flex: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          padding: isMobile ? "20px" : "40px",
+        }}>
+          <AnimatePresence mode="wait">
+            {activeTab === "item" && (
+              <motion.div
+                key="item"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }}>
+                  こちらはテストテキストです。商品の詳細情報や選択オプションを将来的に追加予定です。
+                </p>
+              </motion.div>
+            )}
+            {activeTab === "ai" && (
+              <motion.div
+                key="ai"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* AI生成コンテンツは後で追加 */}
+                <p>AI画像生成機能（実装予定）</p>
+              </motion.div>
+            )}
+            {activeTab === "images" && (
+              <motion.div
+                key="images"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* 画像管理コンテンツは後で追加 */}
+                <p>画像管理機能（実装予定）</p>
+              </motion.div>
+            )}
+            {activeTab === "text" && (
+              <motion.div
+                key="text"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* テキスト編集コンテンツは後で追加 */}
+                <p>テキスト編集機能（実装予定）</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* カートに追加ボタン */}
+        <motion.div
+          style={{
+            padding: isMobile ? "20px" : "40px",
+            borderTop: "1px solid #f0f0f0",
+          }}
+        >
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              width: "100%",
+              padding: "16px 24px",
+              borderRadius: "12px",
+              border: "none",
+              backgroundColor: "#0071e3",
+              color: "#ffffff",
+              fontSize: "17px",
+              fontWeight: "500",
+              cursor: "pointer",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            カートに追加
+          </motion.button>
+        </motion.div>
+      </motion.div>
+
+      {/* 右カラム: Tシャツモックアップ */}
+      <motion.div
+        initial={{ x: 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
+        style={{
+          width: isMobile ? "100%" : "60%",
+          height: isMobile ? "60vh" : "100vh",
+          backgroundColor: "#f5f5f7",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          padding: isMobile ? "20px" : "40px",
+        }}
+      >
+        {/* キャンバスコンテナ */}
+        <div style={{
+          width: "100%",
+          maxWidth: "min(800px, 100%)",
+          aspectRatio: "1 / 1",
+          position: "relative",
         }}>
           <div style={{ 
             display: "flex", 
@@ -3760,7 +3892,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
       
       {/* 著作権モーダル */}
       {showCopyrightModal && (
@@ -4155,7 +4287,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
