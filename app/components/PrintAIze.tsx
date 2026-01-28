@@ -401,8 +401,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
   // ========== ステップ1.5: Fabric.js読み込み待機 ==========
   useEffect(() => {
-    console.log('🔵 Fabric.js読み込みチェック開始');
-    
     // Fabric.jsがグローバルに読み込まれるまで待つ
     let checkCount = 0;
     let isLoaded = false;
@@ -410,7 +408,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     const checkFabric = setInterval(() => {
       checkCount++;
       if (typeof window !== 'undefined' && typeof (window as any).fabric !== 'undefined') {
-        console.log('✅ Fabric.js読み込み成功！（' + checkCount + '回目のチェック）');
         isLoaded = true;
         setFabricLoaded(true);
         clearInterval(checkFabric);
@@ -421,8 +418,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     const timeout = setTimeout(() => {
       clearInterval(checkFabric);
       if (!isLoaded) {
-        console.error('❌ Fabric.jsの読み込みに失敗しました（10秒タイムアウト）');
-        console.error('window.fabric:', typeof (window as any).fabric);
+        console.error('❌ Fabric.jsの読み込みに失敗しました');
       }
     }, 10000);
 
@@ -623,12 +619,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     // Fabric.jsのcanvasWrapperを取得（upper-canvasとlower-canvasを含む親要素）
     const canvasWrapper = canvas.wrapperEl;
     
-    console.log('📍 Canvas wrapper:', canvasWrapper);
-    console.log('📍 Upper canvas:', canvas.upperCanvasEl);
-    console.log('📍 Lower canvas:', canvasElement);
-    
     if (isMobileDevice && canvasWrapper) {
       let lastDistance = 0;
+      let initialDistance = 0;  // 初回の距離を保存
+      let initialScale = { x: 1, y: 1 };  // 初回のスケールを保存
       let lastAngle = 0;
       let isGesture = false;
       let lastCenter = { x: 0, y: 0 };
@@ -653,19 +647,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       };
       
       const handleTouchStart = (e: TouchEvent) => {
-        console.log('🔵 Touch start - fingers:', e.touches.length, 'target:', e.target);
-        console.log('🔵 Canvas objects count:', canvas.getObjects().length);
-        
         if (e.touches.length === 2) {
           // 2本指タッチ時はページズームを無効化
           canvasWrapper.style.touchAction = 'none';
           
           isGesture = true;
           let activeObject = canvas.getActiveObject();
-          
-          console.log('🔵 2 fingers detected!');
-          console.log('🔵 Active object:', activeObject?.type, activeObject?.name);
-          console.log('🔵 All objects:', canvas.getObjects().map((o: any) => ({ type: o.type, name: o.name })));
           
           // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
           if (!activeObject || activeObject.name === 'printArea') {
@@ -677,18 +664,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               y: (touch1.clientY - rect.top) * canvasScale,
             };
             
-            console.log('🔵 Touch position:', pointer);
-            
             // タッチ位置にあるオブジェクトを検索
             const target = canvas.findTarget(e as any, false);
-            console.log('🔵 Found target:', target?.type, target?.name);
             
             if (target && target.name !== 'printArea') {
               canvas.setActiveObject(target);
               activeObject = target;
-              console.log('✅ Auto-selected object:', activeObject.type);
-            } else {
-              console.log('❌ No target found at touch position');
             }
           }
           
@@ -697,11 +678,17 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             e.stopPropagation();
             e.stopImmediatePropagation();
             
-            console.log('✅ Starting pinch gesture on:', activeObject.type);
-            
-            lastDistance = getTouchDistance(e.touches[0], e.touches[1]);
+            // 初回の距離とスケールを保存
+            initialDistance = getTouchDistance(e.touches[0], e.touches[1]);
+            lastDistance = initialDistance;
+            initialScale = {
+              x: activeObject.scaleX || 1,
+              y: activeObject.scaleY || 1,
+            };
             lastAngle = getTouchAngle(e.touches[0], e.touches[1]);
             lastCenter = getTouchCenter(e.touches[0], e.touches[1]);
+            
+            console.log('✅ Starting pinch - initialDistance:', initialDistance, 'initialScale:', initialScale);
             
             // PCの場合のみコントロールを一時非表示（スマホは最初から非表示）
             if (activeObject.hasControls) {
@@ -718,8 +705,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               });
             }
             canvas.renderAll();
-          } else {
-            console.log('❌ No valid object to pinch (activeObject:', activeObject?.name, ')');
           }
         }
       };
@@ -744,14 +729,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             }
             lastCenter = currentCenter;
             
-            // ピンチイン・ピンチアウト（拡大縮小）
+            // ピンチイン・ピンチアウト（拡大縮小）- 初期距離からの相対的な変化を計算
             const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-            if (lastDistance > 0) {
-              const scale = currentDistance / lastDistance;
-              const newScaleX = (activeObject.scaleX || 1) * scale;
-              const newScaleY = (activeObject.scaleY || 1) * scale;
+            if (initialDistance > 0) {
+              // 初期距離からの倍率を計算
+              const scaleRatio = currentDistance / initialDistance;
+              const newScaleX = initialScale.x * scaleRatio;
+              const newScaleY = initialScale.y * scaleRatio;
               
-              console.log('🟢 Pinching - scale:', scale.toFixed(2), 'newScale:', newScaleX.toFixed(2));
+              console.log('🟢 Pinching - ratio:', scaleRatio.toFixed(2), 'newScale:', newScaleX.toFixed(2));
               
               // 最小・最大サイズ制限
               if (newScaleX > 0.1 && newScaleX < 10 && newScaleY > 0.1 && newScaleY < 10) {
@@ -759,7 +745,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 activeObject.scaleY = newScaleY;
               }
             }
-            lastDistance = currentDistance;
             
             // 回転
             const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
@@ -795,13 +780,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       
       const handleTouchEnd = (e: TouchEvent) => {
         if (e.touches.length < 2) {
-          console.log('🔵 Touch end - gesture complete');
-          
           // touchActionを元に戻す
           canvasWrapper.style.touchAction = 'pan-y';
           
           isGesture = false;
           lastDistance = 0;
+          initialDistance = 0;
+          initialScale = { x: 1, y: 1 };
           lastAngle = 0;
           lastCenter = { x: 0, y: 0 };
           
@@ -829,36 +814,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         }
       };
       
-      // デバッグ用：全てのタッチイベントをログ
-      const debugTouchStart = (e: TouchEvent) => {
-        console.log('🟡 DEBUG: touchstart on canvasWrapper, fingers:', e.touches.length, 'element:', e.currentTarget);
-      };
-      
       // キャプチャフェーズで処理（Fabric.jsより先に実行される）
       // canvasWrapperにイベントリスナーを追加（upper-canvasとlower-canvasを両方カバー）
-      canvasWrapper.addEventListener('touchstart', debugTouchStart, { passive: false, capture: true });
       canvasWrapper.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
       canvasWrapper.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
       canvasWrapper.addEventListener('touchend', handleTouchEnd, { capture: true });
       touchListenersAdded = true;
-      
-      console.log('✅ Touch event listeners added to canvasWrapper (with capture phase)');
-      console.log('📍 Canvas wrapper:', canvasWrapper);
-      console.log('📍 Upper canvas:', canvas.upperCanvasEl);
-      console.log('📍 Lower canvas:', canvasElement);
-      
-      // デバッグ用：ウィンドウ全体でタッチイベントを監視
-      const windowTouchDebug = (e: TouchEvent) => {
-        if (e.touches.length === 2) {
-          console.log('🟠 Window detected 2 fingers!');
-          console.log('🟠 Touch target:', e.target);
-          console.log('🟠 Is canvasWrapper?', e.target === canvasWrapper || canvasWrapper.contains(e.target as Node));
-        }
-      };
-      window.addEventListener('touchstart', windowTouchDebug, { passive: false, capture: true });
-      
-      // クリーンアップ時にwindowのリスナーも削除
-      (canvas as any)._windowTouchDebug = windowTouchDebug;
       
       // クリーンアップ用の参照を保存
       (canvas as any)._touchHandlers = {
@@ -866,7 +827,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         start: handleTouchStart,
         move: handleTouchMove,
         end: handleTouchEnd,
-        debug: debugTouchStart,
       };
     }
 
@@ -1230,17 +1190,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // タッチイベントリスナーを削除（captureフェーズで追加したので、削除もcaptureで）
       if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._touchHandlers) {
         const handlers = (fabricCanvasRef.current as any)._touchHandlers;
-        if (handlers.debug) {
-          handlers.element.removeEventListener('touchstart', handlers.debug, { capture: true });
-        }
         handlers.element.removeEventListener('touchstart', handlers.start, { capture: true });
         handlers.element.removeEventListener('touchmove', handlers.move, { capture: true });
         handlers.element.removeEventListener('touchend', handlers.end, { capture: true });
-      }
-      
-      // windowのデバッグリスナーも削除
-      if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._windowTouchDebug) {
-        window.removeEventListener('touchstart', (fabricCanvasRef.current as any)._windowTouchDebug, { capture: true });
       }
       
       if (fabricCanvasRef.current) {
