@@ -3044,15 +3044,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             transition={{ delay: 0.2, duration: 0.6 }}
             style={{
               width: "100%",
-              backgroundColor: "#f5f5f7",
+              backgroundColor: "#fafafa",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              padding: "40px 20px",
+              padding: "0",
               position: "relative",
             }}
           >
-            <canvas ref={canvasRef} style={{ maxWidth: "100%", height: "auto" }} />
+            <canvas ref={canvasRef} style={{ width: "100%", height: "auto" }} />
           </motion.div>
         )}
         {/* 左カラム: タブ + コンテンツ */}
@@ -4606,7 +4606,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             style={{
               width: "60%",
               height: "100%",
-              backgroundColor: "#f5f5f7",
+              backgroundColor: "#fafafa",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -4619,7 +4619,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           className="canvas-container"
           style={{
             width: "100%",
-            maxWidth: "min(800px, 100%)",
             aspectRatio: "3 / 4",
             position: "relative",
           }}
@@ -4640,7 +4639,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 boxShadow: "none",
                 backgroundColor: "#fafafa",
                 width: "100%",
-                maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
                 margin: "0 auto",
                 position: "relative",
                 aspectRatio: "3 / 4",
