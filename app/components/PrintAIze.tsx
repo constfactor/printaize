@@ -4620,169 +4620,18 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             flex: 1,
             backgroundColor: "#fafafa",
             position: "relative",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "stretch",
-            justifyContent: "stretch",
           }}
         >
-          <div style={{ 
-            width: "100%",
-            height: "100%",
-            position: "relative",
-            touchAction: isMobile ? "pan-y" : "auto",
-          }}>
-              {/* ズームボタン */}
-              <button
-                onClick={() => {
-                  if (!fabricCanvasRef.current) return;
-                  const canvas = fabricCanvasRef.current;
-                  
-                  if (isZoomed) {
-                    // ズームアウト：元に戻す
-                    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-                    setIsZoomed(false);
-                  } else {
-                    // ズームイン：プリントエリアの中心にズーム
-                    const printArea = getPrintAreaInPixels(CANVAS_WIDTH, CANVAS_HEIGHT);
-                    
-                    // プリントエリアの中心座標
-                    const centerX = printArea.left + printArea.width / 2;
-                    const centerY = printArea.top + printArea.height / 2;
-                    
-                    // ズーム倍率（スマホ: 2倍、PC: 1.7倍）
-                    const zoom = isMobile ? 2.0 : 1.7;
-                    
-                    // ズーム後の表示位置を計算（プリントエリアが中央に来るように）
-                    const point = new (window as any).fabric.Point(centerX, centerY);
-                    canvas.zoomToPoint(point, zoom);
-                    
-                    setIsZoomed(true);
-                  }
-                  canvas.renderAll();
-                }}
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  border: "none",
-                  backgroundColor: "white",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 10,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.1)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                }}
-                title={isZoomed ? "元のサイズに戻す" : "プリントエリアを拡大"}
-              >
-                <Icon type={isZoomed ? "zoomIn" : "zoomOut"} size={20} color="#667eea" />
-              </button>
-              
-              <canvas 
-                ref={canvasRef} 
-                style={{ 
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                }} 
-              />
-              
-              {/* ゴミ箱（Instagram風） */}
-              {showTrash && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: isMobile ? "30px" : "40px",
-                    left: "50%",
-                    transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
-                    width: isMobile ? "70px" : "80px",
-                    height: isMobile ? "70px" : "80px",
-                    borderRadius: "50%",
-                    backgroundColor: isOverTrash ? "#ff4444" : "#666",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
-                    transition: "all 0.2s ease",
-                    zIndex: 15,
-                    animation: "trashBounce 0.3s ease",
-                  }}
-                >
-                  <Icon type="trash" size={isMobile ? 32 : 36} color="white" />
-                  <style>{`
-                    @keyframes trashBounce {
-                      0% {
-                        transform: translateX(-50%) scale(0.8);
-                        opacity: 0;
-                      }
-                      50% {
-                        transform: translateX(-50%) scale(1.1);
-                      }
-                      100% {
-                        transform: translateX(-50%) scale(1);
-                        opacity: 1;
-                      }
-                    }
-                  `}</style>
-                </div>
-              )}
-              
-              {/* スナップガイドライン（Instagram風） */}
-              {(snapGuides.vertical !== null || snapGuides.horizontal !== null) && (
-                <svg
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
-                    zIndex: 5,
-                  }}
-                >
-                  {snapGuides.vertical !== null && (
-                    <line
-                      x1={`${(snapGuides.vertical / CANVAS_WIDTH) * 100}%`}
-                      y1="0"
-                      x2={`${(snapGuides.vertical / CANVAS_WIDTH) * 100}%`}
-                      y2="100%"
-                      stroke="#ff00ff"
-                      strokeWidth="1"
-                      strokeDasharray="5,5"
-                      opacity="0.8"
-                    />
-                  )}
-                  {snapGuides.horizontal !== null && (
-                    <line
-                      x1="0"
-                      y1={`${(snapGuides.horizontal / CANVAS_HEIGHT) * 100}%`}
-                      x2="100%"
-                      y2={`${(snapGuides.horizontal / CANVAS_HEIGHT) * 100}%`}
-                      stroke="#ff00ff"
-                      strokeWidth="1"
-                      strokeDasharray="5,5"
-                      opacity="0.8"
-                    />
-                  )}
-                </svg>
-              )}
-            </div>
-          </div>
+          <canvas 
+            ref={canvasRef} 
+            style={{ 
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }} 
+          />
         </div>
 
         {/* 編集ツールエリア（デスクトップのみ） */}
