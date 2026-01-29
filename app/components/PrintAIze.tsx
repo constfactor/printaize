@@ -4620,7 +4620,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           style={{
             width: "100%",
             maxWidth: "min(800px, 100%)",
-            aspectRatio: isMobile ? "3 / 4" : "1 / 1",
+            aspectRatio: "3 / 4",
             position: "relative",
           }}
         >
@@ -4643,7 +4643,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
                 margin: "0 auto",
                 position: "relative",
-                aspectRatio: "1 / 1",
+                aspectRatio: "3 / 4",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
