@@ -4607,31 +4607,25 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             style={{
               width: "60%",
               height: "100%",
-              backgroundColor: "#fafafa",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "column",
               position: "relative",
-              padding: "0",
             }}
           >
-        {/* キャンバスコンテナ */}
+        {/* 商品画像エリア */}
         <div 
           className="canvas-container"
           style={{
             width: "100%",
-            height: "100%",
+            flex: 1,
+            backgroundColor: "#fafafa",
             position: "relative",
+            overflow: "hidden",
           }}
         >
           <div style={{ 
-            display: "flex", 
-            flexDirection: "column", 
-            alignItems: "center", 
-            padding: "0",
             width: "100%",
             height: "100%",
-            boxSizing: "border-box",
           }}>
             <div
               style={{
@@ -4798,16 +4792,27 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 </svg>
               )}
             </div>
+          </div>
+        </div>
 
+        {/* 編集ツールエリア（デスクトップのみ） */}
+        <div style={{
+          flex: "0 0 auto",
+          backgroundColor: "#ffffff",
+          borderTop: "1px solid #f0f0f0",
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}>
             {/* オブジェクト操作コントロール */}
             <div style={{ 
-              marginTop: "15px", 
               display: "flex", 
               flexWrap: "wrap",
-              gap: isMobile ? "8px" : "10px", 
+              gap: "10px", 
               justifyContent: "center",
               width: "100%",
-              maxWidth: isMobile ? "100%" : "800px"
+              maxWidth: "800px"
             }}>
               {/* 履歴 */}
               <button 
@@ -4815,40 +4820,40 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 disabled={!canUndo} 
                 style={{
                   ...historyButtonStyle(canUndo),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="元に戻す (Cmd/Ctrl+Z)"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 7v6h6" />
                   <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>元に戻す</span>
+                <span style={{ fontSize: "10px" }}>元に戻す</span>
               </button>
               <button 
                 onClick={handleRedo} 
                 disabled={!canRedo} 
                 style={{
                   ...historyButtonStyle(canRedo),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="やり直し (Cmd/Ctrl+Shift+Z)"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 7v6h-6" />
                   <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>やり直し</span>
+                <span style={{ fontSize: "10px" }}>やり直し</span>
               </button>
               
               {/* 配置 */}
@@ -4857,38 +4862,38 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 disabled={!selectedObject}
                 style={{
                   ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="上下中央"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>上下中央</span>
+                <span style={{ fontSize: "10px" }}>上下中央</span>
               </button>
               <button 
                 onClick={handleCenterHorizontal} 
                 disabled={!selectedObject}
                 style={{
                   ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="左右中央"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>左右中央</span>
+                <span style={{ fontSize: "10px" }}>左右中央</span>
               </button>
               
               {/* 重なり順 */}
@@ -4897,40 +4902,40 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 disabled={!selectedObject}
                 style={{
                   ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="手前に移動"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="13" width="10" height="10" rx="2" ry="2" opacity="0.5" />
                   <rect x="5" y="1" width="10" height="10" rx="2" ry="2" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>手前へ</span>
+                <span style={{ fontSize: "10px" }}>手前へ</span>
               </button>
               <button 
                 onClick={handleSendBackwards} 
                 disabled={!selectedObject}
                 style={{
                   ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="奥に移動"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="5" y="1" width="10" height="10" rx="2" ry="2" opacity="0.5" />
                   <rect x="9" y="13" width="10" height="10" rx="2" ry="2" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>奥へ</span>
+                <span style={{ fontSize: "10px" }}>奥へ</span>
               </button>
               
               {/* その他 */}
@@ -4939,42 +4944,42 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 disabled={!selectedObject}
                 style={{
                   ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
+                  minWidth: "70px"
                 }}
                 title="印刷面を覆う"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>プリント範囲最大</span>
+                <span style={{ fontSize: "10px" }}>プリント範囲最大</span>
               </button>
               <button 
                 onClick={handleRemoveSelected} 
                 disabled={!selectedObject}
                 style={{
                   ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
+                  padding: "10px 12px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px",
+                  minWidth: "70px",
                   backgroundColor: selectedObject ? "#e74c3c" : "#cccccc",
                 }}
                 title="削除 (Delete/Backspace)"
               >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                   <line x1="10" y1="11" x2="10" y2="17" />
                   <line x1="14" y1="11" x2="14" y2="17" />
                 </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>削除</span>
+                <span style={{ fontSize: "10px" }}>削除</span>
               </button>
             </div>
 
@@ -4982,22 +4987,22 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             <div style={{ 
               ...infoBoxStyle, 
               width: "100%", 
-              maxWidth: isMobile ? "100%" : "800px", 
+              maxWidth: "800px", 
               backgroundColor: "#ffffff",
-              marginTop: isMobile ? "15px" : "20px",
-              padding: isMobile ? "15px" : "20px"
+              marginTop: "20px",
+              padding: "20px"
             }}>
               <h3 style={{ 
                 marginTop: 0, 
-                fontSize: isMobile ? "14px" : "16px" 
+                fontSize: "16px" 
               }}>
                 📝 使い方
               </h3>
               <ul style={{ 
                 marginBottom: 0, 
                 lineHeight: 1.6, 
-                paddingLeft: isMobile ? "18px" : "20px", 
-                fontSize: isMobile ? "12px" : "13px" 
+                paddingLeft: "20px", 
+                fontSize: "13px" 
               }}>
                 <li>🤖 AIに画像を生成させることができます</li>
                 <li>📷 画像を複数アップロードして重ね合わせできます</li>
