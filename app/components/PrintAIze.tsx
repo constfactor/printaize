@@ -3044,6 +3044,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             transition={{ delay: 0.2, duration: 0.6 }}
             style={{
               width: "100%",
+              aspectRatio: "3 / 4",
               backgroundColor: "#fafafa",
               display: "flex",
               justifyContent: "center",
@@ -3052,7 +3053,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               position: "relative",
             }}
           >
-            <canvas ref={canvasRef} style={{ width: "100%", height: "auto" }} />
+            <canvas ref={canvasRef} style={{ width: "100%", height: "100%" }} />
           </motion.div>
         )}
         {/* 左カラム: タブ + コンテンツ */}
@@ -4619,7 +4620,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           className="canvas-container"
           style={{
             width: "100%",
-            aspectRatio: "3 / 4",
+            height: "100%",
             position: "relative",
           }}
         >
@@ -4629,6 +4630,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             alignItems: "center", 
             padding: "0",
             width: "100%",
+            height: "100%",
             boxSizing: "border-box",
           }}>
             <div
@@ -4639,9 +4641,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 boxShadow: "none",
                 backgroundColor: "#fafafa",
                 width: "100%",
-                margin: "0 auto",
+                height: "100%",
+                margin: "0",
                 position: "relative",
-                aspectRatio: "3 / 4",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -4713,9 +4715,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   display: "block",
                   width: "100%",
                   height: "100%",
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
                 }} 
               />
               
