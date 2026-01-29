@@ -4621,29 +4621,17 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             backgroundColor: "#fafafa",
             position: "relative",
             overflow: "hidden",
+            display: "flex",
+            alignItems: "stretch",
+            justifyContent: "stretch",
           }}
         >
           <div style={{ 
             width: "100%",
             height: "100%",
+            position: "relative",
+            touchAction: isMobile ? "pan-y" : "auto",
           }}>
-            <div
-              style={{
-                border: "none",
-                borderRadius: "0",
-                overflow: "hidden",
-                boxShadow: "none",
-                backgroundColor: "#fafafa",
-                width: "100%",
-                height: "100%",
-                margin: "0",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                touchAction: isMobile ? "pan-y" : "auto",
-              }}
-            >
               {/* ズームボタン */}
               <button
                 onClick={() => {
@@ -4706,7 +4694,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               <canvas 
                 ref={canvasRef} 
                 style={{ 
-                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
                   width: "100%",
                   height: "100%",
                 }} 
