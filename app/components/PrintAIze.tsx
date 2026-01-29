@@ -4611,7 +4611,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
-              padding: "40px",
+              padding: "0",
             }}
           >
         {/* キャンバスコンテナ */}
@@ -4628,7 +4628,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             display: "flex", 
             flexDirection: "column", 
             alignItems: "center", 
-            padding: isMobile ? "10px" : "40px",
+            padding: "0",
             width: "100%",
             boxSizing: "border-box",
           }}>
