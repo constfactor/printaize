@@ -1366,8 +1366,147 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         position: "relative",
       }}
     >
+      {/* グローバルスタイル（モバイル対応） */}
+      <style>{`
+        @media (max-width: 768px) {
+          /* モバイル用：サイドバーを下部固定タブバーに */
+          .mobile-sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            top: auto !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 80px !important;
+            padding: 10px 15px !important;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
+            z-index: 100 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+          }
+          
+          /* モバイル用：ロゴを非表示 */
+          .desktop-only {
+            display: none !important;
+          }
+          
+          /* モバイル用：メニューを横並びに */
+          .mobile-sidebar nav {
+            flex-direction: row !important;
+            gap: 0 !important;
+            width: 100% !important;
+            justify-content: space-around !important;
+          }
+          
+          /* モバイル用：メニューボタンのスタイル */
+          .mobile-menu-button {
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 8px 12px !important;
+            gap: 4px !important;
+            min-width: 0 !important;
+            height: auto !important;
+            width: auto !important;
+            border: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+          }
+          
+          .mobile-menu-button-icon {
+            margin: 0 !important;
+          }
+          
+          .mobile-menu-button-label {
+            display: block !important;
+            font-size: 10px !important;
+            text-align: center !important;
+            line-height: 1.2 !important;
+            margin: 0 !important;
+            white-space: nowrap !important;
+          }
+          
+          /* デスクトップ用のラベルを非表示 */
+          .mobile-menu-button > span:not(.mobile-menu-button-icon):not(.mobile-menu-button-label) {
+            display: none !important;
+          }
+          
+          /* モバイル用：ホバーエフェクトを無効化 */
+          .mobile-sidebar nav > div > div {
+            display: none !important;
+          }
+          
+          /* モバイル用：コンパネを下部に配置 */
+          .mobile-panel {
+            position: fixed !important;
+            left: 0 !important;
+            top: auto !important;
+            bottom: 80px !important;
+            width: 100% !important;
+            height: 50vh !important;
+            padding: 20px 15px !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            z-index: 90 !important;
+            transform: translateY(0) !important;
+            transition: transform 0.3s ease-in-out !important;
+          }
+          
+          .mobile-panel.hidden {
+            transform: translateY(100%) !important;
+          }
+          
+          /* モバイル用：コンパネ2をタブで切り替え */
+          .mobile-panel2 {
+            position: fixed !important;
+            left: 0 !important;
+            top: auto !important;
+            bottom: 80px !important;
+            width: 100% !important;
+            height: 50vh !important;
+            padding: 20px 15px !important;
+            overflow: auto !important;
+            z-index: 95 !important;
+          }
+          
+          /* モバイル用：メインエリアを全画面に */
+          .mobile-main {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            right: 0 !important;
+            bottom: 80px !important;
+            padding: 10px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+          }
+          
+          /* モバイル用：コンパネの項目を横スクロール */
+          .mobile-scroll-container {
+            display: flex !important;
+            overflow-x: auto !important;
+            gap: 15px !important;
+            padding-bottom: 10px !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          
+          .mobile-scroll-item {
+            flex: 0 0 280px !important;
+            max-width: 280px !important;
+          }
+          
+          /* モバイル用：カートに追加ボタンを非表示 */
+          .desktop-cart-button {
+            display: none !important;
+          }
+        }
+      `}</style>
       {/* コンパネ2（スタイル詳細） */}
       <div
+        className="mobile-panel2"
         style={{
           position: "absolute",
           left: "339.5px",
@@ -1528,6 +1667,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* コンテンツパネル（サイドバーの下） */}
       <div
         ref={scrollContainerRef}
+        className={`mobile-panel ${!activeTab ? 'hidden' : ''}`}
         style={{
           position: "absolute",
           left: 0,
@@ -1583,17 +1723,26 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     >
                     {/* 商品画像 */}
                     {shopifyProduct.image && (
-                      <img
-                        src={shopifyProduct.image}
-                        alt={shopifyProduct.imageAlt}
-                        style={{
-                          width: "100%",
-                          aspectRatio: "3 / 4",
-                          objectFit: "cover",
-                          borderRadius: "13px 13px 0 0",
-                          display: "block",
-                        }}
-                      />
+                      <div style={{
+                        width: "100%",
+                        paddingBottom: "133.33%", /* 3:4 = 4/3 * 100% = 133.33% */
+                        position: "relative",
+                        borderRadius: "13px 13px 0 0",
+                        overflow: "hidden",
+                      }}>
+                        <img
+                          src={shopifyProduct.image}
+                          alt={shopifyProduct.imageAlt}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
                     )}
 
                     {/* 商品情報 */}
@@ -2160,6 +2309,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
       {/* サイドバー */}
       <aside
+        className="mobile-sidebar"
         style={{
           position: "absolute",
           left: 0,
@@ -2187,6 +2337,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             letterSpacing: "0",
             whiteSpace: "nowrap",
           }}
+          className="desktop-only"
         >
           {isCollapsed ? "PAI" : "PrintAize"}
         </h1>
@@ -2210,6 +2361,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               >
                 <button
                   onClick={() => handleMenuClick(item.id)}
+                  className="mobile-menu-button"
                   style={{
                     height: "45px",
                     display: "flex",
@@ -2230,7 +2382,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   }}
                 >
                   {/* アイコン */}
-                  {getIcon(item.id)}
+                  <span className="mobile-menu-button-icon">
+                    {getIcon(item.id)}
+                  </span>
                   {/* テキスト（展開時のみ） */}
                   {!isCollapsed && (
                     <span
@@ -2248,6 +2402,18 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       {item.label}
                     </span>
                   )}
+                  {/* モバイル用：常にラベルを表示 */}
+                  <span
+                    className="mobile-menu-button-label"
+                    style={{
+                      display: "none",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: "#303030",
+                    }}
+                  >
+                    {item.label}
+                  </span>
                 </button>
 
                 {/* 縮小時のホバーボタン（コンパネの上にレイヤー表示） */}
@@ -2319,6 +2485,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
         {/* カートに追加ボタン */}
         <button
+          className="desktop-cart-button"
           style={{
             position: "absolute",
             bottom: "35px",
@@ -2355,6 +2522,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
       {/* メインエリア（Tシャツ表示） */}
       <main
+        className="mobile-main"
         style={{
           position: "absolute",
           left: "339px",
@@ -2608,19 +2776,35 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           )}
 
           {/* 商品画像 */}
-          <img
-            ref={mainImageRef}
-            src={selectedProductImage}
-            alt={selectedProductName}
-            onLoad={updatePrintArea}
-            style={{
+          <div style={{
+            width: "100%",
+            maxWidth: "2252px",
+            position: "relative",
+          }}>
+            <div style={{
               width: "100%",
-              height: "auto",
-              display: "block",
+              paddingBottom: "133.33%", /* 3:4 = 4/3 * 100% = 133.33% */
+              position: "relative",
               backgroundColor: "#ffffff",
               boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-            }}
-          />
+            }}>
+              <img
+                ref={mainImageRef}
+                src={selectedProductImage}
+                alt={selectedProductName}
+                onLoad={updatePrintArea}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  display: "block",
+                }}
+              />
+            </div>
+          </div>
           
           {/* プリント範囲の点線 */}
           {isMounted && (
