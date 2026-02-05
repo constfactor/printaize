@@ -4,6 +4,7 @@
   "description": "PrintAIze - AI-powered custom print design platform",
   "scripts": {
     "dev": "remix dev --manual",
+    "prebuild": "node scripts/generate-style-images-index.js",
     "build": "remix build",
     "start": "remix-serve build",
     "typecheck": "tsc"

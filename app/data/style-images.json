@@ -1,0 +1,68 @@
+{
+  "adventure": [
+    "/images/style/adventure/1.jpg"
+  ],
+  "animals": [
+    "/images/style/animals/1.jpg"
+  ],
+  "anniversaries": [
+    "/images/style/anniversaries/1.jpg"
+  ],
+  "art": [
+    "/images/style/art/1.jpg"
+  ],
+  "business": [
+    "/images/style/business/1.jpg"
+  ],
+  "couples": [
+    "/images/style/couples/1.jpg",
+    "/images/style/couples/2.jpg",
+    "/images/style/couples/e1cae12a-201e-49c5-9838-d5285be9e266.png",
+    "/images/style/couples/h.m.kun_photographs_of_fluffy_Toy_Poodle_sitting_on_top_of_an_5f8bbecc-62eb-4dbe-aeac-9e17072a7a58_3.png",
+    "/images/style/couples/hf_20260116_071954_334423f2-7266-4657-b30a-0d999e81073e.png",
+    "/images/style/couples/hf_20260119_072938_fa77a7bc-0f33-454f-b80f-647958b9fcc8.png",
+    "/images/style/couples/replicate-prediction-84b021raehrmw0cw3h5bjekbq0.jpg"
+  ],
+  "creative": [
+    "/images/style/creative/1.jpg"
+  ],
+  "education": [
+    "/images/style/education/1.jpg"
+  ],
+  "events": [
+    "/images/style/events/1.jpg"
+  ],
+  "families": [
+    "/images/style/families/1.jpg"
+  ],
+  "fans": [
+    "/images/style/fans/1.jpg"
+  ],
+  "hobbies": [
+    "/images/style/hobbies/1.jpg"
+  ],
+  "holidays": [
+    "/images/style/holidays/1.jpg"
+  ],
+  "kids": [
+    "/images/style/kids/1.jpg"
+  ],
+  "pets": [
+    "/images/style/pets/1.jpg"
+  ],
+  "seasons": [
+    "/images/style/seasons/1.jpg"
+  ],
+  "sports": [
+    "/images/style/sports/1.jpg"
+  ],
+  "teams": [
+    "/images/style/teams/1.jpg"
+  ],
+  "travel": [
+    "/images/style/travel/1.jpg"
+  ],
+  "weddings": [
+    "/images/style/weddings/1.jpg"
+  ]
+}
