@@ -1993,29 +1993,64 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
                     アスペクト比
                   </label>
-                  <select
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      fontSize: "12px",
-                      color: "#303030",
-                      backgroundColor: "#f8f8f8",
-                      border: "1px solid #ddd",
-                      borderRadius: "13px",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                      cursor: "pointer",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    <option value="1:1">1:1</option>
-                    <option value="4:3">4:3</option>
-                    <option value="3:4">3:4</option>
-                    <option value="16:9">16:9</option>
-                    <option value="9:16">9:16</option>
-                    <option value="3:2">3:2</option>
-                    <option value="2:3">2:3</option>
-                    <option value="21:9">21:9</option>
-                  </select>
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: "8px",
+                  }}>
+                    {[
+                      { value: "1:1", width: 24, height: 24, label: "1:1" },
+                      { value: "4:3", width: 28, height: 21, label: "4:3" },
+                      { value: "3:4", width: 21, height: 28, label: "3:4" },
+                      { value: "16:9", width: 32, height: 18, label: "16:9" },
+                      { value: "9:16", width: 18, height: 32, label: "9:16" },
+                      { value: "3:2", width: 30, height: 20, label: "3:2" },
+                      { value: "2:3", width: 20, height: 30, label: "2:3" },
+                      { value: "21:9", width: 35, height: 15, label: "21:9" },
+                    ].map((aspect) => (
+                      <button
+                        key={aspect.value}
+                        type="button"
+                        style={{
+                          padding: "12px 8px",
+                          fontSize: "11px",
+                          fontWeight: 600,
+                          color: "#303030",
+                          backgroundColor: "#f8f8f8",
+                          border: "1px solid #ddd",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "6px",
+                          position: "relative",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#e8e8e8";
+                          e.currentTarget.style.borderColor = "#303030";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f8f8f8";
+                          e.currentTarget.style.borderColor = "#ddd";
+                        }}
+                      >
+                        {/* アスペクト比アイコン */}
+                        <div
+                          style={{
+                            width: `${aspect.width}px`,
+                            height: `${aspect.height}px`,
+                            backgroundColor: "#303030",
+                            borderRadius: "2px",
+                            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+                          }}
+                        />
+                        {/* ラベル */}
+                        <span style={{ lineHeight: 1 }}>{aspect.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* 生成ボタン */}
