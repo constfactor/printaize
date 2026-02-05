@@ -1439,6 +1439,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             display: none !important;
           }
           
+          /* デスクトップ専用要素を非表示 */
+          .desktop-title-only {
+            display: none !important;
+          }
+          
+          /* モバイル専用要素を表示 */
+          .mobile-show {
+            display: block !important;
+          }
+          
           /* モバイル用：コンパネを下部に配置 */
           .mobile-panel {
             position: fixed !important;
@@ -1446,13 +1456,14 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             top: auto !important;
             bottom: 80px !important;
             width: 100% !important;
-            height: 50vh !important;
-            padding: 20px 15px !important;
+            height: 240px !important;
+            padding: 15px !important;
             overflow-x: hidden !important;
             overflow-y: auto !important;
             z-index: 90 !important;
             transform: translateY(0) !important;
             transition: transform 0.3s ease-in-out !important;
+            box-sizing: border-box !important;
           }
           
           .mobile-panel.hidden {
@@ -1478,10 +1489,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             left: 0 !important;
             top: 0 !important;
             right: 0 !important;
-            bottom: 80px !important;
+            bottom: 320px !important;
             padding: 10px !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
+            box-sizing: border-box !important;
           }
           
           /* モバイル用：コンパネの項目を横スクロール */
@@ -1500,6 +1512,89 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           
           /* モバイル用：カートに追加ボタンを非表示 */
           .desktop-cart-button {
+            display: none !important;
+          }
+          
+          /* モバイル用：アイテムメニューのレイアウト */
+          .mobile-item-layout {
+            display: flex !important;
+            gap: 15px !important;
+            height: 100% !important;
+          }
+          
+          .mobile-item-info {
+            flex: 0 0 100px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+          }
+          
+          .mobile-item-list {
+            flex: 1 !important;
+            display: flex !important;
+            overflow-x: auto !important;
+            gap: 10px !important;
+            padding-bottom: 10px !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          
+          .mobile-item-card {
+            flex: 0 0 140px !important;
+            max-width: 140px !important;
+          }
+          
+          /* モバイル用：商品情報を小さく */
+          .mobile-item-card .product-info {
+            padding: 8px !important;
+          }
+          
+          .mobile-item-card h3 {
+            font-size: 11px !important;
+            margin: 0 0 4px 0 !important;
+          }
+          
+          .mobile-item-card p {
+            font-size: 10px !important;
+            margin: 0 0 4px 0 !important;
+          }
+          
+          .mobile-item-card .color-swatches {
+            gap: 3px !important;
+          }
+          
+          .mobile-item-card .color-swatch {
+            width: 12px !important;
+            height: 12px !important;
+          }
+          
+          .mobile-item-card .color-label {
+            font-size: 9px !important;
+          }
+          
+          .mobile-show {
+            display: block !important;
+          }
+        }
+        
+        @media (min-width: 769px) {
+          .mobile-item-layout {
+            display: block !important;
+          }
+          
+          .mobile-item-info {
+            display: none !important;
+          }
+          
+          .mobile-item-list {
+            display: block !important;
+          }
+          
+          .mobile-item-card {
+            flex: none !important;
+            max-width: none !important;
+          }
+          
+          .mobile-show {
             display: none !important;
           }
         }
@@ -1688,39 +1783,52 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         {/* パネルの内容（activeTabに応じて表示） */}
         {activeTab && (
           <div>
-            <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#303030", marginTop: "0", marginBottom: "15px" }}>
+            <h2 className="desktop-title-only" style={{ fontSize: "16px", fontWeight: 700, color: "#303030", marginTop: "0", marginBottom: "15px" }}>
               {menuItems.find((item) => item.id === activeTab)?.label}
             </h2>
 
             {/* ダミーテキスト */}
-            <p style={{ fontSize: "12px", fontWeight: 400, color: "#666", lineHeight: "1.6", margin: "0 0 20px 0" }}>
+            <p className="desktop-title-only" style={{ fontSize: "12px", fontWeight: 400, color: "#666", lineHeight: "1.6", margin: "0 0 20px 0" }}>
               ここにダミーテキストが入ります。商品の説明やカテゴリーの情報など、ユーザーに伝えたい内容を表示することができます。
             </p>
 
             {/* アイテムタブの内容 */}
             {activeTab === "item" && (
-              <div>
-                {products.map((shopifyProduct) => {
-                  const isHovered = hoveredProductId === shopifyProduct.id;
-                  const isSelected = selectedProductId === shopifyProduct.id;
-                  const showBorder = isHovered || isSelected;
-                  
-                  return (
-                    <div
-                      key={shopifyProduct.id}
-                      style={{
-                        backgroundColor: "#f8f8f8",
-                        borderRadius: "13px",
-                        marginBottom: "17.5px",
-                        border: showBorder ? "1px solid #303030" : "1px solid transparent",
-                        boxShadow: isSelected ? "0 5px 15px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                      }}
-                      onClick={() => handleProductClick(shopifyProduct.id, shopifyProduct.image, shopifyProduct.title)}
-                      onMouseEnter={() => setHoveredProductId(shopifyProduct.id)}
-                      onMouseLeave={() => setHoveredProductId(null)}
-                    >
+              <div className="mobile-item-layout">
+                {/* モバイル用：左側の情報エリア */}
+                <div className="mobile-item-info">
+                  <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#303030", margin: 0, display: "none" }} className="mobile-show">
+                    {menuItems.find((item) => item.id === activeTab)?.label}
+                  </h2>
+                  <p style={{ fontSize: "11px", fontWeight: 400, color: "#666", lineHeight: "1.4", margin: 0, display: "none" }} className="mobile-show">
+                    商品の説明やカテゴリーの情報など
+                  </p>
+                </div>
+                
+                {/* モバイル用：横スクロール商品リスト */}
+                <div className="mobile-item-list">
+                  {products.map((shopifyProduct) => {
+                    const isHovered = hoveredProductId === shopifyProduct.id;
+                    const isSelected = selectedProductId === shopifyProduct.id;
+                    const showBorder = isHovered || isSelected;
+                    
+                    return (
+                      <div
+                        key={shopifyProduct.id}
+                        className="mobile-item-card"
+                        style={{
+                          backgroundColor: "#f8f8f8",
+                          borderRadius: "13px",
+                          marginBottom: "17.5px",
+                          border: showBorder ? "1px solid #303030" : "1px solid transparent",
+                          boxShadow: isSelected ? "0 5px 15px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                        onClick={() => handleProductClick(shopifyProduct.id, shopifyProduct.image, shopifyProduct.title)}
+                        onMouseEnter={() => setHoveredProductId(shopifyProduct.id)}
+                        onMouseLeave={() => setHoveredProductId(null)}
+                      >
                     {/* 商品画像 */}
                     {shopifyProduct.image && (
                       <div style={{
@@ -1746,7 +1854,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     )}
 
                     {/* 商品情報 */}
-                    <div style={{ padding: "17.5px 17.5px" }}>
+                    <div className="product-info" style={{ padding: "17.5px 17.5px" }}>
                       {/* 商品名 */}
                       <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#303030", margin: "0 0 6px 0" }}>
                         {shopifyProduct.title}
@@ -1760,11 +1868,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       {/* カラー */}
                       {shopifyProduct.colors.length > 0 && (
                         <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                          <span style={{ fontSize: "12px", color: "#666" }}>カラー</span>
-                          <div style={{ display: "flex", gap: "4px" }}>
+                          <span className="color-label" style={{ fontSize: "12px", color: "#666" }}>カラー</span>
+                          <div className="color-swatches" style={{ display: "flex", gap: "4px" }}>
                             {shopifyProduct.colors.map((color, idx) => (
                               <div
                                 key={idx}
+                                className="color-swatch"
                                 style={{
                                   width: "15px",
                                   height: "15px",
@@ -1793,13 +1902,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   </div>
                   );
                 })}
-
-                {/* ローディング表示 */}
-                {isLoadingProducts && (
-                  <p style={{ textAlign: "center", fontSize: "12px", color: "#999", padding: "20px 0" }}>
-                    読み込み中...
-                  </p>
-                )}
+                </div>
               </div>
             )}
 
