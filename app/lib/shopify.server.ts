@@ -192,3 +192,118 @@ export async function getProducts(first: number = 10) {
   const data = await shopifyFetch({ query, variables: { first } });
   return data.products;
 }
+
+/**
+ * ステップ8: コレクションから商品を取得
+ */
+export async function getCollectionProducts(
+  collectionHandle: string,
+  first: number = 10,
+  after?: string | null
+) {
+  const query = `
+    query getCollectionProducts($handle: String!, $first: Int!, $after: String) {
+      collectionByHandle(handle: $handle) {
+        id
+        title
+        products(first: $first, after: $after) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              id
+              title
+              description
+              handle
+              options {
+                name
+                values
+              }
+              metafield(namespace: "custom", key: "color") {
+                type
+                value
+                references(first: 20) {
+                  nodes {
+                    ... on Metaobject {
+                      id
+                      handle
+                      type
+                      fields {
+                        key
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+              variants(first: 50) {
+                edges {
+                  node {
+                    id
+                    title
+                    selectedOptions {
+                      name
+                      value
+                    }
+                    priceV2 {
+                      amount
+                      currencyCode
+                    }
+                    image {
+                      url
+                      altText
+                    }
+                  }
+                }
+              }
+              images(first: 10) {
+                edges {
+                  node {
+                    url
+                    altText
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const variables: any = { handle: collectionHandle, first };
+  if (after) {
+    variables.after = after;
+  }
+
+  const data = await shopifyFetch({ query, variables });
+  return data.collectionByHandle;
+}
+
+/**
+ * メタオブジェクトをID一覧から取得
+ */
+export async function getMetaobjectsByIds(ids: string[]) {
+  if (ids.length === 0) return [];
+
+  const query = `
+    query getMetaobjectsByIds($ids: [ID!]!) {
+      nodes(ids: $ids) {
+        ... on Metaobject {
+          id
+          handle
+          type
+          fields {
+            key
+            value
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await shopifyFetch({ query, variables: { ids } });
+  return data.nodes || [];
+}

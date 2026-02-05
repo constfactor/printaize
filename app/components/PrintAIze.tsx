@@ -1,5429 +1,3657 @@
 /**
  * PrintAIze カスタマイザーコンポーネント
- * Apple風インタラクティブデザイン
- * 
- * 機能:
- * - 画像アップロード＆編集
- * - AI画像生成（Replicate）
- * - テキスト追加＆編集
- * - フィルター適用
- * - 履歴管理（元に戻す/やり直し）
- * - Shopifyカートに追加
- * 
- * デザイン:
- * - 2カラムレイアウト（デスクトップ）
- * - タブ切り替え（Framer Motion）
- * - Apple風アニメーション
+ * ピクセル完璧再現版
  */
 
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import type { Product } from "~/lib/products";
+
+// Shopify商品型
+interface ShopifyProduct {
+  id: string;
+  title: string;
+  handle: string;
+  price: string;
+  currencyCode: string;
+  image: string | null;
+  imageAlt: string;
+  colors: Array<{ name: string; hex: string; image: string | null }>;
+}
 
 interface PrintAIzeProps {
   product: Product;
 }
 
-// SVGアイコンコンポーネント
-const Icon = ({ type, size = 20, color = "currentColor" }: { type: string; size?: number; color?: string }) => {
-  const icons: { [key: string]: JSX.Element } = {
-    clipboard: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>
-    ),
-    check: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M5 13l4 4L19 7"/>
-      </svg>
-    ),
-    warning: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-    ),
-    info: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/>
-      </svg>
-    ),
-    lightbulb: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M9 21h6m-6 0v-2m6 2v-2m-9-7a6 6 0 1112 0c0 3.31-2.31 6-5 8H9c-2.69-2-5-4.69-5-8z"/>
-      </svg>
-    ),
-    cart: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-        <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
-      </svg>
-    ),
-    save: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-        <path d="M17 21v-8H7v8M7 3v5h8"/>
-      </svg>
-    ),
-    refresh: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/>
-      </svg>
-    ),
-    loading: (
-      <svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke={color} 
-        strokeWidth="2"
-        style={{
-          animation: 'spin 1s linear infinite',
-        }}
-      >
-        <circle 
-          cx="12" 
-          cy="12" 
-          r="10" 
-          strokeDasharray="60" 
-          strokeDashoffset="40"
-        />
-        <style>{`
-          @keyframes spin {
-            from {
-              transform: rotate(0deg);
-            }
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
-      </svg>
-    ),
-    image: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
-      </svg>
-    ),
-    text: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
-      </svg>
-    ),
-    palette: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/>
-        <circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/>
-        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
-      </svg>
-    ),
-    trash: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M3 6h18m-2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-      </svg>
-    ),
-    plus: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M12 5v14m-7-7h14"/>
-      </svg>
-    ),
-    robot: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/>
-        <path d="M12 7v4m-4 5h.01M16 16h.01"/>
-      </svg>
-    ),
-    camera: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-        <circle cx="12" cy="13" r="4"/>
-      </svg>
-    ),
-    upload: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14-7l-5-5-5 5m5-5v12"/>
-      </svg>
-    ),
-    zoomIn: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M21 3l-9 9m0 0v-6m0 6h6"/>
-        <path d="M3 21l9-9m0 0v6m0-6H6"/>
-      </svg>
-    ),
-    zoomOut: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-        <path d="M15 9l6-6m0 0h-6m6 0v6"/>
-        <path d="M9 15l-6 6m0 0h6m-6 0v-6"/>
-      </svg>
-    ),
-  };
-  
-  return <span style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>{icons[type] || null}</span>;
-};
-
-// フォントリスト定義（Google Fonts日本語フォント全種 + 英語フォント）
-const FONT_LIST = [
-  // 日本語フォント - Google Fonts
-  { value: "Noto Sans JP", label: "Noto Sans JP", family: "'Noto Sans JP', sans-serif", type: "japanese" },
-  { value: "Noto Serif JP", label: "Noto Serif JP", family: "'Noto Serif JP', serif", type: "japanese" },
-  { value: "BIZ UDPGothic", label: "BIZ UDPゴシック", family: "'BIZ UDPGothic', sans-serif", type: "japanese" },
-  { value: "BIZ UDPMincho", label: "BIZ UDP明朝", family: "'BIZ UDPMincho', serif", type: "japanese" },
-  { value: "M PLUS 1p", label: "M PLUS 1p", family: "'M PLUS 1p', sans-serif", type: "japanese" },
-  { value: "M PLUS 2", label: "M PLUS 2", family: "'M PLUS 2', sans-serif", type: "japanese" },
-  { value: "M PLUS Rounded 1c", label: "M PLUS Rounded 1c", family: "'M PLUS Rounded 1c', sans-serif", type: "japanese" },
-  { value: "Murecho", label: "Murecho", family: "'Murecho', sans-serif", type: "japanese" },
-  { value: "Zen Maru Gothic", label: "Zen Maru Gothic", family: "'Zen Maru Gothic', sans-serif", type: "japanese" },
-  { value: "Zen Kaku Gothic New", label: "Zen Kaku Gothic New", family: "'Zen Kaku Gothic New', sans-serif", type: "japanese" },
-  { value: "Zen Kaku Gothic Antique", label: "Zen Kaku Gothic Antique", family: "'Zen Kaku Gothic Antique', sans-serif", type: "japanese" },
-  { value: "Zen Old Mincho", label: "Zen Old Mincho", family: "'Zen Old Mincho', serif", type: "japanese" },
-  { value: "Zen Kurenaido", label: "Zen Kurenaido", family: "'Zen Kurenaido', sans-serif", type: "japanese" },
-  { value: "Zen Antique", label: "Zen Antique", family: "'Zen Antique', serif", type: "japanese" },
-  { value: "Zen Antique Soft", label: "Zen Antique Soft", family: "'Zen Antique Soft', serif", type: "japanese" },
-  { value: "Kosugi", label: "Kosugi", family: "'Kosugi', sans-serif", type: "japanese" },
-  { value: "Kosugi Maru", label: "Kosugi Maru", family: "'Kosugi Maru', sans-serif", type: "japanese" },
-  { value: "Sawarabi Mincho", label: "Sawarabi Mincho", family: "'Sawarabi Mincho', serif", type: "japanese" },
-  { value: "Sawarabi Gothic", label: "Sawarabi Gothic", family: "'Sawarabi Gothic', sans-serif", type: "japanese" },
-  { value: "Klee One", label: "Klee One", family: "'Klee One', cursive", type: "japanese" },
-  { value: "Shippori Mincho", label: "Shippori Mincho", family: "'Shippori Mincho', serif", type: "japanese" },
-  { value: "Shippori Antique", label: "Shippori Antique", family: "'Shippori Antique', sans-serif", type: "japanese" },
-  { value: "Shippori Antique B1", label: "Shippori Antique B1", family: "'Shippori Antique B1', sans-serif", type: "japanese" },
-  { value: "Yusei Magic", label: "Yusei Magic", family: "'Yusei Magic', sans-serif", type: "japanese" },
-  { value: "Yomogi", label: "Yomogi", family: "'Yomogi', cursive", type: "japanese" },
-  { value: "Dela Gothic One", label: "デラゴシック", family: "'Dela Gothic One', sans-serif", type: "japanese" },
-  { value: "DotGothic16", label: "ドットゴシック16", family: "'DotGothic16', sans-serif", type: "japanese" },
-  { value: "Hina Mincho", label: "ひな明朝", family: "'Hina Mincho', serif", type: "japanese" },
-  { value: "Kaisei Decol", label: "解星デコール", family: "'Kaisei Decol', serif", type: "japanese" },
-  { value: "Kaisei HarunoUmi", label: "Kaisei HarunoUmi", family: "'Kaisei HarunoUmi', serif", type: "japanese" },
-  { value: "Kaisei Tokumin", label: "Kaisei Tokumin", family: "'Kaisei Tokumin', serif", type: "japanese" },
-  { value: "Kaisei Opti", label: "Kaisei Opti", family: "'Kaisei Opti', serif", type: "japanese" },
-  { value: "Kiwi Maru", label: "キウイ丸", family: "'Kiwi Maru', sans-serif", type: "japanese" },
-  { value: "Reggae One", label: "Reggae One", family: "'Reggae One', cursive", type: "japanese" },
-  { value: "RocknRoll One", label: "RocknRoll One", family: "'RocknRoll One', sans-serif", type: "japanese" },
-  { value: "Potta One", label: "Potta One", family: "'Potta One', cursive", type: "japanese" },
-  { value: "Train One", label: "Train One", family: "'Train One', cursive", type: "japanese" },
-  { value: "Rampart One", label: "Rampart One", family: "'Rampart One', cursive", type: "japanese" },
-  { value: "Stick", label: "Stick", family: "'Stick', sans-serif", type: "japanese" },
-  { value: "Mochiy Pop One", label: "Mochiy Pop One", family: "'Mochiy Pop One', sans-serif", type: "japanese" },
-  { value: "Mochiy Pop P One", label: "Mochiy Pop P One", family: "'Mochiy Pop P One', sans-serif", type: "japanese" },
-  { value: "New Tegomin", label: "New Tegomin", family: "'New Tegomin', serif", type: "japanese" },
-  { value: "Hachi Maru Pop", label: "Hachi Maru Pop", family: "'Hachi Maru Pop', sans-serif", type: "japanese" },
-  { value: "Otomanopee One", label: "Otomanopee One", family: "'Otomanopee One', sans-serif", type: "japanese" },
-  { value: "Shirokuma", label: "Shirokuma", family: "'Shirokuma', cursive", type: "japanese" },
-  { value: "Slackkey", label: "Slackkey", family: "'Slackkey', cursive", type: "japanese" },
-  { value: "Cherry Bomb One", label: "Cherry Bomb One", family: "'Cherry Bomb One', cursive", type: "japanese" },
-  { value: "Monomaniac One", label: "Monomaniac One", family: "'Monomaniac One', sans-serif", type: "japanese" },
-  { value: "Palette Mosaic", label: "Palette Mosaic", family: "'Palette Mosaic', cursive", type: "japanese" },
-  { value: "Yuji Syuku", label: "Yuji Syuku", family: "'Yuji Syuku', serif", type: "japanese" },
-  { value: "Yuji Boku", label: "Yuji Boku", family: "'Yuji Boku', serif", type: "japanese" },
-  { value: "Yuji Mai", label: "Yuji Mai", family: "'Yuji Mai', serif", type: "japanese" },
-  // システムフォント（日本語）
-  { value: "Hiragino Kaku Gothic ProN", label: "ヒラギノ角ゴシック", family: "'Hiragino Kaku Gothic ProN', sans-serif", type: "japanese" },
-  { value: "Yu Gothic", label: "游ゴシック", family: "'Yu Gothic', sans-serif", type: "japanese" },
-  { value: "Meiryo", label: "メイリオ", family: "Meiryo, sans-serif", type: "japanese" },
-  // 英語フォント
-  { value: "Arial", label: "Arial", family: "Arial, sans-serif", type: "english" },
-  { value: "Helvetica", label: "Helvetica", family: "Helvetica, sans-serif", type: "english" },
-  { value: "Times New Roman", label: "Times New Roman", family: "'Times New Roman', serif", type: "english" },
-  { value: "Georgia", label: "Georgia", family: "Georgia, serif", type: "english" },
-  { value: "Courier New", label: "Courier New", family: "'Courier New', monospace", type: "english" },
-  { value: "Verdana", label: "Verdana", family: "Verdana, sans-serif", type: "english" },
-  { value: "Trebuchet MS", label: "Trebuchet MS", family: "'Trebuchet MS', sans-serif", type: "english" },
-  { value: "Comic Sans MS", label: "Comic Sans MS", family: "'Comic Sans MS', cursive", type: "english" },
-  { value: "Impact", label: "Impact", family: "Impact, sans-serif", type: "english" },
-  { value: "Palatino", label: "Palatino", family: "Palatino, serif", type: "english" },
-  { value: "Garamond", label: "Garamond", family: "Garamond, serif", type: "english" },
-];
-
-// キャンバスサイズの定数
-const CANVAS_SIZE = 800;
+type MenuTab = "item" | "ai" | "image" | "text";
 
 export default function PrintAIze({ product }: PrintAIzeProps) {
-  // ========== ステップ1: 状態管理 ==========
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fabricCanvasRef = useRef<any>(null);
+  const [activeTab, setActiveTab] = useState<MenuTab | null>(null);
+  const [hoveredTab, setHoveredTab] = useState<MenuTab | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Shopify商品データ
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [endCursor, setEndCursor] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // 選択された商品画像
+  const [selectedProductImage, setSelectedProductImage] = useState<string>("/images/products/box-tshirt-short-white.png");
+  const [selectedProductName, setSelectedProductName] = useState<string>(product.name);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
+  
+  // アップロード済み画像
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isDraggingUpload, setIsDraggingUpload] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // 画像関連
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFabricReady, setIsFabricReady] = useState(false);
-  const [showCopyrightModal, setShowCopyrightModal] = useState(false);
-  const [copyrightAgreed, setCopyrightAgreed] = useState(false);
-  const [imageQualityWarning, setImageQualityWarning] = useState<string | null>(null);
-  const pendingImageRef = useRef<File | null>(null);
-  const [fabricLoaded, setFabricLoaded] = useState(false);
+  // プリント範囲の画像オブジェクト
+  type ImageObject = {
+    id: string;
+    src: string;
+    x: number; // 中心位置 (%)
+    y: number; // 中心位置 (%)
+    scale: number;
+    rotation: number; // 度数
+    zIndex: number;
+  };
+  const [printedImages, setPrintedImages] = useState<ImageObject[]>([]);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeStart, setResizeStart] = useState({ scale: 1, rotation: 0, x: 0, y: 0, direction: "" });
+  const [isRotating, setIsRotating] = useState(false);
+  const [rotateStart, setRotateStart] = useState({ rotation: 0, centerX: 0, centerY: 0 });
+  const [isPrintAreaDragging, setIsPrintAreaDragging] = useState(false);
+  const printAreaFileInputRef = useRef<HTMLInputElement>(null);
   
-  // AI生成関連
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [lastAIPrompt, setLastAIPrompt] = useState("");
-  const [generatedImageUrl, setGeneratedImageUrl] = useState("");
+  // AI生成画像
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   
-  // テキスト関連
-  const [textInput, setTextInput] = useState("");
-  const [textColor, setTextColor] = useState("#000000");
-  const [fontSize, setFontSize] = useState(40);
-  const [fontFamily, setFontFamily] = useState("Noto Sans JP");
-  const firstTextObjectRef = useRef<any>(null); // 初回のテキストオブジェクトを追跡
-  const [isFontDropdownOpen, setIsFontDropdownOpen] = useState(false);
-  const [selectedObject, setSelectedObject] = useState<any>(null);
-  const [activeFontTab, setActiveFontTab] = useState<"japanese" | "english">("japanese"); // フォントタブの状態
+  // 参照画像（AI生成用）
+  const [referenceImages, setReferenceImages] = useState<string[]>([]);
+  const [isReferenceDragging, setIsReferenceDragging] = useState(false);
+  const referenceFileInputRef = useRef<HTMLInputElement>(null);
   
-  // 履歴管理
-  const historyRef = useRef<string[]>([]);
-  const historyStepRef = useRef<number>(0);
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
-  const isHistoryInitializedRef = useRef<boolean>(false); // 履歴初期化フラグ（refで管理）
-  const isLoadingHistoryRef = useRef<boolean>(false); // undo/redo実行中フラグ
+  // コンパネ2（スタイル詳細）
+  const [isPanel2Open, setIsPanel2Open] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  const [styleImages, setStyleImages] = useState<string[]>([]);
   
-  // カート関連
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("");
+  // ポップアップ（画像詳細）
+  const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
+  const [selectedPopupImage, setSelectedPopupImage] = useState<string | null>(null);
+  const [imageMetadata, setImageMetadata] = useState<string>("");
   
-  // モーダル関連
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalColor, setModalColor] = useState(product.colors[0].name);
-  // カラーごとに個数を保持
-  const [modalQuantities, setModalQuantities] = useState<{ [color: string]: { [size: string]: number } }>(() => {
-    const initial: { [color: string]: { [size: string]: number } } = {};
-    product.colors.forEach(color => {
-      initial[color.name] = {
-        S: 0,
-        M: color.name === product.colors[0].name ? 1 : 0, // 最初のカラーのみMを1に
-        L: 0,
-        XL: 0,
-        XXL: 0,
-      };
-    });
-    return initial;
-  });
-  
-  // 商品選択関連
-  const [selectedColor, setSelectedColor] = useState<"white" | "black">("white");
-  const [selectedSize, setSelectedSize] = useState<"S" | "M" | "L" | "XL" | "XXL">("M");
-  
-  const sizes = ["S", "M", "L", "XL", "XXL"];
+  // プロンプト
+  const [promptText, setPromptText] = useState("");
 
-  // レスポンシブ対応
-  const [isMobile, setIsMobile] = useState(false);
-  
-  // ズーム表示状態
-  const [isZoomed, setIsZoomed] = useState(false);
-  
-  // ゴミ箱表示状態
-  const [showTrash, setShowTrash] = useState(false);
-  const [isOverTrash, setIsOverTrash] = useState(false);
-  
-  // スナップガイドライン状態
-  const [snapGuides, setSnapGuides] = useState<{
-    vertical: number | null;   // 縦ガイドのX座標
-    horizontal: number | null; // 横ガイドのY座標
-  }>({ vertical: null, horizontal: null });
-  
-  // タブ状態（Apple風デザイン用）
-  type TabType = "item" | "ai" | "images" | "text";
-  const [activeTab, setActiveTab] = useState<TabType | null>(null); // 最初は全て閉じた状態
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  
-  // ズーム時のESCキーハンドラー
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isZoomed && fabricCanvasRef.current) {
-        // ズームをリセット
-        fabricCanvasRef.current.setViewportTransform([1, 0, 0, 1, 0, 0]);
-        fabricCanvasRef.current.renderAll();
-        setIsZoomed(false);
-      }
-    };
-    
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isZoomed]);
+  // プリント範囲の状態
+  const [printAreaStyle, setPrintAreaStyle] = useState<React.CSSProperties>({});
+  const [isMounted, setIsMounted] = useState(false); // クライアントサイドでのみレンダリング
+  const mainImageRef = useRef<HTMLImageElement>(null);
 
+  // 画像アップロード確認ポップアップ
+  const [showUploadConfirm, setShowUploadConfirm] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [uploadSource, setUploadSource] = useState<"printArea" | "imageManagement" | null>(null);
+  const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
+
+  // 画像サイズチェックポップアップ
+  const [showImageSizeCheck, setShowImageSizeCheck] = useState(false);
+  const [imageSizeInfo, setImageSizeInfo] = useState<{
+    width: number;
+    height: number;
+    isGoodQuality: boolean;
+    isTooSmall: boolean;
+  } | null>(null);
+
+  // アップロード済み画像の原寸大ポップアップ
+  const [showFullSizeImage, setShowFullSizeImage] = useState(false);
+  const [fullSizeImageSrc, setFullSizeImageSrc] = useState<string>("");
+
+  // コントロールメニュー（Undo/Redo機能）
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // コントロールメニューのアクション
+  const handleUndo = () => {
+    console.log("元に戻す");
+    // TODO: Undo機能を実装
+  };
+
+  const handleRedo = () => {
+    console.log("やり直し");
+    // TODO: Redo機能を実装
+  };
+
+  const handleAlignVerticalCenter = () => {
+    console.log("上下中央");
+    // TODO: 上下中央揃え機能を実装
+  };
+
+  const handleAlignHorizontalCenter = () => {
+    console.log("左右中央");
+    // TODO: 左右中央揃え機能を実装
+  };
+
+  const handleBringForward = () => {
+    console.log("手前へ");
+    // TODO: 手前へ移動機能を実装
+  };
+
+  const handleSendBackward = () => {
+    console.log("奥へ");
+    // TODO: 奥へ移動機能を実装
+  };
+
+  const handleFitToArea = () => {
+    console.log("範囲内最大");
+    // TODO: 範囲内最大機能を実装
+  };
+
+  // 初回のみ利用規約の同意状態をlocalStorageから読み込み
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    if (typeof window !== "undefined") {
+      const agreed = localStorage.getItem("hasAgreedToImageUploadTerms") === "true";
+      setHasAgreedToTerms(agreed);
+    }
   }, []);
 
-  // フォントドロップダウン用のref
-  const fontDropdownRef = useRef<HTMLDivElement>(null);
-
-  // フォントドロップダウンの外側クリックで閉じる
+  // 画像オブジェクトのドラッグ処理
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (isFontDropdownOpen && fontDropdownRef.current && !fontDropdownRef.current.contains(e.target as Node)) {
-        setIsFontDropdownOpen(false);
+    if (!isDraggingImage || !selectedImageId) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!mainImageRef.current || !printAreaStyle.width) return;
+
+      const printAreaWidth = parseFloat(printAreaStyle.width as string);
+      const printAreaHeight = parseFloat(printAreaStyle.height as string);
+
+      let deltaX = e.clientX - dragStart.x;
+      let deltaY = e.clientY - dragStart.y;
+
+      // Shiftキーが押されている場合、水平または垂直のみに移動
+      if (e.shiftKey) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          deltaY = 0; // 水平のみ
+        } else {
+          deltaX = 0; // 垂直のみ
+        }
+      }
+
+      const deltaXPercent = (deltaX / printAreaWidth) * 100;
+      const deltaYPercent = (deltaY / printAreaHeight) * 100;
+
+      setPrintedImages((prev) =>
+        prev.map((img) => {
+          if (img.id !== selectedImageId) return img;
+          
+          // 回転した矩形の4つの角から正確な境界ボックスを計算
+          const baseSize = 60;
+          const rotationRad = (img.rotation * Math.PI) / 180;
+          const cosRad = Math.cos(rotationRad);
+          const sinRad = Math.sin(rotationRad);
+          
+          const halfW = baseSize / 2;
+          const halfH = baseSize / 2;
+          
+          const corners = [
+            { x: -halfW, y: -halfH },
+            { x: halfW, y: -halfH },
+            { x: halfW, y: halfH },
+            { x: -halfW, y: halfH },
+          ];
+          
+          const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosRad - corner.y * sinRad,
+            y: corner.x * sinRad + corner.y * cosRad,
+          }));
+          
+          const minX = Math.min(...rotatedCorners.map(c => c.x));
+          const maxX = Math.max(...rotatedCorners.map(c => c.x));
+          const minY = Math.min(...rotatedCorners.map(c => c.y));
+          const maxY = Math.max(...rotatedCorners.map(c => c.y));
+          
+          const boundingWidth = (maxX - minX) * img.scale;
+          const boundingHeight = (maxY - minY) * img.scale;
+          
+          const halfBoundingWidth = boundingWidth / 2;
+          const halfBoundingHeight = boundingHeight / 2;
+          
+          // 範囲制限
+          const minMargin = 0.5;
+          const maxMargin = 99.5;
+          
+          const newX = Math.max(
+            halfBoundingWidth + minMargin,
+            Math.min(maxMargin - halfBoundingWidth, img.x + deltaXPercent)
+          );
+          const newY = Math.max(
+            halfBoundingHeight + minMargin,
+            Math.min(maxMargin - halfBoundingHeight, img.y + deltaYPercent)
+          );
+          
+          return {
+            ...img,
+            x: newX,
+            y: newY,
+          };
+        })
+      );
+
+      setDragStart({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!mainImageRef.current || !printAreaStyle.width) return;
+
+      const touch = e.touches[0];
+      const printAreaWidth = parseFloat(printAreaStyle.width as string);
+      const printAreaHeight = parseFloat(printAreaStyle.height as string);
+
+      const deltaX = touch.clientX - dragStart.x;
+      const deltaY = touch.clientY - dragStart.y;
+
+      const deltaXPercent = (deltaX / printAreaWidth) * 100;
+      const deltaYPercent = (deltaY / printAreaHeight) * 100;
+
+      setPrintedImages((prev) =>
+        prev.map((img) => {
+          if (img.id !== selectedImageId) return img;
+          
+          // 回転した矩形の4つの角から正確な境界ボックスを計算
+          const baseSize = 60;
+          const rotationRad = (img.rotation * Math.PI) / 180;
+          const cosRad = Math.cos(rotationRad);
+          const sinRad = Math.sin(rotationRad);
+          
+          const halfW = baseSize / 2;
+          const halfH = baseSize / 2;
+          
+          const corners = [
+            { x: -halfW, y: -halfH },
+            { x: halfW, y: -halfH },
+            { x: halfW, y: halfH },
+            { x: -halfW, y: halfH },
+          ];
+          
+          const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosRad - corner.y * sinRad,
+            y: corner.x * sinRad + corner.y * cosRad,
+          }));
+          
+          const minX = Math.min(...rotatedCorners.map(c => c.x));
+          const maxX = Math.max(...rotatedCorners.map(c => c.x));
+          const minY = Math.min(...rotatedCorners.map(c => c.y));
+          const maxY = Math.max(...rotatedCorners.map(c => c.y));
+          
+          const boundingWidth = (maxX - minX) * img.scale;
+          const boundingHeight = (maxY - minY) * img.scale;
+          
+          const halfBoundingWidth = boundingWidth / 2;
+          const halfBoundingHeight = boundingHeight / 2;
+          
+          // 範囲制限
+          const minMargin = 0.5;
+          const maxMargin = 99.5;
+          
+          const newX = Math.max(
+            halfBoundingWidth + minMargin,
+            Math.min(maxMargin - halfBoundingWidth, img.x + deltaXPercent)
+          );
+          const newY = Math.max(
+            halfBoundingHeight + minMargin,
+            Math.min(maxMargin - halfBoundingHeight, img.y + deltaYPercent)
+          );
+          
+          return {
+            ...img,
+            x: newX,
+            y: newY,
+          };
+        })
+      );
+
+      setDragStart({ x: touch.clientX, y: touch.clientY });
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingImage(false);
+    };
+
+    const handleTouchEnd = () => {
+      setIsDraggingImage(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isDraggingImage, selectedImageId, dragStart, printAreaStyle]);
+
+  // 画像オブジェクトをプリント範囲内に制約する関数
+  // 画像オブジェクトのリサイズ・回転処理
+  useEffect(() => {
+    if (!isResizing || !selectedImageId) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - resizeStart.x;
+      const deltaY = e.clientY - resizeStart.y;
+      
+      // 方向に応じたスケール変更
+      let scaleChange = 0;
+      const sensitivity = 0.01; // スケール変更の感度
+      
+      switch (resizeStart.direction) {
+        case "top":
+          scaleChange = -deltaY * sensitivity; // 上に引っ張ると拡大
+          break;
+        case "bottom":
+          scaleChange = deltaY * sensitivity; // 下に引っ張ると拡大
+          break;
+        case "left":
+          scaleChange = -deltaX * sensitivity; // 左に引っ張ると拡大
+          break;
+        case "right":
+          scaleChange = deltaX * sensitivity; // 右に引っ張ると拡大
+          break;
+        default:
+          // 角のハンドル（対角線方向）
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          scaleChange = (distance / 100) * (deltaX + deltaY > 0 ? 1 : -1);
+      }
+      
+      const newScale = resizeStart.scale + scaleChange;
+      
+      setPrintedImages((prev) =>
+        prev.map((img) => {
+          if (img.id !== selectedImageId) return img;
+          
+          // スケールを適用
+          const finalScale = Math.max(0.1, newScale);
+          
+          // 回転した矩形の境界ボックスを計算
+          const baseSize = 60;
+          const rotationRad = (img.rotation * Math.PI) / 180;
+          const cosRad = Math.cos(rotationRad);
+          const sinRad = Math.sin(rotationRad);
+          
+          const halfW = (baseSize / 2) * finalScale;
+          const halfH = (baseSize / 2) * finalScale;
+          
+          // 4つの角の座標
+          const corners = [
+            { x: -halfW, y: -halfH },
+            { x: halfW, y: -halfH },
+            { x: halfW, y: halfH },
+            { x: -halfW, y: halfH },
+          ];
+          
+          // 回転後の座標
+          const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosRad - corner.y * sinRad,
+            y: corner.x * sinRad + corner.y * cosRad,
+          }));
+          
+          // 境界ボックス
+          const minX = Math.min(...rotatedCorners.map(c => c.x));
+          const maxX = Math.max(...rotatedCorners.map(c => c.x));
+          const minY = Math.min(...rotatedCorners.map(c => c.y));
+          const maxY = Math.max(...rotatedCorners.map(c => c.y));
+          
+          // 中心位置
+          let centerX = img.x;
+          let centerY = img.y;
+          
+          // 境界（絶対座標%）
+          const boundLeft = centerX + minX;
+          const boundRight = centerX + maxX;
+          const boundTop = centerY + minY;
+          const boundBottom = centerY + maxY;
+          
+          // 範囲を超えている場合、位置を調整（過去の実装と同じ）
+          if (boundLeft < 0) {
+            centerX += (0 - boundLeft);
+          }
+          if (boundRight > 100) {
+            centerX -= (boundRight - 100);
+          }
+          if (boundTop < 0) {
+            centerY += (0 - boundTop);
+          }
+          if (boundBottom > 100) {
+            centerY -= (boundBottom - 100);
+          }
+          
+          return {
+            ...img,
+            scale: finalScale,
+            x: centerX,
+            y: centerY,
+          };
+        })
+      );
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - resizeStart.x;
+      const deltaY = touch.clientY - resizeStart.y;
+      
+      // 方向に応じたスケール変更
+      let scaleChange = 0;
+      const sensitivity = 0.01;
+      
+      switch (resizeStart.direction) {
+        case "top":
+          scaleChange = -deltaY * sensitivity;
+          break;
+        case "bottom":
+          scaleChange = deltaY * sensitivity;
+          break;
+        case "left":
+          scaleChange = -deltaX * sensitivity;
+          break;
+        case "right":
+          scaleChange = deltaX * sensitivity;
+          break;
+        default:
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          scaleChange = (distance / 100) * (deltaX + deltaY > 0 ? 1 : -1);
+      }
+      
+      const newScale = resizeStart.scale + scaleChange;
+      
+      setPrintedImages((prev) =>
+        prev.map((img) => {
+          if (img.id !== selectedImageId) return img;
+          
+          // 回転した矩形の4つの角から正確な境界ボックスを計算
+          const baseSize = 60;
+          const rotationRad = (img.rotation * Math.PI) / 180;
+          const cosRad = Math.cos(rotationRad);
+          const sinRad = Math.sin(rotationRad);
+          
+          // 矩形の半分のサイズ
+          const halfW = baseSize / 2;
+          const halfH = baseSize / 2;
+          
+          // 4つの角の座標（回転前、中心が原点）
+          const corners = [
+            { x: -halfW, y: -halfH },
+            { x: halfW, y: -halfH },
+            { x: halfW, y: halfH },
+            { x: -halfW, y: halfH },
+          ];
+          
+          // 回転後の4つの角の座標
+          const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosRad - corner.y * sinRad,
+            y: corner.x * sinRad + corner.y * cosRad,
+          }));
+          
+          // 境界ボックス
+          const minX = Math.min(...rotatedCorners.map(c => c.x));
+          const maxX = Math.max(...rotatedCorners.map(c => c.x));
+          const minY = Math.min(...rotatedCorners.map(c => c.y));
+          const maxY = Math.max(...rotatedCorners.map(c => c.y));
+          
+          const unscaledBoundingWidth = maxX - minX;
+          const unscaledBoundingHeight = maxY - minY;
+          
+          // スケールを適用
+          let constrainedScale = Math.max(0.1, newScale);
+          let actualBoundingWidth = unscaledBoundingWidth * constrainedScale;
+          let actualBoundingHeight = unscaledBoundingHeight * constrainedScale;
+          
+          // 境界ボックスが100%を超える場合はスケール縮小
+          const maxAllowedSize = 99;
+          if (actualBoundingWidth > maxAllowedSize) {
+            constrainedScale *= maxAllowedSize / actualBoundingWidth;
+            actualBoundingWidth = maxAllowedSize;
+            actualBoundingHeight = unscaledBoundingHeight * constrainedScale;
+          }
+          if (actualBoundingHeight > maxAllowedSize) {
+            constrainedScale *= maxAllowedSize / actualBoundingHeight;
+            actualBoundingHeight = maxAllowedSize;
+            actualBoundingWidth = unscaledBoundingWidth * constrainedScale;
+          }
+          
+          const halfBoundingWidth = actualBoundingWidth / 2;
+          const halfBoundingHeight = actualBoundingHeight / 2;
+          
+          // 位置を調整
+          let adjustedX = img.x;
+          let adjustedY = img.y;
+          
+          const minMargin = 0.5;
+          const maxMargin = 99.5;
+          
+          if (adjustedX - halfBoundingWidth < minMargin) {
+            adjustedX = halfBoundingWidth + minMargin;
+          }
+          if (adjustedX + halfBoundingWidth > maxMargin) {
+            adjustedX = maxMargin - halfBoundingWidth;
+          }
+          if (adjustedY - halfBoundingHeight < minMargin) {
+            adjustedY = halfBoundingHeight + minMargin;
+          }
+          if (adjustedY + halfBoundingHeight > maxMargin) {
+            adjustedY = maxMargin - halfBoundingHeight;
+          }
+          
+          return {
+            ...img,
+            scale: constrainedScale,
+            x: adjustedX,
+            y: adjustedY,
+          };
+        })
+      );
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    const handleTouchEnd = () => {
+      setIsResizing(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isResizing, selectedImageId, resizeStart]);
+
+  // 画像オブジェクトの回転処理
+  useEffect(() => {
+    if (!isRotating || !selectedImageId) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // 中心からマウス位置への角度を計算
+      const deltaX = e.clientX - rotateStart.centerX;
+      const deltaY = e.clientY - rotateStart.centerY;
+      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+      
+      // 90度オフセット（上が0度）
+      let rotation = angle + 90;
+      
+      // Shiftキーが押されている場合、15度刻みにスナップ
+      if (e.shiftKey) {
+        rotation = Math.round(rotation / 15) * 15;
+      }
+      
+      setPrintedImages((prev) =>
+        prev.map((img) => {
+          if (img.id !== selectedImageId) return img;
+          
+          // 回転した矩形の境界ボックスを計算
+          const baseSize = 60;
+          const rotationRad = (rotation * Math.PI) / 180;
+          const cosRad = Math.cos(rotationRad);
+          const sinRad = Math.sin(rotationRad);
+          
+          const halfW = (baseSize / 2) * img.scale;
+          const halfH = (baseSize / 2) * img.scale;
+          
+          // 4つの角の座標
+          const corners = [
+            { x: -halfW, y: -halfH },
+            { x: halfW, y: -halfH },
+            { x: halfW, y: halfH },
+            { x: -halfW, y: halfH },
+          ];
+          
+          // 回転後の座標
+          const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosRad - corner.y * sinRad,
+            y: corner.x * sinRad + corner.y * cosRad,
+          }));
+          
+          // 境界ボックス
+          const minX = Math.min(...rotatedCorners.map(c => c.x));
+          const maxX = Math.max(...rotatedCorners.map(c => c.x));
+          const minY = Math.min(...rotatedCorners.map(c => c.y));
+          const maxY = Math.max(...rotatedCorners.map(c => c.y));
+          
+          // 中心位置
+          let centerX = img.x;
+          let centerY = img.y;
+          
+          // 境界（絶対座標%）
+          const boundLeft = centerX + minX;
+          const boundRight = centerX + maxX;
+          const boundTop = centerY + minY;
+          const boundBottom = centerY + maxY;
+          
+          // 範囲を超えている場合、位置を調整（過去の実装と同じ）
+          if (boundLeft < 0) {
+            centerX += (0 - boundLeft);
+          }
+          if (boundRight > 100) {
+            centerX -= (boundRight - 100);
+          }
+          if (boundTop < 0) {
+            centerY += (0 - boundTop);
+          }
+          if (boundBottom > 100) {
+            centerY -= (boundBottom - 100);
+          }
+          
+          return {
+            ...img,
+            rotation,
+            scale: img.scale,
+            x: centerX,
+            y: centerY,
+          };
+        })
+      );
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - rotateStart.centerX;
+      const deltaY = touch.clientY - rotateStart.centerY;
+      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+      const rotation = angle + 90;
+      
+      setPrintedImages((prev) =>
+        prev.map((img) => {
+          if (img.id !== selectedImageId) return img;
+          
+          // 回転した矩形の境界ボックスを計算
+          const baseSize = 60;
+          const rotationRad = (rotation * Math.PI) / 180;
+          const cosRad = Math.cos(rotationRad);
+          const sinRad = Math.sin(rotationRad);
+          
+          const halfW = (baseSize / 2) * img.scale;
+          const halfH = (baseSize / 2) * img.scale;
+          
+          // 4つの角の座標
+          const corners = [
+            { x: -halfW, y: -halfH },
+            { x: halfW, y: -halfH },
+            { x: halfW, y: halfH },
+            { x: -halfW, y: halfH },
+          ];
+          
+          // 回転後の座標
+          const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosRad - corner.y * sinRad,
+            y: corner.x * sinRad + corner.y * cosRad,
+          }));
+          
+          // 境界ボックス
+          const minX = Math.min(...rotatedCorners.map(c => c.x));
+          const maxX = Math.max(...rotatedCorners.map(c => c.x));
+          const minY = Math.min(...rotatedCorners.map(c => c.y));
+          const maxY = Math.max(...rotatedCorners.map(c => c.y));
+          
+          // 中心位置
+          let centerX = img.x;
+          let centerY = img.y;
+          
+          // 境界（絶対座標%）
+          const boundLeft = centerX + minX;
+          const boundRight = centerX + maxX;
+          const boundTop = centerY + minY;
+          const boundBottom = centerY + maxY;
+          
+          // 範囲を超えている場合、位置を調整（過去の実装と同じ）
+          if (boundLeft < 0) {
+            centerX += (0 - boundLeft);
+          }
+          if (boundRight > 100) {
+            centerX -= (boundRight - 100);
+          }
+          if (boundTop < 0) {
+            centerY += (0 - boundTop);
+          }
+          if (boundBottom > 100) {
+            centerY -= (boundBottom - 100);
+          }
+          
+          return {
+            ...img,
+            rotation,
+            scale: img.scale,
+            x: centerX,
+            y: centerY,
+          };
+        })
+      );
+    };
+
+    const handleMouseUp = () => {
+      setIsRotating(false);
+    };
+
+    const handleTouchEnd = () => {
+      setIsRotating(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isRotating, selectedImageId, rotateStart]);
+
+  // クライアントサイドでのみレンダリング
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Deleteキーで選択中のオブジェクトを削除
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedImageId) {
+        e.preventDefault();
+        setPrintedImages((prev) => prev.filter((img) => img.id !== selectedImageId));
+        setSelectedImageId(null);
       }
     };
 
-    if (isFontDropdownOpen) {
-      document.addEventListener('click', handleClickOutside);
-    }
-
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isFontDropdownOpen]);
+  }, [selectedImageId]);
 
-  // GSAP スクロール連動アニメーション
-  useEffect(() => {
-    // GSAPとScrollTriggerが読み込まれているか確認
-    if (typeof window === 'undefined' || !(window as any).gsap || !(window as any).ScrollTrigger) {
-      return;
-    }
 
-    const gsap = (window as any).gsap;
-    const ScrollTrigger = (window as any).ScrollTrigger;
+  // メニュー項目
+  const menuItems: { id: MenuTab; label: string }[] = [
+    { id: "item", label: "アイテム" },
+    { id: "ai", label: "AI画像生成" },
+    { id: "image", label: "画像管理" },
+    { id: "text", label: "テキスト" },
+  ];
+
+  // アイコンSVGコンポーネント
+  const getIcon = (id: MenuTab, color: string = "#303030") => {
+    const iconStyle = { width: "24px", height: "24px", flexShrink: 0 };
     
-    gsap.registerPlugin(ScrollTrigger);
-
-    // 商品情報ヘッダーのアニメーション（デスクトップのみ）
-    if (!isMobile) {
-      gsap.fromTo(
-        '.product-header',
-        { 
-          opacity: 0, 
-          y: 30,
-          scale: 0.95,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '.product-header',
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      // Tシャツモックアップのパララックス効果
-      gsap.to('.canvas-container', {
-        y: -30,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.canvas-container',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1,
-        },
-      });
+    switch (id) {
+      case "item":
+        return (
+          <svg width="24" height="24" viewBox="0 0 48 48" style={iconStyle}>
+            <path d="M32.6732039,24.2149483 C32.4965006,20.8575868 35.6326999,18.4498489 38.842109,19.542636 L39.6769253,19.8312016 L40.2435121,17.2857296 C40.2435121,17.2857296 33.3348798,9.9395838 32.6241638,10.0099418 C32.6241638,10.0099418 32.1673203,9.99999994 31.6845537,10.0003602 C30.2136854,12.968988 27.1528473,15.0099418 23.6153188,15.0099418 C20.0776473,15.0099418 17.0167046,12.9688229 15.5459055,10 C15.0615473,9.99999994 14.6064738,10.0099418 14.6064738,10.0099418 C13.9583364,10.0099418 7,17.3000118 7,17.3000118 L7.56714184,19.8115152 L8.39607849,19.534326 C11.5774498,18.4705032 14.7353576,20.834396 14.5574338,24.2149483 L14.2483253,30 L32.9771214,30 L32.6732039,24.2149483 Z M33.1872613,34 L14.0345962,34 L13.8203359,38.0099418 L33.3979235,38.0099418 L33.1872613,34 Z M10.579173,23.9947712 C10.6080886,23.4453742 10.2000242,23.1442916 9.68081156,23.3179118 L6.5299669,24.3715267 C5.48148882,24.7221286 4.43611947,24.1263828 4.19755919,23.0521044 L3.06549961,17.9542433 C2.82582448,16.8749445 3.26466057,15.3668688 4.04307572,14.5884537 L11.2199831,7.41154632 C11.9995586,6.63197081 13.5212033,6 14.6226844,6 L17.6405787,6 C18.1878657,6 18.7372603,6.42629719 18.9074574,6.96405029 C18.9074574,6.96405029 19.5971061,11 23.6315294,11 C27.6659527,11 28.3597409,6.95223077 28.3597409,6.95223077 C28.5098455,6.42632824 29.0758629,6 29.6224801,6 L32.6403744,6 C33.7400589,6 35.2646606,6.63313117 36.0430757,7.41154632 L43.2199831,14.5884537 C43.9995586,15.3680292 44.439761,16.8670779 44.1975592,17.9621895 L43.0654996,23.0807792 C42.8258245,24.1644666 41.7846016,24.7545942 40.7330919,24.3965607 L37.5690294,23.3192139 C37.0512624,23.1429169 36.6552623,23.4509254 36.6838858,23.9947712 L37.5264019,40.0025781 C37.5844622,41.1057238 36.7316319,42 35.6402851,42 L11.6227737,42 C10.5230398,42 9.67842021,41.1090746 9.73665687,40.0025781 L10.579173,23.9947712 Z" fill={color} />
+          </svg>
+        );
+      case "ai":
+        return (
+          <svg width="24" height="24" viewBox="0 0 48 48" style={iconStyle}>
+            <path d="M25.3841736,18.0729398 L29.6273588,22.316125 C30.408257,23.0970232 30.4049765,24.3663899 29.6332778,25.1380886 L12.6503326,42.1210338 C11.8727033,42.8986631 10.6148002,42.9015461 9.82836894,42.1151149 L5.58518375,37.8719297 C4.80428553,37.0910314 4.80756608,35.8216647 5.57926479,35.049966 L22.56221,18.0670208 C23.3398392,17.2893916 24.5977424,17.2865086 25.3841736,18.0729398 Z M34.4641357,16.9489765 L31.5395848,18.4865039 C30.557771,19.0026739 29.9141966,18.5328849 30.1013701,17.4415797 L30.6599096,14.1850445 L28.2938983,11.8787535 C27.4995942,11.1044983 27.7475147,10.3472499 28.8432474,10.1880306 L32.1129946,9.71290853 L33.5752701,6.75001494 C34.066177,5.75532888 34.8629747,5.75711264 35.3530013,6.75001494 L36.8152767,9.71290853 L40.0850239,10.1880306 C41.1827251,10.3475359 41.4272527,11.1058868 40.634373,11.8787535 L38.2683617,14.1850445 L38.8269012,17.4415797 C39.014411,18.5348454 38.3687396,19.0017483 37.3886865,18.4865039 L34.4641357,16.9489765 Z M36.7214468,32.2407726 L35.2489561,33.0149067 C34.2677083,33.5307792 33.6224656,33.0731514 33.8115705,31.970585 L34.0927912,30.3309425 L32.9015212,29.1697413 C32.1076751,28.3959325 32.3435141,27.6408555 33.4505537,27.4799932 L35.0968483,27.2407726 L35.8330936,25.7489766 C36.3237175,24.754864 37.1147168,24.7458285 37.6097999,25.7489766 L38.3460453,27.2407726 L39.9923399,27.4799932 C41.0894083,27.6394066 41.3424337,28.3888994 40.5413723,29.1697413 L39.3501023,30.3309425 L39.631323,31.970585 C39.8187247,33.0632205 19.1841038,33.535468 38.1939375,33.0149067 L36.7214468,32.2407726 Z M16.7214468,13.2407726 L15.2489561,14.0149067 C14.2677083,14.5307792 13.6224656,14.0731514 13.8115705,12.970585 L14.0927912,11.3309425 L12.9015212,10.1697413 C12.1076751,9.39593254 12.3435141,8.64085546 13.4505537,8.47999319 L15.0968483,8.24077258 L15.8330936,6.74897657 C16.3237175,5.75486399 17.1147168,5.74582852 17.6097999,6.74897657 L18.3460453,8.24077258 L19.9923399,8.47999319 C21.0894083,8.63940656 21.3424337,9.38889941 20.5413723,10.1697413 L19.3501023,11.3309425 L19.631323,12.970585 C19.8187247,14.0632205 19.1841038,14.535468 18.1939375,14.0149067 L16.7214468,13.2407726 Z M20.3404788,25.9572163 L9.83031737,36.468625 L11.2337183,37.8803629 L21.7470378,27.3638341 L20.3404788,25.9572163 Z" fill={color} fillRule="nonzero" />
+          </svg>
+        );
+      case "image":
+        return (
+          <svg width="24" height="24" viewBox="0 0 48 48" style={iconStyle}>
+            <path d="M2,9.99017859 C2,7.7864638 3.79975948,6 5.99029394,6 L18.0767644,6 C19.1835685,6 20.5701975,6.7477726 21.1746315,7.67133451 L24.0075684,12 L41.9918214,12 C44.2054773,12 46,13.7867947 46,15.9992748 L46,38.0007252 C46,40.2094637 44.2069088,42 41.99819,42 L6.00180999,42 C3.79167136,42 2,40.2147544 2,38.0098214 L2,9.99017859 Z M6,38.0098214 L41.99819,38 L42,15.9992748 L24.0075684,16 C22.658105,16 21.3996088,15.3195781 20.6606307,14.1904356 L18,10.0097802 L5.99029394,10 L6,38.0098214 Z M17.862928,23.9448407 C18.3178041,22.9335006 19.2364493,22.8239147 19.9084014,23.6918355 L22.7905122,27.4144876 C23.4653199,28.2860968 24.7285203,28.4701867 25.6270803,27.8146248 L26.205134,27.3928946 C27.0969196,26.7422751 28.2985638,26.9754922 28.8829814,27.9041067 L31.6562655,32.3107367 C32.2434141,33.2436908 31.8235673,33.9999996 30.718486,33.9999996 L15.3412689,33.9999999 C14.236199,33.9999999 13.7078282,33.1830028 14.1639889,32.1688067 L17.862928,23.9448407 Z M30.9342877,26 C29.2774335,26 27.9342877,24.6568542 27.9342877,23 C27.9342877,21.3431458 29.2774335,20 30.9342877,20 C32.591142,20 33.9342877,21.3431458 33.9342877,23 C33.9342877,24.6568542 32.591142,26 30.9342877,26 Z" fill={color} />
+          </svg>
+        );
+      case "text":
+        return (
+          <svg width="24" height="24" viewBox="0 0 48 48" style={iconStyle}>
+            <path d="M18.7420473,23 L29.2579527,23 L24,12.5 L18.7420473,23 Z M14.7888544,30.8944272 C14.2948759,31.8823842 13.0935298,32.2828329 12.1055728,31.7888544 C11.1176158,31.2948759 10.7171671,30.0935298 11.2111456,29.1055728 L22.2111456,7.10557281 C22.9481942,5.63147573 25.0518058,5.63147573 25.7888544,7.10557281 L36.7888544,29.1055728 C37.2828329,30.0935298 36.8823842,31.2948759 35.8944272,31.7888544 C34.9064702,32.2828329 33.7051241,31.8823842 33.2111456,30.8944272 L31.2609824,27 L16.7390176,27 L14.7888544,30.8944272 Z M6,39 C6,37.3431458 7.34553934,36 9.00741988,36 L38.9925801,36 C40.6535323,36 42,37.3465171 42,39 C42,40.6568542 40.6544607,42 38.9925801,42 L9.00741988,42 C7.34646775,42 6,40.6534829 6,39 Z" fill={color} />
+          </svg>
+        );
     }
+  };
 
-    // クリーンアップ
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger: any) => trigger.kill());
+  // カートアイコン
+  const getCartIcon = (color: string = "#303030") => {
+    return (
+      <svg width="24" height="24" viewBox="0 0 48 48" style={{ width: "24px", height: "24px", flexShrink: 0 }}>
+        <path d="M11.5007403,9.05603578 L43.3117204,11.0066834 C44.4128513,11.0680907 45.1400283,12.0036535 44.9388675,13.0805194 L42.3354502,27.0172835 C42.1329678,28.1012242 41.0744857,28.9799318 39.9706095,28.9799318 L16.1005524,28.9799318 L16.5622906,30.9799318 L38.9688234,30.9799318 C40.0733929,30.9799318 40.9688234,31.8753623 40.9688234,32.9799318 C40.9688234,34.0845013 40.0733929,34.9799318 38.9688234,34.9799318 L14.9688234,34.9799318 C14.0375114,34.9799318 13.2294553,34.337113 13.020041,33.4296508 L7.23501091,8.36118717 L4.10770841,6.79014097 C3.11928363,6.29709916 2.71769638,5.09613319 3.21073819,4.10770841 C3.70378001,3.11928363 4.90474597,2.71769638 5.89317075,3.21073819 L9.86155454,5.19023038 C10.3959835,5.45681194 10.7833136,5.94828007 10.9176058,6.53021276 L11.5007403,9.05603578 Z M38.6470013,24.9790697 L40.5410416,14.8397833 L12.4391717,13.1208128 L15.1770742,24.9799241 L38.6470013,24.9790697 Z M34.9688234,44.9799318 C32.7596844,44.9799318 30.9688234,43.1890708 30.9688234,40.9799318 C30.9688234,38.7707928 32.7596844,36.9799318 34.9688234,36.9799318 C37.1779624,36.9799318 38.9688234,38.7707928 38.9688234,40.9799318 C38.9688234,43.1890708 37.1779624,44.9799318 34.9688234,44.9799318 Z M16.9688234,44.9799318 C14.7596844,44.9799318 12.9688234,43.1890708 12.9688234,40.9799318 C12.9688234,38.7707928 14.7596844,36.9799318 16.9688234,36.9799318 C19.1779624,36.9799318 20.9688234,38.7707928 20.9688234,40.9799318 C20.9688234,43.1890708 19.1779624,44.9799318 16.9688234,44.9799318 Z" fill={color} />
+      </svg>
+    );
+  };
+
+  // 展開アイコン（矢印）
+  const getExpandIcon = () => {
+    return (
+      <svg width="24" height="24" viewBox="0 0 48 48" style={{ width: "24px", height: "24px", flexShrink: 0 }}>
+        <path d="M31.4142136,11.4142136 C32.1952621,10.633165 32.1952621,9.36683502 31.4142136,8.58578644 C30.633165,7.80473785 29.366835,7.80473785 28.5857864,8.58578644 L14.5857864,22.5857864 C13.8047379,23.366835 13.8047379,24.633165 14.5857864,25.4142136 L28.5857864,39.4142136 C29.366835,40.1952621 30.633165,40.1952621 31.4142136,39.4142136 C32.1952621,38.633165 32.1952621,37.366835 31.4142136,36.5857864 L18.8284271,24 L31.4142136,11.4142136 Z" fill="#303030" fillRule="nonzero" transform="translate(23.000000, 24.000000) scale(-1, 1) translate(-23.000000, -24.000000)" />
+      </svg>
+    );
+  };
+
+  // 画像アイコン
+  const getImageIcon = (size: number = 32) => {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" style={{ width: `${size}px`, height: `${size}px`, flexShrink: 0 }}>
+        <path d="M22,8 L11.9909413,8 L12,39.9999745 L35.9957423,40 C35.9957423,40 36.0001766,28.3434109 36.0001145,22 L24,22 C22.8954305,22 22,21.1045695 22,20 L22,8 Z M26,18 L35.9999993,18 L26,8 L26,18 Z M11.9909413,4 L26.6055819,4 C27.1573996,4 27.923594,4.31897704 28.3066744,4.70220075 L39.2980619,15.6977016 C39.6857316,16.0855164 40,16.8559261 40,17.3985099 L40,40.0014572 C40,42.2097914 38.2109725,44 35.9957423,44 L12.0042577,44 C9.79276724,44 8,42.2035752 8,39.9999745 L8,8.00002553 C8,5.79087243 9.79176129,4 11.9909413,4 Z M30.9625772,30 C29.3057229,30 27.9625772,28.6568542 27.9625772,27 C27.9625772,25.3431458 29.3057229,24 30.9625772,24 C32.6194314,24 33.9625772,25.3431458 33.9625772,27 C33.9625772,28.6568542 32.6194314,30 30.9625772,30 Z M17.8912175,27.9448407 C18.3460936,26.9335006 19.2647388,26.8239147 19.9366909,27.6918355 L22.8188017,31.4144876 C23.4936094,32.2860968 24.7568098,32.4701867 25.6553698,31.8146248 L26.2334235,31.3928946 C27.1252091,30.7422751 28.3268533,30.9754922 28.9112709,31.9041067 L31.6845549,36.3107367 C32.2717036,37.2436908 31.8518568,37.9999996 30.7467755,37.9999996 L15.3695584,37.9999999 C14.2644885,37.9999999 13.7361177,37.1830028 14.1922784,36.1688067 L17.8912175,27.9448407 Z" fill="#303030" />
+      </svg>
+    );
+  };
+
+  // 商品データ取得
+  const fetchProducts = async (cursor?: string | null) => {
+    if (isLoadingProducts) return;
+    
+    setIsLoadingProducts(true);
+    try {
+      const url = new URL("/api/collection-products", window.location.origin);
+      url.searchParams.set("handle", "item");
+      url.searchParams.set("first", "10");
+      if (cursor) {
+        url.searchParams.set("after", cursor);
+      }
+
+      const response = await fetch(url.toString());
+      const data = await response.json();
+
+      if (data.success) {
+        setProducts((prev) => cursor ? [...prev, ...data.products] : data.products);
+        setHasNextPage(data.pageInfo.hasNextPage);
+        setEndCursor(data.pageInfo.endCursor);
+      }
+    } catch (error) {
+      console.error("商品取得エラー:", error);
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
+
+  // アイテムタブ選択時に商品を取得
+  useEffect(() => {
+    if (activeTab === "item" && products.length === 0) {
+      fetchProducts();
+    }
+  }, [activeTab]);
+
+  // 無限スクロール
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      if (scrollHeight - scrollTop <= clientHeight + 200 && hasNextPage && !isLoadingProducts) {
+        fetchProducts(endCursor);
+      }
     };
-  }, [isMobile]);
 
-  // カラーに基づいて商品画像のパスを生成
-  const getCurrentMockupImage = () => {
-    // カラー名から画像ファイル名を決定
-    const colorSlug = 
-      selectedColor.name === 'ホワイト' || selectedColor.name === 'オフホワイト' 
-        ? 'white' 
-        : 'black';
-    return `/images/products/${product.id}-${colorSlug}.png`;
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [hasNextPage, endCursor, isLoadingProducts]);
+
+  // メニュークリック処理
+  const handleMenuClick = (id: MenuTab) => {
+    if (activeTab === id) {
+      // 同じボタンを再クリック → 元に戻す
+      setActiveTab(null);
+      setIsCollapsed(false);
+    } else {
+      // 新しいボタンをクリック → 縮小
+      setActiveTab(id);
+      setIsCollapsed(true);
+    }
+    // コンパネ2を閉じる
+    setIsPanel2Open(false);
+    setSelectedStyle(null);
+  };
+
+  // 商品カードクリック処理
+  const handleProductClick = (productId: string, productImage: string | null, productName: string) => {
+    if (productImage) {
+      setSelectedProductImage(productImage);
+      setSelectedProductName(productName);
+      setSelectedProductId(productId);
+    }
+  };
+
+  // 画像アップロード処理（ポップアップを表示）
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    
+    // 画像ファイルのみをフィルタリング
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    if (imageFiles.length === 0) return;
+    
+    // File[]配列として保存
+    setPendingFiles(imageFiles);
+    setUploadSource("imageManagement");
+    
+    // 初回のみ利用規約ポップアップを表示、2回目以降は直接サイズチェック
+    if (hasAgreedToTerms) {
+      checkImageSize(imageFiles);
+    } else {
+      setShowUploadConfirm(true);
+    }
+  };
+
+  // 実際の画像アップロード処理（画像管理用）
+  const confirmImageManagementUpload = (files: File[]) => {
+    if (!files || files.length === 0) return;
+    
+    const newImages: string[] = [];
+    let processedCount = 0;
+    
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          newImages.push(e.target.result as string);
+          processedCount++;
+          if (processedCount === files.length) {
+            setUploadedImages((prev) => [...newImages, ...prev]);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // 画像サイズチェックを実行
+  const checkImageSize = (files: File[]) => {
+    if (files.length === 0) return;
+    
+    const file = files[0]; // 最初の画像をチェック
+    const img = new Image();
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        
+        // プリント範囲: 250mm × 312mm
+        // 150 DPI最低: 1182 × 1475px
+        // 300 DPI推奨: 2953 × 3685px
+        const minWidth = 1182;
+        const minHeight = 1475;
+        const recommendedWidth = 2953;
+        const recommendedHeight = 3685;
+        
+        const isTooSmall = width < minWidth || height < minHeight;
+        const isGoodQuality = width >= recommendedWidth && height >= recommendedHeight;
+        
+        setImageSizeInfo({
+          width,
+          height,
+          isGoodQuality,
+          isTooSmall
+        });
+        setShowImageSizeCheck(true);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // プリント範囲用の画像アップロード処理（ポップアップを表示）
+  const handlePrintAreaFileUpload = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    
+    // 画像ファイルのみをフィルタリング
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    if (imageFiles.length === 0) return;
+    
+    // File[]配列として保存
+    setPendingFiles(imageFiles);
+    setUploadSource("printArea");
+    
+    // 初回のみ利用規約ポップアップを表示、2回目以降は直接サイズチェック
+    if (hasAgreedToTerms) {
+      checkImageSize(imageFiles);
+    } else {
+      setShowUploadConfirm(true);
+    }
+  };
+
+  // 実際の画像アップロード処理
+  const confirmPrintAreaFileUpload = (files: File[]) => {
+    if (!files || files.length === 0) return;
+    
+    const newImageSrcs: string[] = [];
+    let processedCount = 0;
+    
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          newImageSrcs.push(e.target.result as string);
+          processedCount++;
+          
+          if (processedCount === files.length) {
+            // 画像オブジェクトを作成
+            // 初期スケールはプリント範囲の60%以内に収まるように設定
+            const baseSize = 60; // オブジェクトの基本サイズ（%）
+            const maxScale = 100 / baseSize; // プリント範囲いっぱいまでのスケール
+            const initialScale = Math.min(1, maxScale * 0.8); // 初期サイズは最大の80%
+            
+            const newImageObjects: ImageObject[] = newImageSrcs.map((src, index) => ({
+              id: `${Date.now()}-${index}`,
+              src,
+              x: 50, // 中央
+              y: 50, // 中央
+              scale: initialScale,
+              rotation: 0,
+              zIndex: printedImages.length + index,
+            }));
+            
+            // プリント範囲とアップロード済み画像の両方に追加
+            setPrintedImages((prev) => [...prev, ...newImageObjects]);
+            setUploadedImages((prev) => [...newImageSrcs, ...prev]);
+            // 画像管理タブに切り替え
+            setActiveTab("image");
+            setIsCollapsed(true); // サイドバーを縮小してコンパネを表示
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // プリント範囲のドラッグ＆ドロップ
+  const handlePrintAreaDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsPrintAreaDragging(true);
+  };
+
+  const handlePrintAreaDragLeave = () => {
+    setIsPrintAreaDragging(false);
+  };
+
+  const handlePrintAreaDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsPrintAreaDragging(false);
+    handlePrintAreaFileUpload(e.dataTransfer.files);
+  };
+
+  // ファイル選択処理
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileUpload(e.target.files);
+    e.target.value = ""; // ファイル入力をリセット
+  };
+
+  // ドラッグ&ドロップ処理
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingUpload(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingUpload(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingUpload(false);
+    handleFileUpload(e.dataTransfer.files);
+  };
+
+  // カラースウォッチクリック処理
+  const handleColorClick = (e: React.MouseEvent, productId: string, colorImage: string | null, colorName: string, productName: string) => {
+    e.stopPropagation(); // 親の商品カードクリックイベントを防ぐ
+    console.log("Color clicked:", { productId, colorImage, colorName, productName });
+    if (colorImage) {
+      setSelectedProductImage(colorImage);
+      setSelectedProductName(`${productName} - ${colorName}`);
+      setSelectedProductId(productId);
+      console.log("Updated selectedProductImage to:", colorImage);
+    } else {
+      console.warn("No color image available for:", colorName);
+    }
+  };
+
+  // AI生成画像を画像管理に保存
+  const handleSaveToGallery = () => {
+    if (generatedImage) {
+      setUploadedImages((prev) => [generatedImage, ...prev]);
+      // 画像管理タブに切り替え
+      setActiveTab("image");
+    }
+  };
+
+  // 参照画像アップロード処理
+  const handleReferenceFileUpload = (files: FileList | null) => {
+    if (!files) return;
+    
+    const newImages: string[] = [];
+    Array.from(files).forEach((file) => {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            newImages.push(e.target.result as string);
+            if (newImages.length === files.length) {
+              setReferenceImages((prev) => [...newImages, ...prev]);
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  // 参照画像ファイル選択処理
+  const handleReferenceFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleReferenceFileUpload(e.target.files);
+    e.target.value = ""; // ファイル入力をリセット
+  };
+
+  // 参照画像ドラッグ&ドロップ処理
+  const handleReferenceDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsReferenceDragging(true);
+  };
+
+  const handleReferenceDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsReferenceDragging(false);
+  };
+
+  const handleReferenceDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsReferenceDragging(false);
+    handleReferenceFileUpload(e.dataTransfer.files);
+  };
+
+  // スタイルフォルダマッピング
+  const styleFolderMap: { [key: string]: string } = {
+    "カップル": "couples",
+    "結婚式": "weddings",
+    "家族": "families",
+    "記念日": "anniversaries",
+    "スポーツ": "sports",
+    "チーム": "teams",
+    "ビジネス": "business",
+    "イベント": "events",
+    "ペット": "pets",
+    "動物": "animals",
+    "趣味": "hobbies",
+    "ファン": "fans",
+    "季節": "seasons",
+    "ホリデー": "holidays",
+    "旅行": "travel",
+    "冒険": "adventure",
+    "芸術": "art",
+    "クリエイティブ": "creative",
+    "キッズ": "kids",
+    "教育": "education"
+  };
+
+  // スタイル画像を取得（仮：各フォルダに1.jpgがあると仮定）
+  const getStyleImages = async (styleName: string): Promise<string[]> => {
+    const folderName = styleFolderMap[styleName];
+    if (!folderName) return [];
+    
+    try {
+      const url = new URL("/api/style-images", window.location.origin);
+      url.searchParams.set("style", folderName);
+      
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      
+      if (data.success && data.images) {
+        return data.images;
+      }
+    } catch (error) {
+      console.error("スタイル画像の取得に失敗:", error);
+    }
+    
+    return [];
+  };
+
+  // 画像のメタデータを取得
+  const fetchImageMetadata = async (imagePath: string): Promise<string> => {
+    try {
+      const url = new URL("/api/image-metadata", window.location.origin);
+      url.searchParams.set("path", imagePath);
+      
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      
+      if (data.success && data.description) {
+        return data.description;
+      }
+    } catch (error) {
+      console.error("メタデータの取得に失敗:", error);
+    }
+    return "メタデータがありません";
+  };
+
+  // プロンプトに反映
+  const handleApplyPrompt = (text: string) => {
+    setPromptText(text);
+    setIsImagePopupOpen(false);
   };
 
   // プリント範囲を計算（mm → px変換）
-  const getPrintAreaInPixels = (canvasSize: number) => {
-    // 商品ごとにプリント範囲のスケールを調整
-    let baseScale = 0.6; // デフォルト: キャンバスの60%
-    let topOffset = 0; // デフォルト: オフセットなし
+  const getPrintAreaInPixels = (containerWidth: number) => {
+    // 商品名または画像パスから商品タイプを判定
+    const imagePath = selectedProductImage.toLowerCase();
+    const productName = selectedProductName.toLowerCase();
+    let currentProductId = product.id;
     
-    // Tシャツ系：元の枠線の60%に縮小（0.6 * 0.6 = 0.36）+ 上に20px移動
-    // パーカー：元の枠線の40%に縮小（0.6 * 0.4 = 0.24）
-    if (product.id === 'box-tshirt-short' || product.id === 'box-tshirt-long' || product.id === 'sweatshirt') {
-      baseScale = 0.36;
-      topOffset = -20; // 上に20ピクセル移動
-    } else if (product.id === 'hoodie') {
-      baseScale = 0.24; // 40%に縮小
-      topOffset = 0; // 中央配置
+    // まず商品名から判定（Shopify商品の場合）
+    if (productName.includes('パーカ') || productName.includes('hoodie')) {
+      currentProductId = 'hoodie';
+    } else if (productName.includes('スウェットシャツ') || productName.includes('sweatshirt')) {
+      currentProductId = 'sweatshirt';
+    } else if (productName.includes('長袖') || productName.includes('long')) {
+      currentProductId = 'box-tshirt-long';
+    } else if (productName.includes('半袖') || productName.includes('short') || productName.includes('tシャツ')) {
+      currentProductId = 'box-tshirt-short';
+    }
+    // 画像パスからも判定（ローカル画像の場合）
+    else if (imagePath.includes('hoodie')) {
+      currentProductId = 'hoodie';
+    } else if (imagePath.includes('sweatshirt')) {
+      currentProductId = 'sweatshirt';
+    } else if (imagePath.includes('box-tshirt-long')) {
+      currentProductId = 'box-tshirt-long';
+    } else if (imagePath.includes('box-tshirt-short')) {
+      currentProductId = 'box-tshirt-short';
     }
     
-    const scale = canvasSize * baseScale;
+    // 商品ごとにプリント範囲のスケールを調整
+    let baseScale = 0.36; // 全商品共通: 0.36
+    let topOffset = 0; // デフォルト: オフセットなし
+    
+    // 商品ごとに個別のオフセットを設定
+    if (currentProductId === 'box-tshirt-short') {
+      topOffset = -20; // 半袖Tシャツ: 上に20px移動
+    } else if (currentProductId === 'box-tshirt-long') {
+      topOffset = -25; // 長袖Tシャツ: 上に25px移動
+    } else if (currentProductId === 'sweatshirt') {
+      topOffset = -35; // スウェットシャツ: 上に35px移動
+    } else if (currentProductId === 'hoodie') {
+      topOffset = 10; // パーカー: 下に10px移動
+    }
+    
+    const scale = containerWidth * baseScale;
     const ratio = product.printAreaWidth / product.printAreaHeight;
     
-    let width, height;
+    let width, printHeight;
     if (ratio > 1) {
       // 横長
       width = scale;
-      height = scale / ratio;
+      printHeight = scale / ratio;
     } else {
       // 縦長
-      height = scale;
+      printHeight = scale;
       width = scale * ratio;
     }
     
     return {
       width: Math.round(width),
-      height: Math.round(height),
-      left: Math.round((canvasSize - width) / 2),
-      top: Math.round((canvasSize - height) / 2) + topOffset,
+      height: Math.round(printHeight),
+      left: Math.round((containerWidth - width) / 2),
+      top: topOffset,
     };
   };
 
-  // ========== ステップ1.5: Fabric.js読み込み待機 ==========
+  // 画像ロード時・リサイズ時にプリント範囲を計算
+  const updatePrintArea = () => {
+    if (!mainImageRef.current) return;
+    
+    const containerWidth = mainImageRef.current.offsetWidth;
+    const imageHeight = mainImageRef.current.offsetHeight;
+    const printArea = getPrintAreaInPixels(containerWidth);
+    
+    // 画像の中央に配置
+    const topPosition = (imageHeight - printArea.height) / 2 + printArea.top;
+    
+    // 点線の色を決定（画像ファイル名から商品カラーを判定）
+    const imagePath = selectedProductImage.toLowerCase();
+    let borderColor = '#666666'; // デフォルト: グレー
+    
+    if (imagePath.includes('black')) {
+      // 黒い商品 → 白い点線
+      borderColor = '#ffffff';
+    } else if (imagePath.includes('white')) {
+      // 白い商品 → グレーの点線
+      borderColor = '#999999';
+    }
+    
+    setPrintAreaStyle({
+      width: `${printArea.width}px`,
+      height: `${printArea.height}px`,
+      left: `${printArea.left}px`,
+      top: `${topPosition}px`,
+      border: `1px dashed ${borderColor}`,
+      pointerEvents: "none",
+    });
+  };
+
+  // 画像変更時・ウィンドウリサイズ時にプリント範囲を更新
   useEffect(() => {
-    // Fabric.jsがグローバルに読み込まれるまで待つ
-    let checkCount = 0;
-    let isLoaded = false;
+    updatePrintArea();
     
-    const checkFabric = setInterval(() => {
-      checkCount++;
-      if (typeof window !== 'undefined' && typeof (window as any).fabric !== 'undefined') {
-        isLoaded = true;
-        setFabricLoaded(true);
-        clearInterval(checkFabric);
-      }
-    }, 100);
+    window.addEventListener('resize', updatePrintArea);
+    return () => window.removeEventListener('resize', updatePrintArea);
+  }, [selectedProductImage]);
 
-    // タイムアウト（10秒後）
-    const timeout = setTimeout(() => {
-      clearInterval(checkFabric);
-      if (!isLoaded) {
-        console.error('❌ Fabric.jsの読み込みに失敗しました');
-      }
-    }, 10000);
-
-    return () => {
-      clearInterval(checkFabric);
-      clearTimeout(timeout);
-    };
-  }, []);
-
-  // ========== ステップ2: Fabric.jsキャンバス初期化 ==========
-  useEffect(() => {
-    if (!canvasRef.current || !fabricLoaded || typeof (window as any).fabric === 'undefined') {
-      return;
-    }
-    
-    const fabricLib = (window as any).fabric;
-
-    // キャンバスサイズは固定（800x800）- CSS transformでスケーリング
-    
-    // キャンバスを作成
-    const canvas = new fabricLib.Canvas(canvasRef.current, {
-      width: CANVAS_SIZE,
-      height: CANVAS_SIZE,
-      backgroundColor: "#fafafa",
-      selection: true,
-      preserveObjectStacking: true, // 選択時にz-orderを変更しない
-      allowTouchScrolling: true, // モバイルでスクロールを許可
-      stopContextMenu: true, // コンテキストメニューを無効化
-      fireRightClick: false, // 右クリックイベントを無効化
-      fireMiddleClick: false, // 中クリックイベントを無効化
-      enablePointerEvents: true, // ポインターイベントを有効化
-    });
-    
-    // モバイルの場合、初期状態でtouchActionを設定
-    if (window.innerWidth < 768 && canvasRef.current) {
-      canvasRef.current.style.touchAction = "pan-y";
-    }
-
-    fabricCanvasRef.current = canvas;
-    setIsFabricReady(true);
-    
-    // コントロールサイズを設定（モバイルは大きく、PCは通常サイズ）
-    const isMobileDevice = window.innerWidth < 768;
-    const controlSize = isMobileDevice ? 32 : 24; // モバイル: 32px, PC: 24px
-    const cornerSize = isMobileDevice ? 28 : 20; // 角のコントロールサイズ
-    
-    // デフォルトコントロールのサイズを変更
-    fabricLib.Object.prototype.set({
-      borderColor: '#667eea',
-      cornerColor: '#667eea',
-      cornerStyle: 'circle',
-      transparentCorners: false,
-      cornerSize: cornerSize,
-      touchCornerSize: isMobileDevice ? 40 : cornerSize, // タッチ時はさらに大きく
-      padding: isMobileDevice ? 10 : 5,
-    });
-
-    // カスタム削除コントロールを追加
-    const deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
-    
-    const deleteControlSize = isMobileDevice ? 32 : 24; // モバイルで大きく
-    const deleteControl = new fabricLib.Control({
-      x: 0.5,
-      y: -0.5,
-      offsetY: isMobileDevice ? -20 : -16,
-      offsetX: isMobileDevice ? 20 : 16,
-      cursorStyle: 'pointer',
-      mouseUpHandler: (eventData: any, transform: any) => {
-        const target = transform.target;
-        if (target && target.name !== 'printArea') {
-          // テキストオブジェクトの参照をクリア
-          if (firstTextObjectRef.current === target) {
-            firstTextObjectRef.current = null;
-            setTextInput("");
-          }
-          
-          // オブジェクトを削除して初期状態に完全リセット
-          canvas.remove(target);
-          canvas.renderAll();
-          setSelectedObject(null);
-          setIsLoading(false);
-          
-          // 履歴を初期状態にリセット（やり直しを無効化）
-          const initialState = historyRef.current[0];
-          historyRef.current = [initialState];
-          historyStepRef.current = 0;
-          updateHistoryButtons();
-        }
-        return true;
-      },
-      render: (ctx: CanvasRenderingContext2D, left: number, top: number, styleOverride: any, fabricObject: any) => {
-        ctx.save();
-        ctx.translate(left, top);
-        ctx.rotate(fabricLib.util.degreesToRadians(fabricObject.angle || 0));
-        ctx.drawImage(deleteImg, -deleteControlSize / 2, -deleteControlSize / 2, deleteControlSize, deleteControlSize);
-        ctx.restore();
-      },
-      cornerSize: deleteControlSize
-    });
-
-    // 削除アイコン画像を読み込む
-    const deleteImg = document.createElement('img');
-    deleteImg.src = deleteIcon;
-
-    // すべてのオブジェクトに削除コントロールを追加
-    fabricLib.Object.prototype.controls.deleteControl = deleteControl;
-
-    const mockupImageUrl = getCurrentMockupImage();
-
-    // 商品画像を読み込んでキャンバス100%で表示（余白なし）
-    fabricLib.Image.fromURL(
-      mockupImageUrl,
-      (img: any) => {
-        if (!img || !img.width) {
-          console.error('Failed to load image:', mockupImageUrl);
-          return;
-        }
-
-        // キャンバス全体にフィットするようスケールを計算
-        const scaleX = canvas.width! / (img.width || 1);
-        const scaleY = canvas.height! / (img.height || 1);
-        const scale = Math.min(scaleX, scaleY) * 0.95; // 余白を少し残して95%表示
-        
-        img.scale(scale);
-        
-        // 中央配置
-        img.set({
-          left: canvas.width! / 2,
-          top: canvas.height! / 2,
-          originX: 'center',
-          originY: 'center',
-          selectable: false,
-          evented: false,
-        });
-        
-        // 背景画像には削除ボタンを表示しない
-        img.setControlsVisibility({
-          deleteControl: false,
-        });
-
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-        
-        // プリント範囲の矩形を描画（点線）
-        const printArea = getPrintAreaInPixels(CANVAS_SIZE);
-        
-        // 商品の色に応じて点線の色を決定
-        const getPrintAreaStrokeColor = () => {
-          const colorName = selectedColor.name.toLowerCase();
-          if (colorName.includes('ブラック') || colorName.includes('black')) {
-            return 'white'; // ブラックの時は白
-          } else {
-            return '#000000'; // ホワイトの時は黒
-          }
-        };
-        
-        const printRect = new fabricLib.Rect({
-          left: printArea.left,
-          top: printArea.top,
-          width: printArea.width,
-          height: printArea.height,
-          fill: 'transparent',
-          stroke: getPrintAreaStrokeColor(),
-          strokeWidth: 0.25,
-          strokeDashArray: [2, 2], // 2pt線分の破線
-          selectable: false,
-          evented: false,
-          name: 'printArea', // 識別用
-        });
-        // プリント範囲の枠には削除ボタンを表示しない
-        printRect.setControlsVisibility({
-          deleteControl: false,
-        });
-        canvas.add(printRect);
-        
-        // 初期状態を履歴として保存（この時点では「元に戻す」は無効）
-        setTimeout(() => {
-          if (!isHistoryInitializedRef.current) {
-            const json = JSON.stringify(canvas.toJSON(['selectable', 'evented', 'name']));
-            historyRef.current = [json];
-            historyStepRef.current = 0;
-            isHistoryInitializedRef.current = true; // 履歴初期化完了
-            updateHistoryButtons();
-          }
-        }, 100);
-      },
-      { crossOrigin: "anonymous" }
-    );
-
-    // プリント範囲の境界を取得
-    const printArea = getPrintAreaInPixels(CANVAS_SIZE);
-    
-    // ========== スマホ用：2本指ピンチ＆回転の実装 ==========
-    let touchListenersAdded = false;
-    const canvasElement = canvasRef.current;
-    
-    // Fabric.jsのcanvasWrapperを取得（upper-canvasとlower-canvasを含む親要素）
-    const canvasWrapper = canvas.wrapperEl;
-    
-    if (isMobileDevice && canvasWrapper) {
-      let lastDistance = 0;
-      let initialDistance = 0;  // 初回の距離を保存
-      let initialScale = { x: 1, y: 1 };  // 初回のスケールを保存
-      let initialAngle = 0;  // 初回の角度を保存
-      let cumulativeAngle = 0;  // 累積角度
-      let lastAngle = 0;
-      let isGesture = false;
-      let rotationEnabled = false;  // 回転モードかどうか
-      let gestureFrameCount = 0;  // ジェスチャーのフレーム数
-      let lastCenter = { x: 0, y: 0 };
-      
-      const getTouchDistance = (touch1: Touch, touch2: Touch) => {
-        const dx = touch1.clientX - touch2.clientX;
-        const dy = touch1.clientY - touch2.clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-      };
-      
-      const getTouchAngle = (touch1: Touch, touch2: Touch) => {
-        const dx = touch2.clientX - touch1.clientX;
-        const dy = touch2.clientY - touch1.clientY;
-        return Math.atan2(dy, dx) * 180 / Math.PI;
-      };
-      
-      const getTouchCenter = (touch1: Touch, touch2: Touch) => {
-        return {
-          x: (touch1.clientX + touch2.clientX) / 2,
-          y: (touch1.clientY + touch2.clientY) / 2,
-        };
-      };
-      
-      const handleTouchStart = (e: TouchEvent) => {
-        if (e.touches.length === 2) {
-          // 2本指タッチ時はページズームを無効化
-          canvasWrapper.style.touchAction = 'none';
-          
-          isGesture = true;
-          let activeObject = canvas.getActiveObject();
-          
-          // オブジェクトが選択されていない場合、タッチ位置のオブジェクトを自動選択
-          if (!activeObject || activeObject.name === 'printArea') {
-            const rect = canvasWrapper.getBoundingClientRect();
-            const canvasScale = CANVAS_SIZE / rect.width;
-            const touch1 = e.touches[0];
-            const pointer = {
-              x: (touch1.clientX - rect.left) * canvasScale,
-              y: (touch1.clientY - rect.top) * canvasScale,
-            };
-            
-            // タッチ位置にあるオブジェクトを検索
-            const target = canvas.findTarget(e as any, false);
-            
-            if (target && target.name !== 'printArea') {
-              canvas.setActiveObject(target);
-              activeObject = target;
-            }
-          }
-          
-          if (activeObject && activeObject.name !== 'printArea') {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            
-            // 初回の距離とスケールと角度を保存
-            initialDistance = getTouchDistance(e.touches[0], e.touches[1]);
-            lastDistance = initialDistance;
-            initialScale = {
-              x: activeObject.scaleX || 1,
-              y: activeObject.scaleY || 1,
-            };
-            initialAngle = getTouchAngle(e.touches[0], e.touches[1]);
-            lastAngle = initialAngle;
-            cumulativeAngle = 0;
-            rotationEnabled = false;  // 回転モードはまだ無効
-            gestureFrameCount = 0;
-            lastCenter = getTouchCenter(e.touches[0], e.touches[1]);
-            
-            // PCの場合のみコントロールを一時非表示（スマホは最初から非表示）
-            if (activeObject.hasControls) {
-              activeObject.setControlsVisibility({
-                mt: false,
-                mb: false,
-                ml: false,
-                mr: false,
-                tl: false,
-                tr: false,
-                bl: false,
-                br: false,
-                mtr: false,
-              });
-            }
-            canvas.renderAll();
-          }
-        }
-      };
-      
-      const handleTouchMove = (e: TouchEvent) => {
-        if (e.touches.length === 2 && isGesture) {
-          const activeObject = canvas.getActiveObject();
-          if (activeObject && activeObject.name !== 'printArea') {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // フレームカウントを増やす
-            gestureFrameCount++;
-            
-            // 中心点の移動を計算
-            const currentCenter = getTouchCenter(e.touches[0], e.touches[1]);
-            const rect = canvasWrapper.getBoundingClientRect();
-            const canvasScale = CANVAS_SIZE / rect.width; // キャンバスの実際のスケール
-            
-            if (lastCenter.x !== 0) {
-              const dx = (currentCenter.x - lastCenter.x) * canvasScale;
-              const dy = (currentCenter.y - lastCenter.y) * canvasScale;
-              activeObject.left = (activeObject.left || 0) + dx;
-              activeObject.top = (activeObject.top || 0) + dy;
-            }
-            lastCenter = currentCenter;
-            
-            // ピンチイン・ピンチアウト（拡大縮小）- 初期距離からの相対的な変化を計算
-            const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-            if (initialDistance > 0) {
-              // 初期距離からの倍率を計算（感度を1.5倍に上げる）
-              const scaleRatio = currentDistance / initialDistance;
-              // 1.0からの差分を1.5倍にして、より敏感に反応させる
-              const enhancedRatio = 1.0 + (scaleRatio - 1.0) * 1.5;
-              const newScaleX = initialScale.x * enhancedRatio;
-              const newScaleY = initialScale.y * enhancedRatio;
-              
-              // 最小・最大サイズ制限（縮小しやすくするため最小値を下げる）
-              if (newScaleX > 0.05 && newScaleX < 15 && newScaleY > 0.05 && newScaleY < 15) {
-                activeObject.scaleX = newScaleX;
-                activeObject.scaleY = newScaleY;
-              }
-            }
-            
-            // 回転（Instagram風：累積角度で判定）
-            const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
-            let angleDiff = currentAngle - lastAngle;
-            
-            // 角度の差が180度を超える場合は反対方向に補正（-180〜180の範囲に正規化）
-            if (angleDiff > 180) angleDiff -= 360;
-            if (angleDiff < -180) angleDiff += 360;
-            
-            // 累積角度を更新
-            cumulativeAngle += angleDiff;
-            
-            // 回転モード判定：累積で15度以上回転したら回転モードON
-            if (!rotationEnabled && gestureFrameCount > 3 && Math.abs(cumulativeAngle) > 15) {
-              rotationEnabled = true;
-            }
-            
-            // 回転モードがONの場合のみ回転を適用（滑らかに）
-            if (rotationEnabled) {
-              activeObject.angle = (activeObject.angle || 0) + angleDiff;
-            }
-            
-            lastAngle = currentAngle;
-            
-            // 位置を更新して範囲チェック
-            activeObject.setCoords();
-            const objBounds = activeObject.getBoundingRect(true);
-            
-            // 範囲内に収める
-            if (objBounds.left < printArea.left) {
-              activeObject.left += (printArea.left - objBounds.left);
-            }
-            if (objBounds.top < printArea.top) {
-              activeObject.top += (printArea.top - objBounds.top);
-            }
-            if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
-              activeObject.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
-            }
-            if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
-              activeObject.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
-            }
-            
-            activeObject.setCoords();
-            canvas.renderAll();
-          }
-        }
-      };
-      
-      const handleTouchEnd = (e: TouchEvent) => {
-        if (e.touches.length < 2) {
-          // touchActionを元に戻す
-          canvasWrapper.style.touchAction = 'pan-y';
-          
-          isGesture = false;
-          lastDistance = 0;
-          initialDistance = 0;
-          initialScale = { x: 1, y: 1 };
-          initialAngle = 0;
-          cumulativeAngle = 0;
-          lastAngle = 0;
-          rotationEnabled = false;
-          gestureFrameCount = 0;
-          lastCenter = { x: 0, y: 0 };
-          
-          // 最終的な範囲チェック（指を離した時）
-          const activeObject = canvas.getActiveObject();
-          if (activeObject && activeObject.name !== 'printArea') {
-            // 座標を更新
-            activeObject.setCoords();
-            const objBounds = activeObject.getBoundingRect(true);
-            
-            // プリント範囲を超えていたら範囲内に収める
-            if (objBounds.left < printArea.left) {
-              activeObject.left += (printArea.left - objBounds.left);
-            }
-            if (objBounds.top < printArea.top) {
-              activeObject.top += (printArea.top - objBounds.top);
-            }
-            if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
-              activeObject.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
-            }
-            if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
-              activeObject.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
-            }
-            
-            // 最終的な座標を更新
-            activeObject.setCoords();
-            
-            // PCの場合のみコントロールを再表示（スマホは最初から非表示）
-            if (activeObject.hasControls) {
-              activeObject.setControlsVisibility({
-                mt: false,
-                mb: false,
-                ml: false,
-                mr: false,
-                tl: true,
-                tr: true,
-                bl: true,
-                br: true,
-                mtr: true,
-                deleteControl: true,
-              });
-            }
-            
-            canvas.renderAll();
-            saveHistory();
-          }
-        }
-      };
-      
-      // キャプチャフェーズで処理（Fabric.jsより先に実行される）
-      // canvasWrapperにイベントリスナーを追加（upper-canvasとlower-canvasを両方カバー）
-      canvasWrapper.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
-      canvasWrapper.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
-      canvasWrapper.addEventListener('touchend', handleTouchEnd, { capture: true });
-      touchListenersAdded = true;
-      
-      // クリーンアップ用の参照を保存
-      (canvas as any)._touchHandlers = {
-        element: canvasWrapper,
-        start: handleTouchStart,
-        move: handleTouchMove,
-        end: handleTouchEnd,
-      };
-    }
-
-    // 画像の移動・スケール・回転制限（範囲内に収める）
-    canvas.on("object:moving", (e: any) => {
-      const obj = e.target;
-      if (!obj || obj.name === 'printArea') return;
-
-      // Shiftキーでまっすぐ移動（Adobe風）
-      if (e.e && e.e.shiftKey) {
-        // 移動開始位置を記録（初回のみ）
-        if (!obj._movingStart) {
-          obj._movingStart = { x: obj.left, y: obj.top };
-        }
-        
-        // 移動量を計算
-        const dx = Math.abs(obj.left - obj._movingStart.x);
-        const dy = Math.abs(obj.top - obj._movingStart.y);
-        
-        // より大きな移動方向に固定
-        if (dx > dy) {
-          // 水平方向に固定
-          obj.top = obj._movingStart.y;
-        } else {
-          // 垂直方向に固定
-          obj.left = obj._movingStart.x;
-        }
-      } else {
-        // Shiftキーが押されていない場合は記録をクリア
-        obj._movingStart = null;
-      }
-
-      // 境界ボックスを取得（absolute座標）
-      obj.setCoords();
-      const objBounds = obj.getBoundingRect(true);
-      
-      // ゴミ箱エリア判定（Instagram風：プリント範囲からすぐに表示）
-      const trashZoneStart = printArea.top + printArea.height;
-      const trashZoneThreshold = trashZoneStart + 20; // ゴミ箱表示の開始位置（早めに表示）
-      const trashZoneActive = trashZoneStart + 60; // ゴミ箱がアクティブになる位置
-      const objectBottom = objBounds.top + objBounds.height;
-      
-      // ゴミ箱エリアに入ったら表示
-      if (objectBottom > trashZoneThreshold) {
-        setShowTrash(true);
-        // さらに深く入ったらゴミ箱をアクティブ化
-        if (objectBottom > trashZoneActive) {
-          setIsOverTrash(true);
-        } else {
-          setIsOverTrash(false);
-        }
-      } else {
-        setShowTrash(false);
-        setIsOverTrash(false);
-      }
-      
-      // ドラッグ中は画面スクロールを完全に防ぐ
-      if (canvasRef.current) {
-        canvasRef.current.style.touchAction = "none";
-      }
-      
-      // Instagram風スナップガイドライン
-      const snapThreshold = 10; // スナップする距離（px）
-      const centerX = printArea.left + printArea.width / 2;
-      const centerY = printArea.top + printArea.height / 2;
-      const objCenterX = objBounds.left + objBounds.width / 2;
-      const objCenterY = objBounds.top + objBounds.height / 2;
-      
-      // 移動方向を検出（前回の位置との差分）
-      if (!obj._lastPos) {
-        obj._lastPos = { x: obj.left, y: obj.top };
-      }
-      const moveX = Math.abs(obj.left - obj._lastPos.x);
-      const moveY = Math.abs(obj.top - obj._lastPos.y);
-      const isHorizontalMove = moveX > moveY * 2; // 左右移動が支配的
-      const isVerticalMove = moveY > moveX * 2;   // 上下移動が支配的
-      obj._lastPos = { x: obj.left, y: obj.top };
-      
-      let newGuides = { vertical: null as number | null, horizontal: null as number | null };
-      
-      // 中央縦ガイド（左右移動時以外、または中央に近い場合）
-      if (!isHorizontalMove || Math.abs(objCenterX - centerX) < snapThreshold * 3) {
-        if (Math.abs(objCenterX - centerX) < snapThreshold) {
-          obj.left += (centerX - objCenterX);
-          newGuides.vertical = centerX;
-        }
-      }
-      
-      // 中央横ガイド（上下移動時以外、または中央に近い場合）
-      if (!isVerticalMove || Math.abs(objCenterY - centerY) < snapThreshold * 3) {
-        if (Math.abs(objCenterY - centerY) < snapThreshold) {
-          obj.top += (centerY - objCenterY);
-          newGuides.horizontal = centerY;
-        }
-      }
-      
-      // 左端ガイド
-      if (!isHorizontalMove || Math.abs(objBounds.left - printArea.left) < snapThreshold * 3) {
-        if (Math.abs(objBounds.left - printArea.left) < snapThreshold) {
-          obj.left += (printArea.left - objBounds.left);
-          newGuides.vertical = printArea.left + objBounds.width / 2;
-        }
-      }
-      
-      // 右端ガイド
-      const rightEdge = printArea.left + printArea.width;
-      if (!isHorizontalMove || Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold * 3) {
-        if (Math.abs(objBounds.left + objBounds.width - rightEdge) < snapThreshold) {
-          obj.left += (rightEdge - (objBounds.left + objBounds.width));
-          newGuides.vertical = rightEdge - objBounds.width / 2;
-        }
-      }
-      
-      // 上端ガイド
-      if (!isVerticalMove || Math.abs(objBounds.top - printArea.top) < snapThreshold * 3) {
-        if (Math.abs(objBounds.top - printArea.top) < snapThreshold) {
-          obj.top += (printArea.top - objBounds.top);
-          newGuides.horizontal = printArea.top + objBounds.height / 2;
-        }
-      }
-      
-      // 下端ガイド
-      const bottomEdge = printArea.top + printArea.height;
-      if (!isVerticalMove || Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold * 3) {
-        if (Math.abs(objBounds.top + objBounds.height - bottomEdge) < snapThreshold) {
-          obj.top += (bottomEdge - (objBounds.top + objBounds.height));
-          newGuides.horizontal = bottomEdge - objBounds.height / 2;
-        }
-      }
-      
-      setSnapGuides(newGuides);
-      
-      // 左端制限
-      if (objBounds.left < printArea.left) {
-        obj.left += (printArea.left - objBounds.left);
-      }
-      // 右端制限
-      if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
-        obj.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
-      }
-      // 上端制限
-      if (objBounds.top < printArea.top) {
-        obj.top += (printArea.top - objBounds.top);
-      }
-      // 下端制限（ゴミ箱エリアまで許可：100px下まで）
-      const maxBottom = printArea.top + printArea.height + 100;
-      if (objBounds.top + objBounds.height > maxBottom) {
-        obj.top -= ((objBounds.top + objBounds.height) - maxBottom);
-      }
-    });
-
-    // スケール制限（位置調整で範囲内に収める - 滑らか）
-    canvas.on("object:scaling", (e: any) => {
-      const obj = e.target;
-      if (!obj || obj.name === 'printArea') return;
-
-      obj.setCoords();
-      const objBounds = obj.getBoundingRect(true);
-      
-      // 範囲外になった場合、位置を調整して範囲内に収める
-      if (objBounds.left < printArea.left) {
-        obj.left += (printArea.left - objBounds.left);
-      }
-      if (objBounds.top < printArea.top) {
-        obj.top += (printArea.top - objBounds.top);
-      }
-      if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
-        obj.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
-      }
-      if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
-        obj.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
-      }
-    });
-
-
-    // 回転制限（位置調整で範囲内に収める - 滑らか）
-    canvas.on("object:rotating", (e: any) => {
-      const obj = e.target;
-      if (!obj || obj.name === 'printArea') return;
-
-      // Shiftキーで15度単位にスナップ（Adobe風）
-      if (e.e && e.e.shiftKey) {
-        const snapAngle = 15; // 15度単位
-        obj.angle = Math.round(obj.angle / snapAngle) * snapAngle;
-      }
-
-      obj.setCoords();
-      const objBounds = obj.getBoundingRect(true);
-      
-      // 範囲外になった場合、位置を調整して範囲内に収める
-      if (objBounds.left < printArea.left) {
-        obj.left += (printArea.left - objBounds.left);
-      }
-      if (objBounds.top < printArea.top) {
-        obj.top += (printArea.top - objBounds.top);
-      }
-      if (objBounds.left + objBounds.width > printArea.left + printArea.width) {
-        obj.left -= ((objBounds.left + objBounds.width) - (printArea.left + printArea.width));
-      }
-      if (objBounds.top + objBounds.height > printArea.top + printArea.height) {
-        obj.top -= ((objBounds.top + objBounds.height) - (printArea.top + printArea.height));
-      }
-    });
-
-    // イベントリスナー設定
-    
-    // プリント範囲外のタッチを完全にブロック
-    let isOutsideInteraction = false;
-    
-    canvas.on("mouse:down:before", (e: any) => {
-      if (!e.e) return;
-      
-      const pointer = canvas.getPointer(e.e);
-      
-      // プリント範囲外かチェック
-      const isOutsidePrintArea = 
-        pointer.x < printArea.left ||
-        pointer.x > printArea.left + printArea.width ||
-        pointer.y < printArea.top ||
-        pointer.y > printArea.top + printArea.height;
-      
-      if (isOutsidePrintArea && window.innerWidth < 768) {
-        isOutsideInteraction = true;
-        // イベントを完全にキャンセル
-        e.e.preventDefault();
-        e.e.stopPropagation();
-        
-        if (canvasRef.current) {
-          canvasRef.current.style.touchAction = "pan-y";
-        }
-        
-        // 選択を無効化
-        canvas.selection = false;
-        canvas.discardActiveObject();
-        canvas.renderAll();
-      } else {
-        isOutsideInteraction = false;
-        canvas.selection = true;
-      }
-    });
-    
-    // マウス/タッチダウン時の処理
-    canvas.on("mouse:down", (e: any) => {
-      if (isOutsideInteraction) {
-        // 範囲外インタラクション中は何もしない
-        return false;
-      }
-      
-      const pointer = canvas.getPointer(e.e);
-      const clickedOnObject = canvas.findTarget(e.e, false);
-      
-      // オブジェクトをクリックしていない場合
-      if (!clickedOnObject || clickedOnObject.name === 'printArea') {
-        // プリント範囲外をクリック/タッチした場合
-        const isOutsidePrintArea = 
-          pointer.x < printArea.left ||
-          pointer.x > printArea.left + printArea.width ||
-          pointer.y < printArea.top ||
-          pointer.y > printArea.top + printArea.height;
-        
-        if (isOutsidePrintArea && window.innerWidth < 768) {
-          // モバイルでプリント範囲外の場合、スクロールを許可
-          if (canvasRef.current) {
-            canvasRef.current.style.touchAction = "pan-y";
-          }
-          // 選択をクリア
-          canvas.discardActiveObject();
-          canvas.renderAll();
-          return false;
-        }
-      }
-    });
-    
-    // マウスアップ時にフラグをリセット
-    canvas.on("mouse:up", () => {
-      if (isOutsideInteraction) {
-        isOutsideInteraction = false;
-        canvas.selection = true;
-      }
-    });
-    
-    canvas.on("selection:created", (e: any) => {
-      setSelectedObject(e.selected?.[0] || null);
-      // オブジェクト選択時は通常のタッチ操作を許可
-      if (canvasRef.current) {
-        canvasRef.current.style.touchAction = "none";
-      }
-    });
-    canvas.on("selection:updated", (e: any) => {
-      setSelectedObject(e.selected?.[0] || null);
-      if (canvasRef.current) {
-        canvasRef.current.style.touchAction = "none";
-      }
-    });
-    canvas.on("selection:cleared", () => {
-      setSelectedObject(null);
-      // ゴミ箱をリセット
-      setShowTrash(false);
-      setIsOverTrash(false);
-      // スナップガイドラインをリセット
-      setSnapGuides({ vertical: null, horizontal: null });
-      // オブジェクト未選択時はスクロールを許可（モバイルのみ）
-      if (canvasRef.current && window.innerWidth < 768) {
-        canvasRef.current.style.touchAction = "pan-y";
-      }
-    });
-    canvas.on("object:modified", (e: any) => {
-      const obj = e.target;
-      
-      // ゴミ箱削除チェック（Instagram風）
-      if (obj && obj.name !== 'printArea') {
-        obj.setCoords();
-        const objBounds = obj.getBoundingRect(true);
-        const trashZoneActive = printArea.top + printArea.height + 60; // アクティブエリア（赤くなる位置）
-        const objectBottom = objBounds.top + objBounds.height;
-        
-        // ゴミ箱エリアでドロップしたら削除
-        if (objectBottom > trashZoneActive) {
-          canvas.remove(obj);
-          setShowTrash(false);
-          setIsOverTrash(false);
-          canvas.renderAll();
-          return; // 削除したので以降の処理をスキップ
-        }
-      }
-      
-      // ゴミ箱表示をリセット
-      setShowTrash(false);
-      setIsOverTrash(false);
-      
-      // スナップガイドラインをリセット
-      setSnapGuides({ vertical: null, horizontal: null });
-      
-      // Shift移動の記録をクリア
-      if (obj && obj._movingStart) {
-        obj._movingStart = null;
-      }
-      if (obj && obj._lastPos) {
-        obj._lastPos = null;
-      }
-      
-      // テキストオブジェクトの場合、フォントサイズを自動調整
-      if (obj && obj.type === "i-text") {
-        adjustTextSizeToFitPrintArea(obj);
-      }
-      
-      // 操作完了後に範囲チェック - はみ出していたら範囲内に収める
-      if (obj && obj.name !== 'printArea') {
-        obj.setCoords();
-        const objBounds = obj.getBoundingRect(true);
-        
-        let needsAdjustment = false;
-        
-        // 範囲外チェック
-        if (objBounds.left < printArea.left ||
-            objBounds.top < printArea.top ||
-            objBounds.left + objBounds.width > printArea.left + printArea.width ||
-            objBounds.top + objBounds.height > printArea.top + printArea.height) {
-          
-          // オブジェクトが大きすぎる場合はスケールを縮小
-          const maxWidth = printArea.width;
-          const maxHeight = printArea.height;
-          
-          if (objBounds.width > maxWidth || objBounds.height > maxHeight) {
-            const scaleX = maxWidth / objBounds.width;
-            const scaleY = maxHeight / objBounds.height;
-            const scale = Math.min(scaleX, scaleY); // 100%（ぴったり）
-            
-            obj.scaleX! *= scale;
-            obj.scaleY! *= scale;
-            needsAdjustment = true;
-          }
-          
-          // 位置を調整
-          obj.setCoords();
-          const newBounds = obj.getBoundingRect(true);
-          
-          if (newBounds.left < printArea.left) {
-            obj.left += (printArea.left - newBounds.left);
-            needsAdjustment = true;
-          }
-          if (newBounds.top < printArea.top) {
-            obj.top += (printArea.top - newBounds.top);
-            needsAdjustment = true;
-          }
-          if (newBounds.left + newBounds.width > printArea.left + printArea.width) {
-            obj.left -= ((newBounds.left + newBounds.width) - (printArea.left + printArea.width));
-            needsAdjustment = true;
-          }
-          if (newBounds.top + newBounds.height > printArea.top + printArea.height) {
-            obj.top -= ((newBounds.top + newBounds.height) - (printArea.top + printArea.height));
-            needsAdjustment = true;
-          }
-          
-          if (needsAdjustment) {
-            obj.setCoords();
-            canvas.renderAll();
-          }
-        }
-      }
-      
-      saveHistory();
-    });
-    canvas.on("object:added", () => saveHistory());
-    canvas.on("object:removed", () => saveHistory());
-
-    // テキストオブジェクトの選択イベント
-    canvas.on("selection:created", (e: any) => {
-      const obj = e.selected[0];
-      setSelectedObject(obj);
-      // テキストオブジェクトが選択されたら入力フィールドに表示
-      if (obj && obj.type === "i-text") {
-        setTextInput(obj.text || "");
-        firstTextObjectRef.current = obj;
-      }
-    });
-
-    canvas.on("selection:updated", (e: any) => {
-      const obj = e.selected[0];
-      setSelectedObject(obj);
-      // テキストオブジェクトが選択されたら入力フィールドに表示
-      if (obj && obj.type === "i-text") {
-        setTextInput(obj.text || "");
-        firstTextObjectRef.current = obj;
-      } else {
-        setTextInput("");
-        firstTextObjectRef.current = null;
-      }
-    });
-
-    canvas.on("selection:cleared", () => {
-      setSelectedObject(null);
-      setTextInput("");
-      firstTextObjectRef.current = null;
-    });
-
-    // キーボードイベント（Delete/Backspaceキーで削除）
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + Shift + Z: Redo（やり直し）
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
-      
-      if (cmdOrCtrl && e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
-        e.preventDefault();
-        handleRedo();
-        return;
-      }
-      
-      // Cmd/Ctrl + Z: Undo（元に戻す）
-      if (cmdOrCtrl && !e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
-        e.preventDefault();
-        handleUndo();
-        return;
-      }
-      
-      // Delete/Backspace: 削除
-      if ((e.key === 'Delete' || e.key === 'Backspace') && canvas.getActiveObject()) {
-        const activeObject = canvas.getActiveObject();
-        // プリント範囲の枠は削除しない
-        if (activeObject && activeObject.name !== 'printArea') {
-          e.preventDefault(); // デフォルトの動作を防ぐ
-          
-          // テキストオブジェクトの参照をクリア
-          if (firstTextObjectRef.current === activeObject) {
-            firstTextObjectRef.current = null;
-            setTextInput("");
-          }
-          
-          // オブジェクトを削除して初期状態に完全リセット
-          canvas.remove(activeObject);
-          canvas.renderAll();
-          setSelectedObject(null);
-          setIsLoading(false);
-          
-          // 履歴を初期状態にリセット（やり直しを無効化）
-          const initialState = historyRef.current[0];
-          historyRef.current = [initialState];
-          historyStepRef.current = 0;
-          updateHistoryButtons();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    // クリーンアップ
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      
-      // タッチイベントリスナーを削除（captureフェーズで追加したので、削除もcaptureで）
-      if (fabricCanvasRef.current && (fabricCanvasRef.current as any)._touchHandlers) {
-        const handlers = (fabricCanvasRef.current as any)._touchHandlers;
-        handlers.element.removeEventListener('touchstart', handlers.start, { capture: true });
-        handlers.element.removeEventListener('touchmove', handlers.move, { capture: true });
-        handlers.element.removeEventListener('touchend', handlers.end, { capture: true });
-      }
-      
-      if (fabricCanvasRef.current) {
-        fabricCanvasRef.current.dispose();
-      }
-    };
-  }, [fabricLoaded]);
-
-  // 本体カラー変更時に背景画像と点線の色だけを更新（カスタマイズ内容を保持）
-  useEffect(() => {
-    if (!fabricCanvasRef.current || !fabricLoaded || typeof (window as any).fabric === 'undefined') {
-      return;
-    }
-
-    const fabricLib = (window as any).fabric;
-    const canvas = fabricCanvasRef.current;
-    const mockupImageUrl = getCurrentMockupImage();
-
-    // 背景画像を更新
-    fabricLib.Image.fromURL(mockupImageUrl, (img: any) => {
-      if (!img || !img.width) return;
-
-      const scaleX = canvas.width! / (img.width || 1);
-      const scaleY = canvas.height! / (img.height || 1);
-      const scale = Math.min(scaleX, scaleY) * 0.95;
-      
-      img.scale(scale);
-      img.set({
-        left: canvas.width! / 2,
-        top: canvas.height! / 2,
-        originX: 'center',
-        originY: 'center',
-        selectable: false,
-        evented: false,
-      });
-
-      img.setControlsVisibility({
-        deleteControl: false,
-      });
-
-      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-    }, { crossOrigin: "anonymous" });
-
-    // 点線の色を更新
-    const objects = canvas.getObjects();
-    objects.forEach((obj: any) => {
-      if (obj.name === 'printArea') {
-        const colorName = selectedColor.name.toLowerCase();
-        const newColor = (colorName.includes('ブラック') || colorName.includes('black')) 
-          ? 'white' 
-          : '#000000';
-        obj.set('stroke', newColor);
-        canvas.renderAll();
-      }
-    });
-  }, [selectedColor, fabricLoaded, getCurrentMockupImage]);
-
-  // ========== ステップ3: 履歴管理関数 ==========
-  const saveHistory = () => {
-    if (!fabricCanvasRef.current) return;
-    
-    // 履歴が初期化されていない場合は保存しない
-    if (!isHistoryInitializedRef.current) {
-      return;
-    }
-    
-    // undo/redo実行中は保存しない
-    if (isLoadingHistoryRef.current) {
-      return;
-    }
-
-    const json = JSON.stringify(fabricCanvasRef.current.toJSON(['selectable', 'evented', 'name']));
-    historyRef.current = historyRef.current.slice(0, historyStepRef.current + 1);
-    historyRef.current.push(json);
-    historyStepRef.current = historyRef.current.length - 1;
-    
-    // 履歴が50を超えた場合、初期状態（インデックス0）を保護して古いものを削除
-    if (historyRef.current.length > 50) {
-      // 初期状態を保持したまま、古い履歴を削除
-      historyRef.current.splice(1, 1); // インデックス1の要素を削除
-      historyStepRef.current--;
-    }
-    
-    updateHistoryButtons();
-  };
-
-  const updateHistoryButtons = () => {
-    const newCanUndo = historyStepRef.current > 0;
-    const newCanRedo = historyStepRef.current < historyRef.current.length - 1;
-    
-    setCanUndo(newCanUndo);
-    setCanRedo(newCanRedo);
-  };
-
-  const handleUndo = () => {
-    if (historyStepRef.current > 0 && fabricCanvasRef.current) {
-      isLoadingHistoryRef.current = true; // 履歴読み込み開始
-      historyStepRef.current--;
-      const json = historyRef.current[historyStepRef.current];
-      
-      // 初回テキストオブジェクトをクリア（履歴を戻すため）
-      firstTextObjectRef.current = null;
-      setTextInput("");
-      
-      fabricCanvasRef.current.loadFromJSON(json, () => {
-        fabricCanvasRef.current?.discardActiveObject(); // 選択を解除
-        fabricCanvasRef.current?.renderAll();
-        
-        // 次のフレームで設定を再適用（確実に適用されるように）
-        requestAnimationFrame(() => {
-          // 復元後、背景画像とprintAreaの設定を再適用（触れないようにする）
-          const backgroundImage = fabricCanvasRef.current?.backgroundImage;
-          if (backgroundImage) {
-            (backgroundImage as any).set({
-              selectable: false,
-              evented: false,
-            });
-            (backgroundImage as any).setControlsVisibility({
-              deleteControl: false,
-            });
-          }
-          
-          const objects = fabricCanvasRef.current?.getObjects();
-          objects?.forEach((obj: any) => {
-            if (obj.name === 'printArea') {
-              obj.set({
-                selectable: false,
-                evented: false,
-              });
-              obj.setControlsVisibility({
-                deleteControl: false,
-              });
-            }
-          });
-          
-          fabricCanvasRef.current?.renderAll();
-        });
-        
-        setSelectedObject(null); // Reactの状態も更新
-        
-        // 初期状態（ステップ0）に戻った場合、履歴をリセット
-        if (historyStepRef.current === 0) {
-          const initialState = historyRef.current[0];
-          historyRef.current = [initialState];
-          historyStepRef.current = 0;
-        }
-        
-        updateHistoryButtons(); // ボタンの状態を更新
-        isLoadingHistoryRef.current = false; // 履歴読み込み完了
-      });
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyStepRef.current < historyRef.current.length - 1 && fabricCanvasRef.current) {
-      isLoadingHistoryRef.current = true; // 履歴読み込み開始
-      historyStepRef.current++;
-      const json = historyRef.current[historyStepRef.current];
-      
-      // 初回テキストオブジェクトをクリア（履歴を進めるため）
-      firstTextObjectRef.current = null;
-      setTextInput("");
-      
-      fabricCanvasRef.current.loadFromJSON(json, () => {
-        fabricCanvasRef.current?.discardActiveObject(); // 選択を解除
-        fabricCanvasRef.current?.renderAll();
-        
-        // 次のフレームで設定を再適用（確実に適用されるように）
-        requestAnimationFrame(() => {
-          // 復元後、背景画像とprintAreaの設定を再適用（触れないようにする）
-          const backgroundImage = fabricCanvasRef.current?.backgroundImage;
-          if (backgroundImage) {
-            (backgroundImage as any).set({
-              selectable: false,
-              evented: false,
-            });
-            (backgroundImage as any).setControlsVisibility({
-              deleteControl: false,
-            });
-          }
-          
-          const objects = fabricCanvasRef.current?.getObjects();
-          objects?.forEach((obj: any) => {
-            if (obj.name === 'printArea') {
-              obj.set({
-                selectable: false,
-                evented: false,
-              });
-              obj.setControlsVisibility({
-                deleteControl: false,
-              });
-            }
-          });
-          
-          fabricCanvasRef.current?.renderAll();
-        });
-        
-        setSelectedObject(null); // Reactの状態も更新
-        updateHistoryButtons(); // ボタンの状態を更新
-        isLoadingHistoryRef.current = false; // 履歴読み込み完了
-      });
-    }
-  };
-
-  // 画像品質チェック関数
-  const checkImageQuality = (file: File, width: number, height: number): { isGood: boolean; message: string } => {
-    // 推奨ピクセルサイズ（300 DPI）
-    const recommendedWidth = 2953;
-    const recommendedHeight = 3685;
-    
-    // 最低ピクセルサイズ（150 DPI）
-    const minWidth = 1182;
-    const minHeight = 1475;
-    
-    // ファイルサイズチェック（100MB以上）
-    const fileSizeMB = file.size / (1024 * 1024);
-    if (fileSizeMB > 100) {
-      return {
-        isGood: false,
-        message: `[WARNING] ファイルサイズが大きすぎます（${fileSizeMB.toFixed(1)}MB）\n100MB以下を推奨します。`
-      };
-    }
-    
-    // 画質チェック
-    if (width < minWidth || height < minHeight) {
-      return {
-        isGood: false,
-        message: `[WARNING] 画像サイズが小さすぎます\n\n現在: ${width} × ${height}px\n最低: ${minWidth} × ${minHeight}px (150 DPI)\n推奨: ${recommendedWidth} × ${recommendedHeight}px (300 DPI)\n\n印刷時に画質が粗くなる可能性があります。`
-      };
-    } else if (width < recommendedWidth || height < recommendedHeight) {
-      return {
-        isGood: true,
-        message: `[INFO] 画像サイズは使用可能ですが、より高画質をお求めの場合は大きな画像を推奨します\n\n現在: ${width} × ${height}px\n推奨: ${recommendedWidth} × ${recommendedHeight}px (300 DPI)`
-      };
-    } else {
-      return {
-        isGood: true,
-        message: `[SUCCESS] 高品質な画像です！\n\n${width} × ${height}px\n印刷に最適なサイズです。`
-      };
-    }
-  };
-
-  // 著作権モーダルの同意後に画像をアップロード
-  const processImageUpload = (file: File, event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsLoading(true);
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageUrl = e.target?.result as string;
-      
-      // 画像サイズを取得して品質チェック
-      const img = new Image();
-      img.onload = () => {
-        const qualityCheck = checkImageQuality(file, img.width, img.height);
-        setImageQualityWarning(qualityCheck.message);
-        
-        // 最低品質を満たしていない場合は確認
-        if (!qualityCheck.isGood) {
-          const proceed = confirm(`${qualityCheck.message}\n\nそれでもこの画像を使用しますか？`);
-          if (!proceed) {
-            setIsLoading(false);
-            setImageQualityWarning(null);
-            event.target.value = '';
-            return;
-          }
-        }
-        
-        // キャンバスに画像を追加
-        setUploadedImages(prev => [...prev, imageUrl]);
-        
-        if (fabricCanvasRef.current && typeof (window as any).fabric !== 'undefined') {
-          const fabricLib = (window as any).fabric;
-          fabricLib.Image.fromURL(imageUrl, (fabricImg: any) => {
-            const canvas = fabricCanvasRef.current;
-            
-            // プリント範囲を取得
-            const printArea = getPrintAreaInPixels(canvas.width!);
-            
-            // プリント範囲の80%に収まるようにスケール（余裕を持たせる）
-            const maxWidth = printArea.width * 0.8;
-            const maxHeight = printArea.height * 0.8;
-            const scale = Math.min(
-              maxWidth / (fabricImg.width || 1),
-              maxHeight / (fabricImg.height || 1),
-              1
-            );
-            
-            fabricImg.scale(scale);
-            
-            // スマホではコントロール非表示（Instagram風）
-            const isMobileView = window.innerWidth < 768;
-            fabricImg.set({
-              left: printArea.left + printArea.width / 2,
-              top: printArea.top + printArea.height / 2,
-              originX: "center",
-              originY: "center",
-              selectable: true,
-              hasControls: !isMobileView, // スマホではコントロール非表示
-              hasBorders: !isMobileView,   // スマホでは枠線も非表示
-            });
-            
-            // 元の高解像度画像データを保存（重要！）
-            (fabricImg as any).originalImageData = imageUrl; // 元のDataURL
-            (fabricImg as any).originalWidth = img.width; // 元の幅
-            (fabricImg as any).originalHeight = img.height; // 元の高さ
-            
-            canvas.add(fabricImg);
-            canvas.setActiveObject(fabricImg);
-            canvas.renderAll();
-            
-            setIsLoading(false);
-            event.target.value = '';
-          });
-        } else {
-          setIsLoading(false);
-          event.target.value = '';
-        }
-      };
-      img.src = imageUrl;
-    };
-    
-    reader.onerror = () => {
-      setIsLoading(false);
-      event.target.value = '';
-    };
-    
-    reader.readAsDataURL(file);
-  };
-
-  // ========== ステップ4: 画像アップロード機能 ==========
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) {
-      setIsLoading(false);
-      return;
-    }
-    
-    const file = files[0]; // 最初のファイルのみ処理
-    
-    // 画像ファイルかチェック
-    if (!file.type.startsWith("image/")) {
-      alert(`${file.name} は画像ファイルではありません（PNG, JPG, GIFなどを使用してください）`);
-      event.target.value = '';
-      return;
-    }
-    
-    // 初回アップロード時は著作権モーダルを表示
-    if (!copyrightAgreed) {
-      pendingImageRef.current = file;
-      setShowCopyrightModal(true);
-      return;
-    }
-    
-    // 著作権に同意済みの場合は直接アップロード
-    processImageUpload(file, event);
-  };
-  
-  // 著作権同意後の処理
-  const handleCopyrightAgree = () => {
-    setCopyrightAgreed(true);
-    setShowCopyrightModal(false);
-    
-    if (pendingImageRef.current && fileInputRef.current) {
-      // ダミーイベントを作成
-      const dummyEvent = {
-        target: fileInputRef.current,
-        currentTarget: fileInputRef.current
-      } as React.ChangeEvent<HTMLInputElement>;
-      
-      processImageUpload(pendingImageRef.current, dummyEvent);
-      pendingImageRef.current = null;
-    }
-  };
-
-
-  // ========== ステップ5: AI画像生成機能 ==========
-  const handleGenerateAI = async () => {
-    if (!aiPrompt.trim()) {
-      alert("生成したい画像の説明を入力してください");
-      return;
-    }
-
-    setIsGenerating(true);
-
-    try {
-      const response = await fetch("/api/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: aiPrompt,
-          width: 1024,
-          height: 1024,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.imageUrl) {
-        setGeneratedImageUrl(data.imageUrl);
-        setLastAIPrompt(aiPrompt);
-
-        // 生成された画像をキャンバスに追加
-        if (fabricCanvasRef.current && typeof (window as any).fabric !== 'undefined') {
-          const fabricLib = (window as any).fabric;
-          fabricLib.Image.fromURL(data.imageUrl, (img) => {
-            const canvas = fabricCanvasRef.current;
-            
-            // プリント範囲を取得
-            const printArea = getPrintAreaInPixels(canvas.width!);
-            
-            // プリント範囲の80%に収まるようにスケール
-            const maxWidth = printArea.width * 0.8;
-            const maxHeight = printArea.height * 0.8;
-            const scale = Math.min(
-              maxWidth / (img.width || 1),
-              maxHeight / (img.height || 1),
-              1
-            );
-
-            img.scale(scale);
-            
-            // スマホではコントロール非表示（Instagram風）
-            const isMobileView = window.innerWidth < 768;
-            img.set({
-              left: printArea.left + printArea.width / 2,
-              top: printArea.top + printArea.height / 2,
-              originX: "center",
-              originY: "center",
-              selectable: true,
-              hasControls: !isMobileView, // スマホではコントロール非表示
-              hasBorders: !isMobileView,   // スマホでは枠線も非表示
-            });
-
-            // 元の高解像度画像データを保存（AI生成画像）
-            (img as any).originalImageData = data.imageUrl; // 元のURL
-            (img as any).originalWidth = img.width; // 元の幅
-            (img as any).originalHeight = img.height; // 元の高さ
-
-            fabricCanvasRef.current?.add(img);
-            fabricCanvasRef.current?.setActiveObject(img);
-            fabricCanvasRef.current?.renderAll();
-          }, { crossOrigin: "anonymous" });
-        }
-
-        setAiPrompt("");
-      } else {
-        alert(data.error || "AI画像生成に失敗しました");
-      }
-    } catch (error) {
-      console.error("AI生成エラー:", error);
-      alert("AI画像生成に失敗しました");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // ========== ステップ6: テキスト追加機能 ==========
-  // テキストがプリント範囲を超えていないかチェックして自動調整
-  const adjustTextSizeToFitPrintArea = (textObj: any) => {
-    if (!fabricCanvasRef.current) return;
-    
-    const canvas = fabricCanvasRef.current;
-    const printArea = getPrintAreaInPixels(canvas.width!);
-    
-    // テキストの境界ボックスを取得
-    textObj.setCoords();
-    const textBounds = textObj.getBoundingRect(true);
-    
-    // プリント範囲を超えているかチェック
-    const exceedsWidth = textBounds.width > printArea.width;
-    const exceedsHeight = textBounds.height > printArea.height;
-    
-    if (exceedsWidth || exceedsHeight) {
-      // 縮小率を計算（余裕を持たせるために95%）
-      const scaleX = printArea.width / textBounds.width;
-      const scaleY = printArea.height / textBounds.height;
-      const scale = Math.min(scaleX, scaleY) * 0.95;
-      
-      // フォントサイズを調整
-      const currentFontSize = textObj.fontSize;
-      const newFontSize = Math.floor(currentFontSize * scale);
-      
-      textObj.set({ fontSize: newFontSize });
-      setFontSize(newFontSize);
-      
-      // 位置を再調整（中央に配置）
-      textObj.set({
-        left: printArea.left + printArea.width / 2,
-        top: printArea.top + printArea.height / 2,
-      });
-      
-      textObj.setCoords();
-      canvas.renderAll();
-    }
-  };
-
-  // リアルタイムテキスト更新
-  const handleTextInputChange = (value: string) => {
-    setTextInput(value);
-    
-    if (!fabricCanvasRef.current || typeof (window as any).fabric === 'undefined') return;
-    
-    const fabricLib = (window as any).fabric;
-    const canvas = fabricCanvasRef.current;
-    
-    // 選択中のテキストオブジェクトが存在する場合は更新
-    if (firstTextObjectRef.current && canvas.contains(firstTextObjectRef.current)) {
-      firstTextObjectRef.current.set({ text: value });
-      
-      // プリント範囲を超えていないかチェック
-      if (value.trim()) {
-        adjustTextSizeToFitPrintArea(firstTextObjectRef.current);
-      }
-      
-      canvas.renderAll();
-      if (value.trim()) {
-        saveHistory();
-      }
-    } 
-    // 新規テキストオブジェクトを作成（初回のみ）
-    else if (value.trim() && !firstTextObjectRef.current) {
-      const printArea = getPrintAreaInPixels(canvas.width!);
-      
-      const text = new fabricLib.IText(value, {
-        left: printArea.left + printArea.width / 2,
-        top: printArea.top + printArea.height / 2,
-        originX: "center",
-        originY: "center",
-        fill: textColor,
-        fontSize: fontSize,
-        fontFamily: fontFamily,
-        selectable: true,
-        hasControls: true,
-        hasBorders: true,
-      });
-      
-      canvas.add(text);
-      canvas.setActiveObject(text);
-      
-      // プリント範囲を超えていないかチェック
-      adjustTextSizeToFitPrintArea(text);
-      
-      canvas.renderAll();
-      firstTextObjectRef.current = text;
-      saveHistory();
-    }
-  };
-
-  const handleAddText = () => {
-    if (!textInput.trim() || !fabricCanvasRef.current || typeof (window as any).fabric === 'undefined') {
-      alert("テキストを入力してください");
-      return;
-    }
-
-    const fabricLib = (window as any).fabric;
-    const canvas = fabricCanvasRef.current;
-    
-    // プリント範囲の中央に配置
-    const printArea = getPrintAreaInPixels(canvas.width!);
-    
-    const text = new fabricLib.IText(textInput, {
-      left: printArea.left + printArea.width / 2,
-      top: printArea.top + printArea.height / 2,
-      originX: "center",
-      originY: "center",
-      fill: textColor,
-      fontSize: fontSize,
-      fontFamily: fontFamily,
-      selectable: true,
-      hasControls: true,
-      hasBorders: true,
-    });
-
-    fabricCanvasRef.current.add(text);
-    fabricCanvasRef.current.setActiveObject(text);
-    fabricCanvasRef.current.renderAll();
-    
-    // 新しいテキストを追加する場合、初回オブジェクトをリセット
-    firstTextObjectRef.current = null;
-    setTextInput("");
-    saveHistory();
-  };
-
-  const handleChangeTextColor = (color: string) => {
-    setTextColor(color);
-    if (selectedObject && selectedObject.type === "i-text") {
-      (selectedObject as any).set({ fill: color });
-      fabricCanvasRef.current?.renderAll();
-      saveHistory();
-    }
-  };
-
-  const handleChangeFontSize = (size: number) => {
-    setFontSize(size);
-    if (selectedObject && selectedObject.type === "i-text") {
-      (selectedObject as any).set({ fontSize: size });
-      
-      // プリント範囲を超えないように自動調整
-      adjustTextSizeToFitPrintArea(selectedObject);
-      
-      fabricCanvasRef.current?.renderAll();
-      saveHistory();
-    }
-  };
-
-  const handleChangeFontFamily = (font: string) => {
-    setFontFamily(font);
-    if (selectedObject && selectedObject.type === "i-text") {
-      (selectedObject as any).set({ fontFamily: font });
-      
-      // フォント変更でサイズが変わる可能性があるため、プリント範囲チェック
-      adjustTextSizeToFitPrintArea(selectedObject);
-      
-      fabricCanvasRef.current?.renderAll();
-      saveHistory();
-    }
-  };
-
-  // フォントリストをフィルタリング
-  const getFilteredFonts = () => {
-    return FONT_LIST.filter(font => font.type === activeFontTab);
-  };
-
-  // ========== Cloudinaryに直接アップロード（お客さんの生データをそのまま保存）==========
-  const uploadToSupabaseDirect = async (imageDataUrl: string): Promise<string> => {
-    try {
-      // ステップ1: Data URLをBlobに変換
-      const response = await fetch(imageDataUrl);
-      const blob = await response.blob();
-
-      // ステップ2: ファイル名を生成（ユニークID + タイムスタンプ）
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 15);
-      const fileName = `design-${timestamp}-${randomId}.png`;
-
-      // ステップ3: Supabaseにアップロード
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabaseUrl = (window as any).ENV?.SUPABASE_URL || '';
-      const supabaseKey = (window as any).ENV?.SUPABASE_ANON_KEY || '';
-      
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Supabase設定が見つかりません');
-      }
-
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data, error } = await supabase.storage
-        .from('printaize')
-        .upload(fileName, blob, {
-          contentType: 'image/png',
-          cacheControl: '3600',
-          upsert: false,
-        });
-
-      if (error) {
-        console.error('Supabaseアップロードエラー:', error);
-        throw new Error(`Supabaseへのアップロードに失敗しました: ${error.message}`);
-      }
-
-      // ステップ4: 公開URLを取得
-      const { data: urlData } = supabase.storage
-        .from('printaize')
-        .getPublicUrl(data.path);
-
-      return urlData.publicUrl;
-    } catch (error) {
-      console.error("Supabase直接アップロードエラー:", error);
-      throw error;
-    }
-  };
-
-  // ========== 高解像度出力生成（元の画像データを使用）==========
-  const generateHighResolutionOutput = async (canvas: any, printArea: any): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const fabricLib = (window as any).fabric;
-        if (!fabricLib) {
-          console.error('Fabric.js not loaded');
-          reject(new Error('Fabric.js not loaded'));
-          return;
-        }
-
-        // 目標サイズ: 2953px × 3685px（プリント範囲 250mm × 312mm @ 300DPI）
-        // お客さんの生データを最大限活用するため、高解像度で出力
-        // Cloudinary直接アップロードでファイルサイズ制限なし
-        const targetWidth = 2953;
-        const targetHeight = 3685;
-
-        // スケール比率を計算
-        const scaleRatio = targetWidth / printArea.width;
-
-        // オフスクリーンキャンバスを作成
-        const offscreenCanvas = new fabricLib.Canvas(null, {
-          width: targetWidth,
-          height: targetHeight,
-          backgroundColor: 'transparent',
-        });
-
-        // 元のキャンバスのオブジェクトを高解像度で再構成
-        const objects = canvas.getObjects();
-        const filteredObjects = objects.filter((obj: any) => obj.name !== 'printArea');
-        const totalObjects = filteredObjects.length;
-
-        if (totalObjects === 0) {
-          // オブジェクトがない場合は空の透過画像を返す
-          const dataURL = offscreenCanvas.toDataURL({ format: 'png', quality: 1 });
-          resolve(dataURL);
-          return;
-        }
-
-        // オブジェクトを格納する配列（z-indexを保持）
-        const loadedObjects: Array<{ index: number; fabricObj: any }> = [];
-        let loadedCount = 0;
-
-        // タイムアウト処理（30秒）
-        const timeout = setTimeout(() => {
-          console.error('高解像度出力タイムアウト');
-          reject(new Error('高解像度出力がタイムアウトしました'));
-        }, 30000);
-
-        const checkComplete = () => {
-          loadedCount++;
-          
-          if (loadedCount === totalObjects) {
-            clearTimeout(timeout);
-            try {
-              // z-index（元の順序）でソートしてキャンバスに追加
-              loadedObjects.sort((a, b) => a.index - b.index);
-              loadedObjects.forEach((item) => {
-                offscreenCanvas.add(item.fabricObj);
-              });
-              
-              offscreenCanvas.renderAll();
-              
-              // PNG形式で出力（背景透過を維持）
-              const dataURL = offscreenCanvas.toDataURL({ 
-                format: 'png',
-                multiplier: 1
-              });
-              
-              resolve(dataURL);
-            } catch (error) {
-              console.error('Canvas renderエラー:', error);
-              reject(error);
-            }
-          }
-        };
-
-        filteredObjects.forEach((obj: any, index: number) => {
-
-          try {
-            // プリント範囲の座標系に変換
-            const relativeLeft = (obj.left - printArea.left) * scaleRatio;
-            const relativeTop = (obj.top - printArea.top) * scaleRatio;
-
-            if (obj.type === 'image' && (obj as any).originalImageData) {
-              // 元の高解像度画像を使用
-              fabricLib.Image.fromURL(
-                (obj as any).originalImageData,
-                (hdImg: any) => {
-                  if (!hdImg) {
-                    console.error('画像読み込み失敗');
-                    // 失敗してもカウントを進める
-                    checkComplete();
-                    return;
-                  }
-
-                  try {
-                    // 元の画像サイズを基準にスケールを計算
-                    const originalWidth = (obj as any).originalWidth;
-                    const originalHeight = (obj as any).originalHeight;
-                    
-                    if (!originalWidth || !originalHeight) {
-                      console.warn('originalWidth/Height が未設定。現在のサイズを使用します。');
-                      // フォールバック: 現在のサイズを使用
-                      const newScaleX = obj.scaleX * scaleRatio;
-                      const newScaleY = obj.scaleY * scaleRatio;
-                      
-                      hdImg.set({
-                        left: relativeLeft,
-                        top: relativeTop,
-                        scaleX: newScaleX,
-                        scaleY: newScaleY,
-                        angle: obj.angle,
-                      });
-                      
-                      loadedObjects.push({ index, fabricObj: hdImg });
-                      checkComplete();
-                      return;
-                    }
-                    
-                    const originalScale = (obj.width * obj.scaleX) / originalWidth;
-                    const newScale = originalScale * scaleRatio;
-
-                    hdImg.set({
-                      left: relativeLeft,
-                      top: relativeTop,
-                      scaleX: newScale,
-                      scaleY: newScale,
-                      angle: obj.angle,
-                      originX: obj.originX,
-                      originY: obj.originY,
-                      flipX: obj.flipX,
-                      flipY: obj.flipY,
-                    });
-
-                    // フィルターも適用
-                    if (obj.filters && obj.filters.length > 0) {
-                      hdImg.filters = obj.filters.map((filter: any) => Object.assign(Object.create(Object.getPrototypeOf(filter)), filter));
-                      hdImg.applyFilters();
-                    }
-
-                    // z-indexを保持して配列に追加
-                    loadedObjects.push({ index, fabricObj: hdImg });
-                    checkComplete();
-                  } catch (error) {
-                    console.error('画像設定エラー:', error);
-                    // エラーでもカウントを進める
-                    checkComplete();
-                  }
-                },
-                { crossOrigin: 'anonymous' }
-              );
-            } else if (obj.type === 'text' || obj.type === 'textbox' || obj.type === 'i-text') {
-              // テキストを高解像度で再構成
-              const hdText = new fabricLib.Text(obj.text, {
-                left: relativeLeft,
-                top: relativeTop,
-                fontSize: obj.fontSize * scaleRatio,
-                fontFamily: obj.fontFamily,
-                fill: obj.fill,
-                angle: obj.angle,
-                originX: obj.originX,
-                originY: obj.originY,
-                scaleX: obj.scaleX,
-                scaleY: obj.scaleY,
-              });
-
-              // z-indexを保持して配列に追加
-              loadedObjects.push({ index, fabricObj: hdText });
-              checkComplete();
-            } else {
-              // その他のオブジェクト
-              checkComplete();
-            }
-          } catch (error) {
-            console.error('オブジェクト処理エラー:', error);
-            checkComplete();
-          }
-        });
-      } catch (error) {
-        console.error('generateHighResolutionOutput エラー:', error);
-        reject(error);
-      }
-    });
-  };
-
-  // ========== モーダル関連の関数 ==========
-  
-  // モーダルを開く
-  const openCartModal = () => {
-    // 現在選択されているカラーをモーダルのデフォルトに設定
-    setModalColor(selectedColor.name);
-    
-    // 現在のカラー・サイズの個数が0の場合のみ1にする
-    setModalQuantities(prev => {
-      const currentColorQuantities = prev[selectedColor.name];
-      const currentSizeQuantity = currentColorQuantities[selectedSize];
-      
-      if (currentSizeQuantity === 0) {
-        return {
-          ...prev,
-          [selectedColor.name]: {
-            ...currentColorQuantities,
-            [selectedSize]: 1,
-          }
-        };
-      }
-      return prev;
-    });
-    
-    setIsModalOpen(true);
-  };
-
-  // モーダルを閉じる
-  const closeCartModal = () => {
-    setIsModalOpen(false);
-  };
-
-  // モーダルから複数アイテムをカートに追加
-  const handleAddToCartMultiple = async () => {
-    // 全カラー・全サイズから選択された個数を取得
-    const allSelections: { color: string; size: string; quantity: number }[] = [];
-    
-    Object.entries(modalQuantities).forEach(([color, sizes]) => {
-      Object.entries(sizes).forEach(([size, quantity]) => {
-        if (quantity > 0) {
-          allSelections.push({ color, size, quantity });
-        }
-      });
-    });
-
-    if (allSelections.length === 0) {
-      alert('サイズと個数を選択してください');
-      return;
-    }
-
-    // モーダルを閉じて、カートに追加
-    closeCartModal();
-    
-    // 全選択に対してカートに追加
-    await handleAddToCartWithOptions(allSelections);
-  };
-
-  // 複数のサイズ・個数でカートに追加する処理
-  const handleAddToCartWithOptions = async (allSelections: { color: string; size: string; quantity: number }[]) => {
-    if (!fabricCanvasRef.current) return;
-
-    setIsAddingToCart(true);
-    setLoadingMessage("カートに追加中...（少しお待ちください）");
-    
-    try {
-      // ステップ1: プリント範囲の矩形（点線）を一時的に非表示
-      const canvas = fabricCanvasRef.current;
-      let printAreaObj = canvas.getObjects().find((obj: any) => obj.id === 'printArea' || obj.name === 'printArea');
-      
-      // プリント範囲オブジェクトを非表示
-      if (printAreaObj) {
-        printAreaObj.visible = false;
-        canvas.renderAll();
-      } else {
-        console.warn('プリント範囲オブジェクトが見つかりません');
-      }
-
-      // ステップ2: 通常解像度版を生成（プレビュー用）
-      const dataURL = canvas.toDataURL({
-        format: 'png',
-        quality: 1.0,
-      });
-
-      // ステップ3: 点線を再表示
-      if (printAreaObj) {
-        printAreaObj.visible = true;
-        canvas.renderAll();
-      }
-      
-      // ステップ4: 高解像度出力用のプリント範囲を計算で求める
-      let printArea = printAreaObj;
-      if (!printArea) {
-        const calculatedPrintArea = getPrintAreaInPixels(canvas.width);
-        printArea = {
-          left: calculatedPrintArea.left,
-          top: calculatedPrintArea.top,
-          width: calculatedPrintArea.width,
-          height: calculatedPrintArea.height,
-        };
-      }
-
-      // ステップ5: 高解像度版を生成（印刷用、プリント範囲のみ、背景透過）
-      let dataURLHD: string;
-      try {
-        if (!printArea) {
-          throw new Error('プリント範囲が見つかりません');
-        }
-        dataURLHD = await generateHighResolutionOutput(canvas, printArea);
-      } catch (error) {
-        console.error('高解像度出力エラー:', error);
-        alert(`高解像度出力に失敗しました\n\nエラー: ${error instanceof Error ? error.message : '不明なエラー'}`);
-        setIsAddingToCart(false);
-        setLoadingMessage("");
-        return;
-      }
-
-      // ステップ5: 通常版をSupabaseに直接アップロード
-      let designImageUrl: string;
-      try {
-        designImageUrl = await uploadToSupabaseDirect(dataURL);
-      } catch (uploadError) {
-        console.error('プレビューアップロードエラー:', uploadError);
-        alert(`プレビュー画像のアップロードに失敗しました\n\nエラー: ${uploadError instanceof Error ? uploadError.message : '不明なエラー'}`);
-        setIsAddingToCart(false);
-        setLoadingMessage("");
-        return;
-      }
-
-      // ステップ6: 高解像度版をSupabaseに直接アップロード
-      let designImageUrlHD: string;
-      try {
-        designImageUrlHD = await uploadToSupabaseDirect(dataURLHD);
-      } catch (uploadError) {
-        console.error('高解像度アップロードエラー:', uploadError);
-        alert(`高解像度画像のアップロードに失敗しました\n\nエラー: ${uploadError instanceof Error ? uploadError.message : '不明なエラー'}`);
-        setIsAddingToCart(false);
-        setLoadingMessage("");
-        return;
-      }
-
-      // ステップ7: design_imagesテーブルに記録（ordered: false）
-      let designImageId: string | null = null;
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabaseUrl = (window as any).ENV?.SUPABASE_URL || '';
-        const supabaseKey = (window as any).ENV?.SUPABASE_ANON_KEY || '';
-        
-        if (supabaseUrl && supabaseKey) {
-          const supabase = createClient(supabaseUrl, supabaseKey);
-          
-          const { data: insertData, error: insertError } = await supabase
-            .from('design_images')
-            .insert({
-              preview_url: designImageUrl,
-              hd_url: designImageUrlHD,
-              metadata: {
-                product_id: product.id,
-                selections: allSelections, // 全カラー・サイズの選択を保存
-              }
-            })
-            .select()
-            .single();
-          
-          if (insertError) {
-            console.error('デザイン画像の記録エラー:', insertError);
-          } else if (insertData) {
-            designImageId = insertData.id;
-          }
-        }
-      } catch (dbError) {
-        console.warn('データベース記録失敗（続行）:', dbError);
-      }
-
-      // ステップ8: 全てのアイテムを配列にまとめる
-      const cartItems = allSelections.map(selection => ({
-        variantId: getVariantId(selection.color, selection.size),
-        quantity: selection.quantity,
-        customAttributes: [
-          { key: "design_image", value: designImageUrl },
-          { key: "design_image_hd", value: designImageUrlHD },
-        ],
-      }));
-
-      // ステップ9: 全てのアイテムを1回でカートに追加
-      let checkoutUrl = '';
-      try {
-        const response = await fetch("/api/add-to-cart-multiple", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items: cartItems,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`カート追加APIエラー: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        checkoutUrl = data.checkoutUrl;
-      } catch (error) {
-        console.error(`カート追加エラー:`, error);
-        alert(`カートへの追加に失敗しました\n\nエラー: ${error instanceof Error ? error.message : '不明なエラー'}`);
-        setIsAddingToCart(false);
-        setLoadingMessage("");
-        return;
-      }
-
-      // ステップ10: Shopifyチェックアウトページに移動
-      if (checkoutUrl) {
-        // 注文状態の更新はスキップ
-        // カート追加時は ordered: false のまま
-        // 30日後に自動削除される（未購入の場合）
-        
-        // Shopifyのチェックアウトページにリダイレクト
-        window.location.href = checkoutUrl;
-      } else {
-        alert("チェックアウトURLの取得に失敗しました");
-      }
-    } catch (error) {
-      console.error("カート追加エラー:", error);
-      alert(`カートに追加できませんでした。\n\nエラー: ${error instanceof Error ? error.message : '不明なエラー'}`);
-    } finally {
-      setIsAddingToCart(false);
-      setLoadingMessage("");
-    }
-  };
-
-  // バリアントIDを取得するヘルパー関数
-  const getVariantId = (color: string, size: string): string => {
-    const variantMap: { [key: string]: { [size: string]: string } } = {
-      'ホワイト': {
-        'S': '48602131628256',
-        'M': '48602131661024',
-        'L': '48602131693792',
-        'XL': '48602131726560',
-        'XXL': '48602131759328',
-      },
-      'ブラック': {
-        'S': '48602131792096',
-        'M': '48602131824864',
-        'L': '48602131857632',
-        'XL': '48602131890400',
-        'XXL': '48602131923168',
-      },
-    };
-
-    const numericId = variantMap[color]?.[size] || '48602131661024'; // デフォルト: ホワイト/M
-    return `gid://shopify/ProductVariant/${numericId}`;
-  };
-
-  // ========== ステップ8: カート追加機能（旧版・単一アイテム用） ==========
-  const handleAddToCart = async () => {
-    if (!fabricCanvasRef.current) return;
-
-    setIsAddingToCart(true);
-    setLoadingMessage("カートに追加中...（少しお待ちください）");
-    
-    try {
-      // ステップ1: プリント範囲の矩形（点線）を一時的に非表示
-      const canvas = fabricCanvasRef.current;
-      const printAreaRect = canvas.getObjects().find((obj: any) => obj.name === 'printArea');
-      if (printAreaRect) {
-        printAreaRect.visible = false;
-        canvas.renderAll();
-      }
-
-      // ステップ2: 通常解像度版を生成（プレビュー用 - キャンバス全体、点線なし）
-      const dataURL = canvas.toDataURL({
-        format: "png",
-        quality: 1,
-      });
-
-      // 点線を再表示
-      if (printAreaRect) {
-        printAreaRect.visible = true;
-        canvas.renderAll();
-      }
-
-      // ステップ3: プリント範囲を取得
-      const printArea = getPrintAreaInPixels(canvas.width!);
-
-      // ステップ4: 高解像度版を生成（印刷用 - 元の画像データを使用）
-      const dataURLHD = await generateHighResolutionOutput(canvas, printArea);
-
-      // ステップ5: 通常解像度版をCloudinaryにアップロード
-      const uploadResponse = await fetch("/api/upload-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageData: dataURL,
-        }),
-      });
-
-      const uploadData = await uploadResponse.json();
-
-      if (!uploadData.success) {
-        alert(uploadData.error || "画像のアップロードに失敗しました");
-        return;
-      }
-
-      // ステップ6: 高解像度版をSupabaseに直接アップロード（サーバーを経由しない）
-      let designImageUrlHD: string;
-      try {
-        designImageUrlHD = await uploadToSupabaseDirect(dataURLHD);
-      } catch (uploadError) {
-        console.error('高解像度アップロードエラー:', uploadError);
-        alert(`高解像度画像のアップロードに失敗しました\n\nエラー: ${uploadError instanceof Error ? uploadError.message : '不明なエラー'}`);
-        return;
-      }
-
-      // アップロードされた画像のURL
-      const designImageUrl = uploadData.imageUrl; // プレビュー用（キャンバス全体）
-      // designImageUrlHDは上のステップ6で既に定義済み
-
-      // ステップ7: デザイン画像をデータベースに記録
-      let designImageId: string | null = null;
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabaseUrl = (window as any).ENV?.SUPABASE_URL || '';
-        const supabaseKey = (window as any).ENV?.SUPABASE_ANON_KEY || '';
-        
-        if (supabaseUrl && supabaseKey) {
-          const supabase = createClient(supabaseUrl, supabaseKey);
-          
-          const { data: insertData, error: insertError } = await supabase
-            .from('design_images')
-            .insert({
-              preview_url: designImageUrl,
-              hd_url: designImageUrlHD,
-              metadata: {
-                product_id: product.id,
-                product_name: product.name,
-                color: selectedColor.name,
-                size: selectedSize,
-              }
-            })
-            .select('id')
-            .single();
-          
-          if (!insertError && insertData) {
-            designImageId = insertData.id;
-          } else {
-            console.warn('データベース記録エラー（続行）:', insertError);
-          }
-        }
-      } catch (dbError) {
-        console.warn('データベース記録失敗（続行）:', dbError);
-      }
-
-      // ステップ8: カラー×サイズに応じた商品バリアントIDを取得
-      const variantMapping: { [key: string]: { [key: string]: string } } = {
-        "ホワイト": {
-          "S": "48602131628256",
-          "M": "48602131661024",
-          "L": "48602131693792",
-          "XL": "48602131726560",
-          "XXL": "48602131759328",
-        },
-        "ブラック": {
-          "S": "48602131792096",
-          "M": "48602131824864",
-          "L": "48602131857632",
-          "XL": "48602131890400",
-          "XXL": "48602131923168",
-        },
-      };
-
-      // 選択されたカラーとサイズから正しいバリアントIDを取得
-      const colorKey = selectedColor.name.includes("ホワイト") || selectedColor.name.includes("White") ? "ホワイト" : "ブラック";
-      const variantId = variantMapping[colorKey]?.[selectedSize] || "48602131661024"; // デフォルト: ホワイトM
-      const productVariantId = `gid://shopify/ProductVariant/${variantId}`;
-
-      // ステップ8: カートに追加APIを呼び出す（通常版と高解像度版の両方のURLを送信）
-      const response = await fetch("/api/add-to-cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          designImageUrl: designImageUrl, // CloudinaryのURL（プレビュー用）
-          designImageUrlHD: designImageUrlHD, // CloudinaryのURL（印刷用・高解像度）
-          isAIGenerated: !!lastAIPrompt,
-          aiPrompt: lastAIPrompt,
-          productId: product.id,
-          productName: product.name,
-          color: selectedColor.name,
-          size: selectedSize,
-          price: product.price,
-          productVariantId: productVariantId,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.checkoutUrl) {
-        // ステップ9: 注文状態の更新はスキップ
-        // カート追加時は ordered: false のまま
-        // 30日後に自動削除される（未購入の場合）
-        // 
-        // 将来的にShopify Webhookを実装する場合は、
-        // 注文完了時に ordered: true に更新する
-        
-        // Shopifyのチェックアウトページにリダイレクト
-        window.location.href = data.checkoutUrl;
-      } else {
-        alert(data.error || "カートへの追加に失敗しました");
-      }
-    } catch (error) {
-      console.error("カート追加エラー:", error);
-      const errorMessage = error instanceof Error ? error.message : "不明なエラー";
-      alert(`カートへの追加に失敗しました\n\nエラー: ${errorMessage}`);
-    } finally {
-      setIsAddingToCart(false);
-      setLoadingMessage("");
-    }
-  };
-
-  // ========== ステップ9: その他の機能 ==========
-  const handleUploadClick = () => fileInputRef.current?.click();
-
-  const handleRemoveSelected = () => {
-    if (fabricCanvasRef.current && selectedObject) {
-      // 初回テキストオブジェクトが削除される場合、参照をクリア
-      if (firstTextObjectRef.current === selectedObject) {
-        firstTextObjectRef.current = null;
-        setTextInput(""); // テキスト入力フィールドもクリア
-      }
-      
-      fabricCanvasRef.current.remove(selectedObject);
-      fabricCanvasRef.current.renderAll();
-      setSelectedObject(null);
-      setIsLoading(false); // ローディング状態をリセット
-      
-      // 履歴を初期状態にリセット（やり直しを無効化）
-      const initialState = historyRef.current[0];
-      historyRef.current = [initialState];
-      historyStepRef.current = 0;
-      updateHistoryButtons();
-    }
-  };
-
-  // オブジェクト配置・整列機能
-  const handleCenterVertical = () => {
-    if (fabricCanvasRef.current && selectedObject) {
-      const canvas = fabricCanvasRef.current;
-      const printArea = getPrintAreaInPixels(canvas.width!);
-      
-      // プリント範囲の上下中央に配置
-      selectedObject.set({
-        top: printArea.top + printArea.height / 2,
-        originY: 'center'
-      });
-      selectedObject.setCoords();
-      canvas.renderAll();
-      saveHistory();
-    }
-  };
-
-  const handleCenterHorizontal = () => {
-    if (fabricCanvasRef.current && selectedObject) {
-      const canvas = fabricCanvasRef.current;
-      const printArea = getPrintAreaInPixels(canvas.width!);
-      
-      // プリント範囲の左右中央に配置
-      selectedObject.set({
-        left: printArea.left + printArea.width / 2,
-        originX: 'center'
-      });
-      selectedObject.setCoords();
-      canvas.renderAll();
-      saveHistory();
-    }
-  };
-
-  const handleBringForward = () => {
-    if (fabricCanvasRef.current && selectedObject) {
-      fabricCanvasRef.current.bringForward(selectedObject);
-      fabricCanvasRef.current.renderAll();
-    }
-  };
-
-  const handleSendBackwards = () => {
-    if (fabricCanvasRef.current && selectedObject) {
-      fabricCanvasRef.current.sendBackwards(selectedObject);
-      fabricCanvasRef.current.renderAll();
-    }
-  };
-
-  const handleFitToPrintArea = () => {
-    if (!fabricCanvasRef.current || !selectedObject) return;
-    
-    const canvas = fabricCanvasRef.current;
-    const printArea = getPrintAreaInPixels(canvas.width!);
-    
-    // プリント範囲いっぱいにスケール（元のサイズから計算）
-    const scaleX = printArea.width / selectedObject.width!;
-    const scaleY = printArea.height / selectedObject.height!;
-    const scale = Math.min(scaleX, scaleY);
-    
-    // 絶対値でスケールを設定
-    selectedObject.set({
-      scaleX: scale,
-      scaleY: scale,
-      left: printArea.left + printArea.width / 2,
-      top: printArea.top + printArea.height / 2,
-    });
-    
-    selectedObject.setCoords();
-    canvas.renderAll();
-    saveHistory();
-  };
-
-  // 編集ツール用の関数（エイリアス）
-  const undo = () => {
-    if (!canUndo || !fabricCanvasRef.current) return;
-    
-    if (historyStepRef.current > 0) {
-      historyStepRef.current--;
-      isLoadingHistoryRef.current = true;
-      
-      const canvas = fabricCanvasRef.current;
-      const historyData = historyRef.current[historyStepRef.current];
-      
-      canvas.loadFromJSON(historyData, () => {
-        canvas.renderAll();
-        isLoadingHistoryRef.current = false;
-        setCanUndo(historyStepRef.current > 0);
-        setCanRedo(historyStepRef.current < historyRef.current.length - 1);
-      });
-    }
-  };
-
-  const redo = () => {
-    if (!canRedo || !fabricCanvasRef.current) return;
-    
-    if (historyStepRef.current < historyRef.current.length - 1) {
-      historyStepRef.current++;
-      isLoadingHistoryRef.current = true;
-      
-      const canvas = fabricCanvasRef.current;
-      const historyData = historyRef.current[historyStepRef.current];
-      
-      canvas.loadFromJSON(historyData, () => {
-        canvas.renderAll();
-        isLoadingHistoryRef.current = false;
-        setCanUndo(historyStepRef.current > 0);
-        setCanRedo(historyStepRef.current < historyRef.current.length - 1);
-      });
-    }
-  };
-
-  const centerVertically = () => {
-    if (!fabricCanvasRef.current || !selectedObject) return;
-    
-    const canvas = fabricCanvasRef.current;
-    const printArea = getPrintAreaInPixels(canvas.width!);
-    
-    selectedObject.set({
-      top: printArea.top + printArea.height / 2,
-    });
-    
-    selectedObject.setCoords();
-    canvas.renderAll();
-    saveHistory();
-  };
-
-  const centerHorizontally = () => {
-    if (!fabricCanvasRef.current || !selectedObject) return;
-    
-    const canvas = fabricCanvasRef.current;
-    const printArea = getPrintAreaInPixels(canvas.width!);
-    
-    selectedObject.set({
-      left: printArea.left + printArea.width / 2,
-    });
-    
-    selectedObject.setCoords();
-    canvas.renderAll();
-    saveHistory();
-  };
-
-  const bringForward = () => handleBringForward();
-  const sendBackward = () => handleSendBackwards();
-  const fitToPrintArea = () => handleFitToPrintArea();
-
-  const handleClearCanvas = () => {
-    if (fabricCanvasRef.current) {
-      fabricCanvasRef.current.getObjects().forEach((obj) => {
-        fabricCanvasRef.current?.remove(obj);
-      });
-      fabricCanvasRef.current.renderAll();
-      setUploadedImages([]);
-      setSelectedObject(null);
-      setIsLoading(false); // ローディング状態をリセット
-      
-      // 初回テキストオブジェクトもクリア
-      firstTextObjectRef.current = null;
-      setTextInput("");
-      
-      // 履歴を初期状態にリセット（やり直しを無効化）
-      const initialState = historyRef.current[0];
-      historyRef.current = [initialState];
-      historyStepRef.current = 0;
-      updateHistoryButtons();
-    }
-  };
-
-  const handleSaveDesign = () => {
-    if (fabricCanvasRef.current) {
-      const dataURL = fabricCanvasRef.current.toDataURL({
-        format: "png",
-        quality: 1,
-      });
-
-      const link = document.createElement("a");
-      link.download = "tshirt-design.png";
-      link.href = dataURL;
-      link.click();
-    }
-  };
-
-  // ========== ステップ10: UIレンダリング ==========
-  
-  // Fabric.jsが読み込まれるまでローディング表示
-  if (!fabricLoaded) {
-    return (
-      <div style={{ padding: "60px", textAlign: "center" }}>
-        <h2>⏳ 読み込み中...</h2>
-        <p style={{ color: "#666", marginTop: "20px" }}>
-          Fabric.jsライブラリを読み込んでいます...
-        </p>
-        <div style={{ 
-          marginTop: "30px", 
-          width: "200px", 
-          height: "4px", 
-          backgroundColor: "#e0e0e0", 
-          margin: "30px auto",
-          borderRadius: "2px",
-          overflow: "hidden"
-        }}>
-          <div style={{
-            width: "50%",
-            height: "100%",
-            backgroundColor: "#5c6ac4",
-            animation: "loading 1.5s ease-in-out infinite"
-          }}></div>
-        </div>
-        <style>{`
-          @keyframes loading {
-            0% { transform: translateX(-100%); }
-            50% { transform: translateX(200%); }
-            100% { transform: translateX(-100%); }
-          }
-        `}</style>
-      </div>
-    );
-  }
-  
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      style={{ 
-        width: "100%", 
+    <div
+      style={{
+        width: "100vw",
         height: "100vh",
-        margin: "0 auto", 
-        padding: 0,
+        backgroundColor: "#f8f8f8",
         display: "flex",
-        flexDirection: "column",
         overflow: "hidden",
-        backgroundColor: "#ffffff",
+        fontFamily: '"Yu Gothic", "游ゴシック体", YuGothic, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", sans-serif',
+        position: "relative",
       }}
     >
-      {/* 商品情報ヘッダー（デスクトップのみ上部に表示） */}
-      {!isMobile && (
-        <motion.div
-          className="product-header"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          style={{
-            padding: "40px 60px",
-            borderBottom: "1px solid #f0f0f0",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <h1 style={{ 
-            margin: 0, 
-            fontSize: "28px",
-            fontWeight: "600",
-            letterSpacing: "-0.02em",
-            color: "#1d1d1f",
-            lineHeight: 1.2,
-          }}>
-            {product.name}
-          </h1>
-          <div style={{ 
-            marginTop: "8px", 
-            fontSize: "15px",
-            color: "#6e6e73",
-            lineHeight: 1.5,
-          }}>
-            {product.description}
-          </div>
-          <div style={{ 
-            marginTop: "12px", 
-            fontSize: "24px", 
-            fontWeight: "600", 
-            color: "#1d1d1f",
-            letterSpacing: "-0.01em",
-            textAlign: "right",
-          }}>
-            ¥{product.price.toLocaleString()}
-            <span style={{ fontSize: "14px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }}>
-              税込
-            </span>
-          </div>
-        </motion.div>
-      )}
-
-      {/* 2カラムレイアウト */}
-      <div style={{
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        flex: 1,
-        overflow: "hidden",
-      }}>
-        {/* モバイルでは商品画像を先に表示 */}
-        {isMobile && (
-          <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            style={{
-              width: "100%",
-              backgroundColor: "#f5f5f7",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "40px 20px",
-              position: "relative",
-            }}
-          >
-            <canvas ref={canvasRef} style={{ maxWidth: "100%", height: "auto" }} />
-          </motion.div>
-        )}
-        {/* 左カラム: タブ + コンテンツ */}
-        <motion.div
-          style={{
-            width: isMobile ? "100%" : "40%",
-            height: "100%",
-            backgroundColor: "#ffffff",
-            borderRight: isMobile ? "none" : "1px solid #f0f0f0",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          {/* モバイルの商品情報ヘッダー */}
-          {isMobile && (
-            <motion.div
-              className="product-header"
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              style={{
-                padding: "24px 20px",
-                borderBottom: "1px solid #f0f0f0",
-              }}
-            >
-              <h1 style={{ 
-                margin: 0, 
-                fontSize: "24px",
-                fontWeight: "600",
-                letterSpacing: "-0.02em",
-                color: "#1d1d1f",
-                lineHeight: 1.2,
-              }}>
-                {product.name}
-              </h1>
-              <div style={{ 
-                marginTop: "8px", 
-                fontSize: "14px",
-                color: "#6e6e73",
-                lineHeight: 1.5,
-              }}>
-                {product.description}
-              </div>
-              <div style={{ 
-                marginTop: "16px", 
-                fontSize: "28px", 
-                fontWeight: "600", 
-                color: "#1d1d1f",
-                letterSpacing: "-0.01em",
-              }}>
-                ¥{product.price.toLocaleString()}
-                <span style={{ fontSize: "16px", fontWeight: "400", color: "#86868b", marginLeft: "8px" }}>
-                  税込
-                </span>
-              </div>
-            </motion.div>
-          )}
-
-          {/* タブメニュー（モバイル時） */}
-        {isMobile && (
-          <motion.div
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            style={{
-              display: "flex",
-              gap: "8px",
-              padding: "16px 20px",
-              borderBottom: "1px solid #f0f0f0",
-              flexWrap: "wrap",
-              overflowX: "auto",
-            }}
-          >
-            {[
-              { id: "item" as TabType, label: "アイテム" },
-              { id: "ai" as TabType, label: "AI画像生成" },
-              { id: "images" as TabType, label: "画像管理" },
-              { id: "text" as TabType, label: "テキスト" },
-            ].map((tab) => (
-              <motion.button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setIsOverlayOpen(true);
-                }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "980px",
-                  border: activeTab === tab.id ? "1.5px solid #1d1d1f" : "1.5px solid #d2d2d7",
-                  backgroundColor: activeTab === tab.id ? "#1d1d1f" : "transparent",
-                  color: activeTab === tab.id ? "#ffffff" : "#1d1d1f",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  transition: "all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
-                  letterSpacing: "-0.01em",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {tab.label}
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
-
-        {/* カラー＆サイズ選択、カートに追加（モバイルのみ） */}
-        {isMobile && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            style={{
-              padding: "20px",
-              borderBottom: "1px solid #f0f0f0",
-            }}
-          >
-            {/* 本体カラー */}
-            <div style={{ marginBottom: "24px" }}>
-              <h3 style={{
-                fontSize: "14px",
-                fontWeight: "600",
-                color: "#1d1d1f",
-                marginBottom: "12px",
-              }}>
-                本体カラー
-              </h3>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "12px",
-              }}>
-                <motion.button
-                  onClick={() => setSelectedColor("white")}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+      {/* コンパネ2（スタイル詳細） */}
+      <div
+        style={{
+          position: "absolute",
+          left: "339.5px",
+          top: 0,
+          width: "259.5px",
+          height: "100vh",
+          backgroundColor: "rgba(238, 238, 238, 0.5)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          zIndex: 4,
+          boxShadow: "5px 0 15px rgba(0, 0, 0, 0.1)",
+          overflow: "auto",
+          paddingTop: "35px",
+          paddingBottom: "35px",
+          paddingLeft: "17.5px",
+          paddingRight: "17.5px",
+          transform: isPanel2Open ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.3s ease-in-out",
+          pointerEvents: isPanel2Open ? "auto" : "none",
+        }}
+      >
+        {selectedStyle && (
+          <div>
+            <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#303030", marginTop: "0", marginBottom: "15px" }}>
+              {selectedStyle}
+            </h2>
+            
+            {/* スタイル画像一覧 */}
+            <div style={{ 
+              columnCount: 2,
+              columnGap: "9px"
+            }}>
+              {styleImages.map((imageSrc, index) => (
+                <div
+                  key={index}
                   style={{
-                    padding: "20px",
-                    borderRadius: "16px",
-                    border: selectedColor === "white" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
-                    backgroundColor: "#ffffff",
+                    width: "100%",
+                    borderRadius: "13px",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                    overflow: "hidden",
                     cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
                     transition: "all 0.2s ease",
+                    marginBottom: "4.5px",
+                    breakInside: "avoid",
+                    display: "inline-block",
+                  }}
+                  onClick={async () => {
+                    setSelectedPopupImage(imageSrc);
+                    const metadata = await fetchImageMetadata(imageSrc);
+                    setImageMetadata(metadata);
+                    setIsImagePopupOpen(true);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = "0 5px 15px rgba(0, 0, 0, 0.2)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
                   }}
                 >
-                  <div style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    backgroundColor: "#ffffff",
-                    border: "2px solid #d2d2d7",
-                  }} />
-                  <span style={{
-                    fontSize: "13px",
-                    fontWeight: "500",
-                    color: "#1d1d1f",
-                  }}>
-                    ホワイト
-                  </span>
-                </motion.button>
-                <motion.button
-                  onClick={() => setSelectedColor("black")}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  style={{
-                    padding: "20px",
-                    borderRadius: "16px",
-                    border: selectedColor === "black" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
-                    backgroundColor: "#ffffff",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <div style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    backgroundColor: "#1d1d1f",
-                  }} />
-                  <span style={{
-                    fontSize: "13px",
-                    fontWeight: "500",
-                    color: "#1d1d1f",
-                  }}>
-                    ブラック
-                  </span>
-                </motion.button>
-              </div>
-            </div>
-
-            {/* サイズ */}
-            <div style={{ marginBottom: "24px" }}>
-              <h3 style={{
-                fontSize: "14px",
-                fontWeight: "600",
-                color: "#1d1d1f",
-                marginBottom: "12px",
-              }}>
-                サイズ
-              </h3>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: "8px",
-              }}>
-                {(["S", "M", "L", "XL", "XXL"] as const).map((size) => (
-                  <motion.button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <img
+                    src={imageSrc}
+                    alt={`${selectedStyle} ${index + 1}`}
                     style={{
-                      padding: "12px 8px",
-                      borderRadius: "980px",
-                      border: selectedSize === size ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
-                      backgroundColor: selectedSize === size ? "#f5f5f7" : "#ffffff",
-                      color: "#1d1d1f",
-                      fontSize: "13px",
-                      fontWeight: selectedSize === size ? "600" : "500",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
                     }}
-                  >
-                    {size}
-                  </motion.button>
-                ))}
-              </div>
+                  />
+                </div>
+              ))}
             </div>
+          </div>
+        )}
+      </div>
 
-            {/* カートに追加ボタン */}
-            <motion.button
-              onClick={() => setIsModalOpen(true)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+      {/* 画像ポップアップ */}
+      {isImagePopupOpen && selectedPopupImage && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "40px",
+          }}
+          onClick={() => setIsImagePopupOpen(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "13px",
+              maxWidth: "800px",
+              maxHeight: "90vh",
+              overflow: "auto",
+              padding: "20px",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 画像 */}
+            <img
+              src={selectedPopupImage}
+              alt="選択された画像"
               style={{
                 width: "100%",
-                padding: "14px",
-                borderRadius: "980px",
-                border: "none",
-                backgroundColor: "#1d1d1f",
-                color: "#ffffff",
-                fontSize: "15px",
-                fontWeight: "600",
-                cursor: "pointer",
-                letterSpacing: "-0.01em",
+                height: "auto",
+                borderRadius: "13px",
+                marginBottom: "20px",
               }}
-            >
-              カートに追加
-            </motion.button>
-          </motion.div>
-        )}
+            />
 
-        {/* デスクトップ: アコーディオン形式のタブメニュー */}
-        {!isMobile && (
-          <div style={{
-            flex: 1,
-            overflowY: "auto",
-            overflowX: "hidden",
-            padding: "0 40px", // ボタンの外側の余白を左カラムに合わせる
-          }}>
-            {/* アイテム - Pill型ボタン → ボックス変形アコーディオン */}
-            <motion.div 
-              layout
-              animate={{
-                borderRadius: activeTab === "item" ? "24px" : "980px", // Pill → Box
-                backgroundColor: activeTab === "item" ? "#f5f5f7" : "#ffffff",
-                padding: activeTab === "item" ? "24px" : "0", // ボタン内部のpadding
-                width: activeTab === "item" ? "100%" : "fit-content", // 開いた時は100%、閉じた時はfit-content
-              }}
-              transition={{ 
-                layout: {
-                  type: "spring",
-                  stiffness: 100, // スプリング剛性
-                  damping: 20,
-                  mass: 0.8,
-                },
-                default: {
-                  duration: 0.8,
-                  ease: "easeInOut",
-                },
-              }}
-              style={{
-                border: "1.5px solid #d2d2d7",
-                marginBottom: "12px",
-                overflow: "hidden",
-                willChange: "border-radius, background-color, padding, width",
-              }}
-            >
-              {/* ヘッダーボタン */}
-              <motion.button
-                onClick={() => setActiveTab(activeTab === "item" ? null : "item")}
-                whileHover={{ 
-                  backgroundColor: activeTab === "item" ? "transparent" : "rgba(0,0,0,0.02)",
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ 
-                  scale: 0.98,
-                  transition: { duration: 0.15 }
-                }}
-                style={{
-                  width: "fit-content", // テキスト内容に合わせた自然な幅
-                  textAlign: "left",
-                  padding: activeTab === "item" ? "0 0 16px 0" : "16px 24px",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  fontSize: "17px",
-                  fontWeight: "500",
-                  color: "#1d1d1f",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "flex-start", // 左揃え
-                  alignItems: "center",
-                  letterSpacing: "-0.01em",
-                  transition: "padding 0.8s ease-in-out",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  {/* 左側の丸アイコン */}
-                  <div style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    backgroundColor: "#1d1d1f",
-                    flexShrink: 0,
-                  }} />
-                  アイテム
-                </div>
-              </motion.button>
-              
-              {/* コンテンツエリア */}
-              <AnimatePresence initial={false}>
-                {activeTab === "item" && (
-                  <motion.div
-                    key="item-content"
-                    initial={{ opacity: 0 }}
-                    animate={{ 
-                      opacity: 1,
-                      transition: {
-                        duration: 0.6,
-                        delay: 0.3,
-                        ease: "easeInOut",
-                      },
-                    }}
-                    exit={{ 
-                      opacity: 0,
-                      transition: { 
-                        duration: 0.4,
-                        ease: "easeInOut",
-                      },
-                    }}
-                  >
-                    <motion.div
-                      initial={{ y: -15, opacity: 0 }}
-                      animate={{ 
-                        y: 0, 
-                        opacity: 1,
-                        transition: {
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 20,
-                          delay: 0.35,
-                        },
-                      }}
-                      exit={{ 
-                        y: -15, 
-                        opacity: 0,
-                        transition: { 
-                          duration: 0.4,
-                          ease: "easeInOut",
-                        },
-                      }}
-                    >
-                      <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }}>
-                        商品を選んでください。<br/>
-                        Tシャツ・スウェット商品は男女兼用（ユニセックス）です
-                      </p>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-
-            {/* AI画像生成 - Pill型ボタン → ボックス変形アコーディオン */}
-            <motion.div 
-              layout
-              animate={{
-                borderRadius: activeTab === "ai" ? "24px" : "980px",
-                backgroundColor: activeTab === "ai" ? "#f5f5f7" : "#ffffff",
-                padding: activeTab === "ai" ? "24px" : "0",
-                width: activeTab === "ai" ? "100%" : "fit-content",
-              }}
-              transition={{ 
-                layout: {
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  mass: 0.8,
-                },
-                default: {
-                  duration: 0.8,
-                  ease: "easeInOut",
-                },
-              }}
-              style={{
-                border: "1.5px solid #d2d2d7",
-                marginBottom: "12px",
-                overflow: "hidden",
-                willChange: "border-radius, background-color, padding, width",
-              }}
-            >
-              <motion.button
-                onClick={() => setActiveTab(activeTab === "ai" ? null : "ai")}
-                whileHover={{ 
-                  backgroundColor: activeTab === "ai" ? "transparent" : "rgba(0,0,0,0.02)",
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ 
-                  scale: 0.98,
-                  transition: { duration: 0.15 }
-                }}
-                style={{
-                  width: "fit-content",
-                  textAlign: "left",
-                  padding: activeTab === "ai" ? "0 0 16px 0" : "16px 24px",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  fontSize: "17px",
-                  fontWeight: "500",
-                  color: "#1d1d1f",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  letterSpacing: "-0.01em",
-                  transition: "padding 0.8s ease-in-out",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    backgroundColor: "#1d1d1f",
-                    flexShrink: 0,
-                  }} />
-                  AI画像生成
-                </div>
-              </motion.button>
-              
-              <AnimatePresence initial={false}>
-                {activeTab === "ai" && (
-                  <motion.div
-                    key="ai-content"
-                    initial={{ opacity: 0 }}
-                    animate={{ 
-                      opacity: 1,
-                      transition: {
-                        duration: 0.6,
-                        delay: 0.3,
-                        ease: "easeInOut",
-                      },
-                    }}
-                    exit={{ 
-                      opacity: 0,
-                      transition: { 
-                        duration: 0.4,
-                        ease: "easeInOut",
-                      },
-                    }}
-                  >
-                    <motion.div
-                      initial={{ y: -15, opacity: 0 }}
-                      animate={{ 
-                        y: 0, 
-                        opacity: 1,
-                        transition: {
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 20,
-                          delay: 0.35,
-                        },
-                      }}
-                      exit={{ 
-                        y: -15, 
-                        opacity: 0,
-                        transition: { 
-                          duration: 0.4,
-                          ease: "easeInOut",
-                        },
-                      }}
-                    >
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                      <div>
-                        <label style={{
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#1d1d1f",
-                          marginBottom: "8px",
-                        }}>
-                          プロンプト
-                        </label>
-                        <textarea
-                          value={aiPrompt}
-                          onChange={(e) => setAiPrompt(e.target.value)}
-                          placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市..."
-                          rows={4}
-                          disabled={isGenerating}
-                          style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "12px",
-                            border: "1.5px solid #d2d2d7",
-                            fontSize: "15px",
-                            resize: "vertical",
-                            fontFamily: "inherit",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                      </div>
-                      <motion.button
-                        onClick={handleGenerateAI}
-                        disabled={isGenerating || !aiPrompt.trim()}
-                        whileHover={!isGenerating && aiPrompt.trim() ? { scale: 1.02 } : {}}
-                        whileTap={!isGenerating && aiPrompt.trim() ? { scale: 0.98 } : {}}
-                        style={{
-                          padding: "14px",
-                          borderRadius: "12px",
-                          border: "none",
-                          backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
-                          color: "#fff",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer",
-                        }}
-                      >
-                        {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
-                      </motion.button>
-                      {lastAIPrompt && (
-                        <p style={{ fontSize: "13px", color: "#6e6e73", margin: 0 }}>
-                          最後の生成: "{lastAIPrompt}"
-                        </p>
-                      )}
-                    </div>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-
-            {/* 画像管理 - Pill型ボタン → ボックス変形アコーディオン */}
-            <motion.div 
-              layout
-              animate={{
-                borderRadius: activeTab === "images" ? "24px" : "980px",
-                backgroundColor: activeTab === "images" ? "#f5f5f7" : "#ffffff",
-                padding: activeTab === "images" ? "24px" : "0",
-                width: activeTab === "images" ? "100%" : "fit-content",
-              }}
-              transition={{ 
-                layout: {
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  mass: 0.8,
-                },
-                default: {
-                  duration: 0.8,
-                  ease: "easeInOut",
-                },
-              }}
-              style={{
-                border: "1.5px solid #d2d2d7",
-                marginBottom: "12px",
-                overflow: "hidden",
-                willChange: "border-radius, background-color, padding, width",
-              }}
-            >
-              <motion.button
-                onClick={() => setActiveTab(activeTab === "images" ? null : "images")}
-                whileHover={{ 
-                  backgroundColor: activeTab === "images" ? "transparent" : "rgba(0,0,0,0.02)",
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ 
-                  scale: 0.98,
-                  transition: { duration: 0.15 }
-                }}
-                style={{
-                  width: "fit-content",
-                  textAlign: "left",
-                  padding: activeTab === "images" ? "0 0 16px 0" : "16px 24px",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  fontSize: "17px",
-                  fontWeight: "500",
-                  color: "#1d1d1f",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  letterSpacing: "-0.01em",
-                  transition: "padding 0.8s ease-in-out",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    backgroundColor: "#1d1d1f",
-                    flexShrink: 0,
-                  }} />
-                  画像管理
-                </div>
-              </motion.button>
-              
-              <AnimatePresence initial={false}>
-                {activeTab === "images" && (
-                  <motion.div
-                    key="images-content"
-                    initial={{ opacity: 0 }}
-                    animate={{ 
-                      opacity: 1,
-                      transition: {
-                        duration: 0.6,
-                        delay: 0.3,
-                        ease: "easeInOut",
-                      },
-                    }}
-                    exit={{ 
-                      opacity: 0,
-                      transition: { 
-                        duration: 0.4,
-                        ease: "easeInOut",
-                      },
-                    }}
-                  >
-                    <motion.div
-                      initial={{ y: -15, opacity: 0 }}
-                      animate={{ 
-                        y: 0, 
-                        opacity: 1,
-                        transition: {
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 20,
-                          delay: 0.35,
-                        },
-                      }}
-                      exit={{ 
-                        y: -15, 
-                        opacity: 0,
-                        transition: { 
-                          duration: 0.4,
-                          ease: "easeInOut",
-                        },
-                      }}
-                    >
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageUpload}
-                        style={{ display: "none" }}
-                      />
-                      <motion.button
-                        onClick={handleUploadClick}
-                        disabled={isLoading}
-                        whileHover={!isLoading ? { scale: 1.02 } : {}}
-                        whileTap={!isLoading ? { scale: 0.98 } : {}}
-                        style={{
-                          padding: "14px",
-                          borderRadius: "12px",
-                          border: "none",
-                          backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
-                          color: "#fff",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: isLoading ? "not-allowed" : "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        {isLoading ? (
-                          <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
-                        ) : (
-                          <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
-                        )}
-                      </motion.button>
-                      {uploadedImages.length > 0 && (
-                        <div>
-                          <h3 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px" }}>
-                            アップロード済み画像
-                          </h3>
-                          <div style={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                            gap: "12px",
-                          }}>
-                            {uploadedImages.map((imgUrl, index) => (
-                              <div
-                                key={index}
-                                style={{
-                                  borderRadius: "8px",
-                                  overflow: "hidden",
-                                  aspectRatio: "1 / 1",
-                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                                }}
-                              >
-                                <img
-                                  src={imgUrl}
-                                  alt={`Uploaded ${index + 1}`}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                  }}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-
-            {/* テキスト - Pill型ボタン → ボックス変形アコーディオン */}
-            <motion.div 
-              layout
-              animate={{
-                borderRadius: activeTab === "text" ? "24px" : "980px",
-                backgroundColor: activeTab === "text" ? "#f5f5f7" : "#ffffff",
-                padding: activeTab === "text" ? "24px" : "0",
-                width: activeTab === "text" ? "100%" : "fit-content",
-              }}
-              transition={{ 
-                layout: {
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  mass: 0.8,
-                },
-                default: {
-                  duration: 0.8,
-                  ease: "easeInOut",
-                },
-              }}
-              style={{
-                border: "1.5px solid #d2d2d7",
-                marginBottom: "12px",
-                overflow: "hidden",
-                willChange: "border-radius, background-color, padding, width",
-              }}
-            >
-              <motion.button
-                onClick={() => setActiveTab(activeTab === "text" ? null : "text")}
-                whileHover={{ 
-                  backgroundColor: activeTab === "text" ? "transparent" : "rgba(0,0,0,0.02)",
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ 
-                  scale: 0.98,
-                  transition: { duration: 0.15 }
-                }}
-                style={{
-                  width: "fit-content",
-                  textAlign: "left",
-                  padding: activeTab === "text" ? "0 0 16px 0" : "16px 24px",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  fontSize: "17px",
-                  fontWeight: "500",
-                  color: "#1d1d1f",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  letterSpacing: "-0.01em",
-                  transition: "padding 0.8s ease-in-out",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    backgroundColor: "#1d1d1f",
-                    flexShrink: 0,
-                  }} />
-                  テキスト
-                </div>
-              </motion.button>
-              
-              <AnimatePresence initial={false}>
-                {activeTab === "text" && (
-                  <motion.div
-                    key="text-content"
-                    initial={{ opacity: 0 }}
-                    animate={{ 
-                      opacity: 1,
-                      transition: {
-                        duration: 0.6,
-                        delay: 0.3,
-                        ease: "easeInOut",
-                      },
-                    }}
-                    exit={{ 
-                      opacity: 0,
-                      transition: { 
-                        duration: 0.4,
-                        ease: "easeInOut",
-                      },
-                    }}
-                  >
-                    <motion.div
-                      initial={{ y: -15, opacity: 0 }}
-                      animate={{ 
-                        y: 0, 
-                        opacity: 1,
-                        transition: {
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 20,
-                          delay: 0.35,
-                        },
-                      }}
-                      exit={{ 
-                        y: -15, 
-                        opacity: 0,
-                        transition: { 
-                          duration: 0.4,
-                          ease: "easeInOut",
-                        },
-                      }}
-                    >
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                      <div>
-                        <label style={{
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#1d1d1f",
-                          marginBottom: "8px",
-                        }}>
-                          テキスト
-                        </label>
-                        <input
-                          type="text"
-                          value={textInput}
-                          onChange={(e) => handleTextInputChange(e.target.value)}
-                          placeholder="テキストを入力"
-                          style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "12px",
-                            border: "1.5px solid #d2d2d7",
-                            fontSize: "15px",
-                            fontFamily: "inherit",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                      </div>
-                      <div style={{ display: "flex", gap: "16px" }}>
-                        <div style={{ flex: 1 }}>
-                          <label style={{
-                            display: "block",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#1d1d1f",
-                            marginBottom: "8px",
-                          }}>
-                            色
-                          </label>
-                          <input
-                            type="color"
-                            value={textColor}
-                            onChange={(e) => handleChangeTextColor(e.target.value)}
-                            style={{
-                              width: "100%",
-                              height: "44px",
-                              borderRadius: "12px",
-                              border: "1.5px solid #d2d2d7",
-                              cursor: "pointer",
-                            }}
-                          />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <label style={{
-                            display: "block",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#1d1d1f",
-                            marginBottom: "8px",
-                          }}>
-                            サイズ: {fontSize}px
-                          </label>
-                          <input
-                            type="range"
-                            min="10"
-                            max="100"
-                            value={fontSize}
-                            onChange={(e) => handleChangeFontSize(Number(e.target.value))}
-                            style={{ width: "100%", height: "44px" }}
-                          />
-                        </div>
-                      </div>
-                      <motion.button
-                        onClick={handleAddText}
-                        disabled={!textInput.trim()}
-                        whileHover={textInput.trim() ? { scale: 1.02 } : {}}
-                        whileTap={textInput.trim() ? { scale: 0.98 } : {}}
-                        style={{
-                          padding: "14px",
-                          borderRadius: "12px",
-                          border: "none",
-                          backgroundColor: !textInput.trim() ? "#d2d2d7" : "#0071e3",
-                          color: "#fff",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: !textInput.trim() ? "not-allowed" : "pointer",
-                        }}
-                      >
-                        テキストを追加
-                      </motion.button>
-                    </div>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </div>
-        )}
-
-        {/* モバイルオーバーレイ */}
-        <AnimatePresence>
-          {isMobile && isOverlayOpen && (
-            <>
-              {/* 背景（backdrop） */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                onClick={() => setIsOverlayOpen(false)}
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: "rgba(0, 0, 0, 0.4)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                  zIndex: 1000,
-                }}
-              />
-              
-              {/* オーバーレイコンテンツ */}
-              <motion.div
-                initial={{ y: "100%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: "100%", opacity: 0 }}
-                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                style={{
-                  position: "fixed",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  maxHeight: "80vh",
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  borderTopLeftRadius: "20px",
-                  borderTopRightRadius: "20px",
-                  boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.15)",
-                  zIndex: 1001,
-                  overflowY: "auto",
-                  padding: "24px",
-                }}
-              >
-                {/* 閉じるボタン */}
-                <button
-                  onClick={() => setIsOverlayOpen(false)}
-                  style={{
-                    position: "absolute",
-                    top: "16px",
-                    right: "16px",
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    border: "none",
-                    backgroundColor: "rgba(0, 0, 0, 0.05)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    fontSize: "20px",
-                    color: "#1d1d1f",
-                  }}
-                >
-                  ×
-                </button>
-
-                {/* タブコンテンツ */}
-                <div style={{ marginTop: "20px" }}>
-                  {activeTab === "item" && (
-                    <div>
-                      <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "#6e6e73" }}>
-                        こちらはテストテキストです。商品の詳細情報や選択オプションを将来的に追加予定です。
-                      </p>
-                    </div>
-                  )}
-                  {activeTab === "ai" && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                      <div>
-                        <label style={{
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#1d1d1f",
-                          marginBottom: "8px",
-                        }}>
-                          プロンプト
-                        </label>
-                        <textarea
-                          value={aiPrompt}
-                          onChange={(e) => setAiPrompt(e.target.value)}
-                          placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市..."
-                          rows={4}
-                          disabled={isGenerating}
-                          style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "12px",
-                            border: "1.5px solid #d2d2d7",
-                            fontSize: "15px",
-                            resize: "vertical",
-                            fontFamily: "inherit",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                      </div>
-                      <button
-                        onClick={() => {
-                          handleGenerateAI();
-                          setIsOverlayOpen(false);
-                        }}
-                        disabled={isGenerating || !aiPrompt.trim()}
-                        style={{
-                          padding: "14px",
-                          borderRadius: "12px",
-                          border: "none",
-                          backgroundColor: isGenerating || !aiPrompt.trim() ? "#d2d2d7" : "#0071e3",
-                          color: "#fff",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: isGenerating || !aiPrompt.trim() ? "not-allowed" : "pointer",
-                        }}
-                      >
-                        {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
-                      </button>
-                    </div>
-                  )}
-                  {activeTab === "images" && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                      <button
-                        onClick={() => {
-                          handleUploadClick();
-                          setIsOverlayOpen(false);
-                        }}
-                        disabled={isLoading}
-                        style={{
-                          padding: "14px",
-                          borderRadius: "12px",
-                          border: "none",
-                          backgroundColor: isLoading ? "#d2d2d7" : "#0071e3",
-                          color: "#fff",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: isLoading ? "not-allowed" : "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        {isLoading ? (
-                          <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
-                        ) : (
-                          <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
-                        )}
-                      </button>
-                      {uploadedImages.length > 0 && (
-                        <div>
-                          <h3 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px" }}>
-                            アップロード済み画像
-                          </h3>
-                          <div style={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
-                            gap: "12px",
-                          }}>
-                            {uploadedImages.map((imgUrl, index) => (
-                              <div
-                                key={index}
-                                style={{
-                                  borderRadius: "8px",
-                                  overflow: "hidden",
-                                  aspectRatio: "1 / 1",
-                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                                }}
-                              >
-                                <img
-                                  src={imgUrl}
-                                  alt={`Uploaded ${index + 1}`}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                  }}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {activeTab === "text" && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                      <div>
-                        <label style={{
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#1d1d1f",
-                          marginBottom: "8px",
-                        }}>
-                          テキスト
-                        </label>
-                        <input
-                          type="text"
-                          value={textInput}
-                          onChange={(e) => handleTextInputChange(e.target.value)}
-                          placeholder="テキストを入力"
-                          style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "12px",
-                            border: "1.5px solid #d2d2d7",
-                            fontSize: "15px",
-                            fontFamily: "inherit",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                      </div>
-                      <div style={{ display: "flex", gap: "16px" }}>
-                        <div style={{ flex: 1 }}>
-                          <label style={{
-                            display: "block",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#1d1d1f",
-                            marginBottom: "8px",
-                          }}>
-                            色
-                          </label>
-                          <input
-                            type="color"
-                            value={textColor}
-                            onChange={(e) => handleChangeTextColor(e.target.value)}
-                            style={{
-                              width: "100%",
-                              height: "44px",
-                              borderRadius: "12px",
-                              border: "1.5px solid #d2d2d7",
-                              cursor: "pointer",
-                            }}
-                          />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <label style={{
-                            display: "block",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#1d1d1f",
-                            marginBottom: "8px",
-                          }}>
-                            サイズ: {fontSize}px
-                          </label>
-                          <input
-                            type="range"
-                            min="10"
-                            max="100"
-                            value={fontSize}
-                            onChange={(e) => handleChangeFontSize(Number(e.target.value))}
-                            style={{ width: "100%", height: "44px" }}
-                          />
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          handleAddText();
-                          setIsOverlayOpen(false);
-                        }}
-                        disabled={!textInput.trim()}
-                        style={{
-                          padding: "14px",
-                          borderRadius: "12px",
-                          border: "none",
-                          backgroundColor: !textInput.trim() ? "#d2d2d7" : "#0071e3",
-                          color: "#fff",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: !textInput.trim() ? "not-allowed" : "pointer",
-                        }}
-                      >
-                        テキストを追加
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-
-        {/* カラー＆サイズ選択、カートに追加（デスクトップのみ） */}
-        {!isMobile && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            style={{
-              padding: "40px",
-              borderTop: "1px solid #f0f0f0",
-            }}
-          >
-            {/* 本体カラー */}
-            <div style={{ marginBottom: "32px" }}>
-              <h3 style={{
-                fontSize: "15px",
-                fontWeight: "600",
-                color: "#1d1d1f",
-                marginBottom: "16px",
-              }}>
-                本体カラー
+            {/* IPTCメタデータ */}
+            <div style={{ marginBottom: "20px" }}>
+              <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#303030", marginBottom: "10px" }}>
+                この画像のプロンプト
               </h3>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "12px",
-              }}>
-                <motion.button
-                  onClick={() => setSelectedColor("white")}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  style={{
-                    padding: "24px",
-                    borderRadius: "16px",
-                    border: selectedColor === "white" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
-                    backgroundColor: "#ffffff",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "12px",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <div style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "50%",
-                    backgroundColor: "#ffffff",
-                    border: "2px solid #d2d2d7",
-                  }} />
-                  <span style={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#1d1d1f",
-                  }}>
-                    ホワイト
-                  </span>
-                </motion.button>
-                <motion.button
-                  onClick={() => setSelectedColor("black")}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  style={{
-                    padding: "24px",
-                    borderRadius: "16px",
-                    border: selectedColor === "black" ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
-                    backgroundColor: "#ffffff",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "12px",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <div style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "50%",
-                    backgroundColor: "#1d1d1f",
-                  }} />
-                  <span style={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#1d1d1f",
-                  }}>
-                    ブラック
-                  </span>
-                </motion.button>
-              </div>
+              <p style={{ fontSize: "12px", color: "#666", lineHeight: "1.6", margin: "0", whiteSpace: "pre-wrap" }}>
+                {imageMetadata}
+              </p>
             </div>
 
-            {/* サイズ */}
-            <div style={{ marginBottom: "32px" }}>
-              <h3 style={{
-                fontSize: "15px",
-                fontWeight: "600",
-                color: "#1d1d1f",
-                marginBottom: "16px",
-              }}>
-                サイズ
-              </h3>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: "8px",
-              }}>
-                {(["S", "M", "L", "XL", "XXL"] as const).map((size) => (
-                  <motion.button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      padding: "12px 8px",
-                      borderRadius: "980px",
-                      border: selectedSize === size ? "2.5px solid #0071e3" : "1.5px solid #d2d2d7",
-                      backgroundColor: selectedSize === size ? "#f5f5f7" : "#ffffff",
-                      color: "#1d1d1f",
-                      fontSize: "14px",
-                      fontWeight: selectedSize === size ? "600" : "500",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    {size}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* カートに追加ボタン（デスクトップのみ） */}
-        {!isMobile && (
-          <motion.div
-            style={{
-              padding: "40px",
-              borderTop: "1px solid #f0f0f0",
-            }}
-          >
-            <motion.button
-              onClick={() => setIsModalOpen(true)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            {/* プロンプトに反映ボタン */}
+            <button
               style={{
                 width: "100%",
                 padding: "16px",
-                borderRadius: "980px",
-                border: "none",
-                backgroundColor: "#1d1d1f",
+                fontSize: "14px",
+                fontWeight: 700,
                 color: "#ffffff",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              カートに追加
-            </motion.button>
-          </motion.div>
-        )}
-      </motion.div>
-
-        {/* 右カラム: Tシャツモックアップ（デスクトップのみ） */}
-        {!isMobile && (
-          <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            style={{
-              width: "60%",
-              height: "100%",
-              backgroundColor: "#f5f5f7",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              padding: "40px",
-            }}
-          >
-        {/* キャンバスコンテナ */}
-        <div 
-          className="canvas-container"
-          style={{
-            width: "100%",
-            maxWidth: "min(800px, 100%)",
-            aspectRatio: isMobile ? "3 / 4" : "1 / 1",
-            position: "relative",
-          }}
-        >
-          <div style={{ 
-            display: "flex", 
-            flexDirection: "column", 
-            alignItems: "center", 
-            padding: isMobile ? "10px" : "40px",
-            width: "100%",
-            boxSizing: "border-box",
-          }}>
-            <div
-              style={{
+                backgroundColor: "#303030",
                 border: "none",
-                borderRadius: "0",
-                overflow: "hidden",
-                boxShadow: "none",
-                backgroundColor: "#fafafa",
-                width: "100%",
-                maxWidth: isMobile ? "100vw" : "min(800px, 100%)",
-                margin: "0 auto",
-                position: "relative",
-                aspectRatio: "1 / 1",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                touchAction: isMobile ? "pan-y" : "auto",
+                borderRadius: "13px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#404040";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#303030";
+              }}
+              onClick={() => {
+                handleApplyPrompt(imageMetadata);
               }}
             >
-              {/* ズームボタン */}
-              <button
-                onClick={() => {
-                  if (!fabricCanvasRef.current) return;
-                  const canvas = fabricCanvasRef.current;
-                  
-                  if (isZoomed) {
-                    // ズームアウト：元に戻す
-                    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-                    setIsZoomed(false);
-                  } else {
-                    // ズームイン：プリントエリアの中心にズーム
-                    const printArea = getPrintAreaInPixels(CANVAS_SIZE);
-                    
-                    // プリントエリアの中心座標
-                    const centerX = printArea.left + printArea.width / 2;
-                    const centerY = printArea.top + printArea.height / 2;
-                    
-                    // ズーム倍率（スマホ: 2倍、PC: 1.7倍）
-                    const zoom = isMobile ? 2.0 : 1.7;
-                    
-                    // ズーム後の表示位置を計算（プリントエリアが中央に来るように）
-                    const point = new (window as any).fabric.Point(centerX, centerY);
-                    canvas.zoomToPoint(point, zoom);
-                    
-                    setIsZoomed(true);
-                  }
-                  canvas.renderAll();
-                }}
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  border: "none",
-                  backgroundColor: "white",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 10,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.1)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                }}
-                title={isZoomed ? "元のサイズに戻す" : "プリントエリアを拡大"}
-              >
-                <Icon type={isZoomed ? "zoomIn" : "zoomOut"} size={20} color="#667eea" />
-              </button>
-              
-              <canvas 
-                ref={canvasRef} 
-                style={{ 
-                  display: "block",
-                  width: "100%",
-                  height: "100%",
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                }} 
-              />
-              
-              {/* ゴミ箱（Instagram風） */}
-              {showTrash && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: isMobile ? "30px" : "40px",
-                    left: "50%",
-                    transform: `translateX(-50%) scale(${isOverTrash ? 1.15 : 1})`,
-                    width: isMobile ? "70px" : "80px",
-                    height: isMobile ? "70px" : "80px",
-                    borderRadius: "50%",
-                    backgroundColor: isOverTrash ? "#ff4444" : "#666",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: isOverTrash ? "0 6px 20px rgba(255,68,68,0.5)" : "0 4px 12px rgba(0,0,0,0.3)",
-                    transition: "all 0.2s ease",
-                    zIndex: 15,
-                    animation: "trashBounce 0.3s ease",
-                  }}
-                >
-                  <Icon type="trash" size={isMobile ? 32 : 36} color="white" />
-                  <style>{`
-                    @keyframes trashBounce {
-                      0% {
-                        transform: translateX(-50%) scale(0.8);
-                        opacity: 0;
-                      }
-                      50% {
-                        transform: translateX(-50%) scale(1.1);
-                      }
-                      100% {
-                        transform: translateX(-50%) scale(1);
-                        opacity: 1;
-                      }
-                    }
-                  `}</style>
-                </div>
-              )}
-              
-              {/* スナップガイドライン（Instagram風） */}
-              {(snapGuides.vertical !== null || snapGuides.horizontal !== null) && (
-                <svg
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
-                    zIndex: 5,
-                  }}
-                >
-                  {snapGuides.vertical !== null && (
-                    <line
-                      x1={`${(snapGuides.vertical / CANVAS_SIZE) * 100}%`}
-                      y1="0"
-                      x2={`${(snapGuides.vertical / CANVAS_SIZE) * 100}%`}
-                      y2="100%"
-                      stroke="#ff00ff"
-                      strokeWidth="1"
-                      strokeDasharray="5,5"
-                      opacity="0.8"
-                    />
-                  )}
-                  {snapGuides.horizontal !== null && (
-                    <line
-                      x1="0"
-                      y1={`${(snapGuides.horizontal / CANVAS_SIZE) * 100}%`}
-                      x2="100%"
-                      y2={`${(snapGuides.horizontal / CANVAS_SIZE) * 100}%`}
-                      stroke="#ff00ff"
-                      strokeWidth="1"
-                      strokeDasharray="5,5"
-                      opacity="0.8"
-                    />
-                  )}
-                </svg>
-              )}
-            </div>
-
-            {/* オブジェクト操作コントロール */}
-            <div style={{ 
-              marginTop: "15px", 
-              display: "flex", 
-              flexWrap: "wrap",
-              gap: isMobile ? "8px" : "10px", 
-              justifyContent: "center",
-              width: "100%",
-              maxWidth: isMobile ? "100%" : "800px"
-            }}>
-              {/* 履歴 */}
-              <button 
-                onClick={handleUndo} 
-                disabled={!canUndo} 
-                style={{
-                  ...historyButtonStyle(canUndo),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="元に戻す (Cmd/Ctrl+Z)"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 7v6h6" />
-                  <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>元に戻す</span>
-              </button>
-              <button 
-                onClick={handleRedo} 
-                disabled={!canRedo} 
-                style={{
-                  ...historyButtonStyle(canRedo),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="やり直し (Cmd/Ctrl+Shift+Z)"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 7v6h-6" />
-                  <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>やり直し</span>
-              </button>
-              
-              {/* 配置 */}
-              <button 
-                onClick={handleCenterVertical} 
-                disabled={!selectedObject}
-                style={{
-                  ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="上下中央"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>上下中央</span>
-              </button>
-              <button 
-                onClick={handleCenterHorizontal} 
-                disabled={!selectedObject}
-                style={{
-                  ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="左右中央"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l-7 7 7 7M12 5l7 7-7 7" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>左右中央</span>
-              </button>
-              
-              {/* 重なり順 */}
-              <button 
-                onClick={handleBringForward} 
-                disabled={!selectedObject}
-                style={{
-                  ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="手前に移動"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="9" y="13" width="10" height="10" rx="2" ry="2" opacity="0.5" />
-                  <rect x="5" y="1" width="10" height="10" rx="2" ry="2" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>手前へ</span>
-              </button>
-              <button 
-                onClick={handleSendBackwards} 
-                disabled={!selectedObject}
-                style={{
-                  ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="奥に移動"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="5" y="1" width="10" height="10" rx="2" ry="2" opacity="0.5" />
-                  <rect x="9" y="13" width="10" height="10" rx="2" ry="2" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>奥へ</span>
-              </button>
-              
-              {/* その他 */}
-              <button 
-                onClick={handleFitToPrintArea} 
-                disabled={!selectedObject}
-                style={{
-                  ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px"
-                }}
-                title="印刷面を覆う"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>プリント範囲最大</span>
-              </button>
-              <button 
-                onClick={handleRemoveSelected} 
-                disabled={!selectedObject}
-                style={{
-                  ...historyButtonStyle(!!selectedObject),
-                  padding: isMobile ? "8px 10px" : "10px 12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                  minWidth: isMobile ? "60px" : "70px",
-                  backgroundColor: selectedObject ? "#e74c3c" : "#cccccc",
-                }}
-                title="削除 (Delete/Backspace)"
-              >
-                <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                  <line x1="10" y1="11" x2="10" y2="17" />
-                  <line x1="14" y1="11" x2="14" y2="17" />
-                </svg>
-                <span style={{ fontSize: isMobile ? "9px" : "10px" }}>削除</span>
-              </button>
-            </div>
-
-            {/* 操作説明 */}
-            <div style={{ 
-              ...infoBoxStyle, 
-              width: "100%", 
-              maxWidth: isMobile ? "100%" : "800px", 
-              backgroundColor: "#ffffff",
-              marginTop: isMobile ? "15px" : "20px",
-              padding: isMobile ? "15px" : "20px"
-            }}>
-              <h3 style={{ 
-                marginTop: 0, 
-                fontSize: isMobile ? "14px" : "16px" 
-              }}>
-                📝 使い方
-              </h3>
-              <ul style={{ 
-                marginBottom: 0, 
-                lineHeight: 1.6, 
-                paddingLeft: isMobile ? "18px" : "20px", 
-                fontSize: isMobile ? "12px" : "13px" 
-              }}>
-                <li>🤖 AIに画像を生成させることができます</li>
-                <li>📷 画像を複数アップロードして重ね合わせできます</li>
-                <li>✏️ テキストを追加してカスタマイズできます</li>
-                <li>🎨 画像にフィルターを適用できます</li>
-                <li>🛒 完成したらShopifyカートに追加できます</li>
-              </ul>
-            </div>
+              プロンプトに反映
+            </button>
           </div>
         </div>
+      )}
 
-        {/* 右側: コントロールパネル（モバイルのみ表示） */}
-        <div style={{ 
-          display: isMobile ? "block" : "none",
-          width: "100%", 
-          backgroundColor: "#ffffff",
-          overflowY: "auto",
-          overflowX: "hidden",
-        }}>
-          <div style={{
-            ...panelStyle,
-            padding: isMobile ? "25px 20px" : "40px 30px",
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-          }}>
-            <h2 style={{ 
-              marginTop: 0, 
-              color: "#1a1a1a", 
-              marginBottom: isMobile ? "20px" : "30px",
-              fontSize: isMobile ? "14px" : "16px",
-              fontWeight: "400",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-            }}>
-              商品詳細
+      {/* コンテンツパネル（サイドバーの下） */}
+      <div
+        ref={scrollContainerRef}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: "339.5px",
+          height: "100vh",
+          backgroundColor: "#eeeeee",
+          zIndex: 5,
+          boxShadow: isCollapsed ? "5px 0 15px rgba(0, 0, 0, 0.1)" : "none",
+          transition: isCollapsed ? "none" : "box-shadow 0s 0.28s",
+          overflow: "auto",
+          paddingTop: "35px",
+          paddingBottom: "35px",
+          paddingLeft: "97.5px",
+          paddingRight: "17.5px",
+        }}
+      >
+        {/* パネルの内容（activeTabに応じて表示） */}
+        {activeTab && (
+          <div>
+            <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#303030", marginTop: "0", marginBottom: "15px" }}>
+              {menuItems.find((item) => item.id === activeTab)?.label}
             </h2>
 
-            {/* 商品説明セクション */}
-            <div style={sectionStyle}>
-              <div style={{
-                padding: "0",
-                backgroundColor: "transparent",
-                borderRadius: "0",
-                marginBottom: "20px",
-              }}>
-                <h3 style={{ ...sectionTitleStyle, marginTop: 0 }}>商品説明</h3>
-                <p style={{ 
-                  fontSize: "13px", 
-                  color: "#666", 
-                  lineHeight: "1.8",
-                  margin: 0,
-                  letterSpacing: "0.02em",
-                }}>
-                  {product.description}
-                </p>
-              </div>
-            </div>
+            {/* ダミーテキスト */}
+            <p style={{ fontSize: "12px", fontWeight: 400, color: "#666", lineHeight: "1.6", margin: "0 0 20px 0" }}>
+              ここにダミーテキストが入ります。商品の説明やカテゴリーの情報など、ユーザーに伝えたい内容を表示することができます。
+            </p>
 
-            {/* 本体カラー選択セクション */}
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>本体カラー</h3>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-                {product.colors.map((color) => (
-                  <button
-                    key={color.name}
-                    onClick={() => setSelectedColor(color)}
-                    style={{
-                      flex: 1,
-                      padding: "14px 10px",
-                      border: selectedColor.name === color.name 
-                        ? "1px solid #1a1a1a" 
-                        : "1px solid #d0d0d0",
-                      borderRadius: "0",
-                      backgroundColor: selectedColor.name === color.name ? "#f5f5f5" : "white",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedColor.name !== color.name) {
-                        e.currentTarget.style.borderColor = "#888";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedColor.name !== color.name) {
-                        e.currentTarget.style.borderColor = "#d0d0d0";
-                      }
-                    }}
-                  >
+            {/* アイテムタブの内容 */}
+            {activeTab === "item" && (
+              <div>
+                {products.map((shopifyProduct) => {
+                  const isHovered = hoveredProductId === shopifyProduct.id;
+                  const isSelected = selectedProductId === shopifyProduct.id;
+                  const showBorder = isHovered || isSelected;
+                  
+                  return (
                     <div
+                      key={shopifyProduct.id}
                       style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                        backgroundColor: color.hex,
-                        border: color.hex === '#FFFFFF' || color.hex === '#F5F5DC'
-                          ? '2px solid #e0e0e0' 
-                          : 'none',
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        backgroundColor: "#f8f8f8",
+                        borderRadius: "13px",
+                        marginBottom: "17.5px",
+                        border: showBorder ? "1px solid #303030" : "1px solid transparent",
+                        boxShadow: isSelected ? "0 5px 15px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
                       }}
-                    />
-                    <span style={{ 
-                      fontSize: "12px", 
-                      fontWeight: selectedColor.name === color.name ? "bold" : "normal",
-                      color: selectedColor.name === color.name ? "#667eea" : "#666",
-                    }}>
-                      {color.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
+                      onClick={() => handleProductClick(shopifyProduct.id, shopifyProduct.image, shopifyProduct.title)}
+                      onMouseEnter={() => setHoveredProductId(shopifyProduct.id)}
+                      onMouseLeave={() => setHoveredProductId(null)}
+                    >
+                    {/* 商品画像 */}
+                    {shopifyProduct.image && (
+                      <img
+                        src={shopifyProduct.image}
+                        alt={shopifyProduct.imageAlt}
+                        style={{
+                          width: "100%",
+                          aspectRatio: "3 / 4",
+                          objectFit: "cover",
+                          borderRadius: "13px 13px 0 0",
+                          display: "block",
+                        }}
+                      />
+                    )}
 
-            {/* サイズ選択セクション */}
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>サイズ</h3>
-              <div style={{ 
-                display: "grid", 
-                gridTemplateColumns: "repeat(5, 1fr)", 
-                gap: "8px",
-                marginBottom: "20px",
-              }}>
-                {sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
+                    {/* 商品情報 */}
+                    <div style={{ padding: "17.5px 17.5px" }}>
+                      {/* 商品名 */}
+                      <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#303030", margin: "0 0 6px 0" }}>
+                        {shopifyProduct.title}
+                      </h3>
+
+                      {/* 価格 */}
+                      <p style={{ fontSize: "12px", fontWeight: 700, color: "#666", margin: "0 0 6px 0" }}>
+                        ¥{parseInt(shopifyProduct.price).toLocaleString()}（税込）
+                      </p>
+
+                      {/* カラー */}
+                      {shopifyProduct.colors.length > 0 && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                          <span style={{ fontSize: "12px", color: "#666" }}>カラー</span>
+                          <div style={{ display: "flex", gap: "4px" }}>
+                            {shopifyProduct.colors.map((color, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  width: "15px",
+                                  height: "15px",
+                                  borderRadius: "50%",
+                                  backgroundColor: color.hex,
+                                  border: "1px solid #ddd",
+                                  cursor: color.image ? "pointer" : "default",
+                                  transition: "transform 0.2s ease",
+                                }}
+                                title={color.name}
+                                onClick={(e) => handleColorClick(e, shopifyProduct.id, color.image, color.name, shopifyProduct.title)}
+                                onMouseEnter={(e) => {
+                                  if (color.image) {
+                                    e.currentTarget.style.transform = "scale(1.2)";
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = "scale(1)";
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  );
+                })}
+
+                {/* ローディング表示 */}
+                {isLoadingProducts && (
+                  <p style={{ textAlign: "center", fontSize: "12px", color: "#999", padding: "20px 0" }}>
+                    読み込み中...
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* 画像管理タブの内容 */}
+            {activeTab === "image" && (
+              <div>
+                {/* 隠しファイル入力 */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleFileSelect}
+                />
+
+                {/* 大きなアップロードカード */}
+                <div
+                  style={{
+                    width: "223.5px",
+                    backgroundColor: "#f8f8f8",
+                    borderRadius: "13px",
+                    boxShadow: isDraggingUpload ? "inset 0 2px 8px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    border: isDraggingUpload ? "2px dashed #303030" : "2px dashed transparent",
+                    transition: "all 0.2s ease",
+                    marginBottom: "18px",
+                    padding: "20px",
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  {getImageIcon(32)}
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#303030", marginTop: "12px", marginBottom: "10px" }}>
+                    画像を追加
+                  </span>
+                  <div style={{ fontSize: "9px", color: "#666", textAlign: "center", lineHeight: "1.5" }}>
+                    <p style={{ margin: "0 0 2px 0", fontWeight: 600 }}>推奨: 2953×3685px以上</p>
+                    <p style={{ margin: "0 0 5px 0", fontWeight: 600 }}>RGB、300dpi</p>
+                    <p style={{ margin: "0 0 4px 0" }}>対応形式: JPG, PNG (最大15MB)</p>
+                    <p style={{ margin: "0", fontSize: "8px", color: "#999" }}>著作権を侵害する画像の使用は禁止です</p>
+                  </div>
+                </div>
+
+                {/* 小さな画像カード（グリッドレイアウト）*/}
+                {uploadedImages.length > 0 && (
+                  <div
                     style={{
-                      padding: "14px 8px",
-                      border: selectedSize === size 
-                        ? "1px solid #1a1a1a" 
-                        : "1px solid #d0d0d0",
-                      borderRadius: "0",
-                      backgroundColor: selectedSize === size ? "#1a1a1a" : "white",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: "400",
-                      letterSpacing: "0.05em",
-                      color: selectedSize === size ? "white" : "#666",
-                      transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedSize !== size) {
-                        e.currentTarget.style.backgroundColor = "#fafafa";
-                        e.currentTarget.style.borderColor = "#888";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedSize !== size) {
-                        e.currentTarget.style.backgroundColor = "white";
-                        e.currentTarget.style.borderColor = "#d0d0d0";
-                      }
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 107.5px)",
+                      gap: "9px",
                     }}
                   >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <hr style={dividerStyle} />
-
-            {/* カートに追加ボタン */}
-            <button
-              onClick={openCartModal}
-              disabled={isAddingToCart}
-              style={{
-                ...buttonStyle("#5c6ac4", !isAddingToCart),
-                fontSize: isMobile ? "16px" : "18px",
-                fontWeight: "bold",
-                padding: isMobile ? "14px" : "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                marginBottom: "24px"
-              }}
-            >
-              {isAddingToCart ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Icon type="loading" size={20} color="white" /> 
-                    カートに追加中...
-                  </div>
-                  <span style={{ fontSize: "13px" }}>（少しお待ちください）</span>
-                </div>
-              ) : (
-                <><Icon type="cart" size={20} color="white" /> カートに追加</>
-              )}
-            </button>
-
-            <hr style={dividerStyle} />
-
-            <h2 style={{ marginTop: 0, color: "#333" }}>デザイン編集</h2>
-
-            {/* 画像アップロードセクション */}
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>📷 画像アップロード</h3>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                style={{ display: "none" }}
-              />
-              <button
-                onClick={handleUploadClick}
-                disabled={isLoading}
-                style={{
-                  ...buttonStyle("#3498db", !isLoading),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px"
-                }}
-              >
-                {isLoading ? (
-                  <><Icon type="loading" size={18} color="white" /> 読み込み中...</>
-                ) : (
-                  <><Icon type="upload" size={18} color="white" /> 画像をアップロード</>
-                )}
-              </button>
-              
-              {/* 選択されたオブジェクトの削除ボタン */}
-            </div>
-
-            <hr style={dividerStyle} />
-
-            {/* AI画像生成セクション */}
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>🤖 AI画像生成</h3>
-              <textarea
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="例: 宇宙を飛ぶ猫、サイバーパンクな都市、カラフルな抽象画..."
-                rows={3}
-                style={textareaStyle}
-                disabled={isGenerating}
-              />
-              <button
-                onClick={handleGenerateAI}
-                disabled={isGenerating}
-                style={primaryButtonStyle(isGenerating)}
-              >
-                {isGenerating ? "⏳ 生成中..." : "✨ AIで画像生成"}
-              </button>
-              {lastAIPrompt && (
-                <p style={{ fontSize: "12px", color: "#666", marginTop: "10px" }}>
-                  最後の生成: "{lastAIPrompt}"
-                </p>
-              )}
-            </div>
-
-            <hr style={dividerStyle} />
-
-            {/* テキスト追加セクション */}
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>✏️ テキスト追加</h3>
-              <input
-                type="text"
-                value={textInput}
-                onChange={(e) => handleTextInputChange(e.target.value)}
-                placeholder="テキストを入力"
-                style={inputStyle}
-              />
-              <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label style={labelStyle}>色</label>
-                  <input
-                    type="color"
-                    value={textColor}
-                    onChange={(e) => handleChangeTextColor(e.target.value)}
-                    style={colorInputStyle}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={labelStyle}>サイズ: {fontSize}px</label>
-                  <input
-                    type="range"
-                    min="10"
-                    max="100"
-                    value={fontSize}
-                    onChange={(e) => handleChangeFontSize(Number(e.target.value))}
-                    style={{ width: "100%" }}
-                  />
-                </div>
-              </div>
-              <label style={{ 
-                fontSize: isMobile ? "12px" : "13px", 
-                fontWeight: "600",
-                color: "#333",
-                marginBottom: "8px",
-                display: "block"
-              }}>
-                フォントの選択
-              </label>
-              
-              {/* カスタムフォントドロップダウン */}
-              <div ref={fontDropdownRef} style={{ position: "relative", width: "100%" }}>
-                {/* 選択中のフォント表示 */}
-                <div
-                  onClick={() => setIsFontDropdownOpen(!isFontDropdownOpen)}
-                  style={{
-                    ...selectStyle,
-                    cursor: "pointer",
-                    fontFamily: FONT_LIST.find(f => f.value === fontFamily)?.family || fontFamily,
-                    fontSize: isMobile ? "14px" : "16px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center"
-                  }}
-                >
-                  <span>{FONT_LIST.find(f => f.value === fontFamily)?.label || fontFamily}</span>
-                  <span style={{ fontSize: "12px" }}>{isFontDropdownOpen ? "▲" : "▼"}</span>
-                </div>
-                
-                {/* ドロップダウンリスト */}
-                {isFontDropdownOpen && (
-                  <div style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    right: 0,
-                    backgroundColor: "white",
-                    border: "2px solid #4c51bf",
-                    borderRadius: "8px",
-                    maxHeight: "350px",
-                    overflowY: "auto",
-                    zIndex: 1000,
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                    marginTop: "4px"
-                  }}>
-                    {/* タブボタン */}
-                    <div style={{
-                      display: "flex",
-                      borderBottom: "2px solid #e2e8f0",
-                      position: "sticky",
-                      top: 0,
-                      backgroundColor: "white",
-                      zIndex: 1001
-                    }}>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveFontTab("japanese");
-                        }}
-                        style={{
-                          flex: 1,
-                          padding: "12px",
-                          border: "none",
-                          backgroundColor: activeFontTab === "japanese" ? "#4c51bf" : "transparent",
-                          color: activeFontTab === "japanese" ? "white" : "#4a5568",
-                          fontWeight: activeFontTab === "japanese" ? "bold" : "normal",
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                          fontSize: isMobile ? "14px" : "16px"
-                        }}
-                      >
-                        日本語
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveFontTab("english");
-                        }}
-                        style={{
-                          flex: 1,
-                          padding: "12px",
-                          border: "none",
-                          backgroundColor: activeFontTab === "english" ? "#4c51bf" : "transparent",
-                          color: activeFontTab === "english" ? "white" : "#4a5568",
-                          fontWeight: activeFontTab === "english" ? "bold" : "normal",
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                          fontSize: isMobile ? "14px" : "16px"
-                        }}
-                      >
-                        English
-                      </button>
-                    </div>
-                    
-                    {/* フォントリスト */}
-                    {getFilteredFonts().map((font) => (
+                    {uploadedImages.map((imageSrc, index) => (
                       <div
-                        key={font.value}
+                        key={index}
                         onClick={() => {
-                          handleChangeFontFamily(font.value);
-                          setIsFontDropdownOpen(false);
+                          setFullSizeImageSrc(imageSrc);
+                          setShowFullSizeImage(true);
                         }}
                         style={{
-                          padding: isMobile ? "10px 12px" : "12px 16px",
+                          width: "107.5px",
+                          height: "107.5px",
+                          backgroundColor: "#f8f8f8",
+                          borderRadius: "13px",
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                          overflow: "hidden",
                           cursor: "pointer",
-                          fontFamily: font.family,
-                          fontSize: isMobile ? "14px" : "16px",
-                          borderBottom: "1px solid #eee",
-                          backgroundColor: fontFamily === font.value ? "#f0f0ff" : "transparent",
-                          transition: "background-color 0.2s"
+                          transition: "transform 0.2s ease, box-shadow 0.2s ease",
                         }}
                         onMouseEnter={(e) => {
-                          if (fontFamily !== font.value) {
-                            e.currentTarget.style.backgroundColor = "#f9f9f9";
-                          }
+                          e.currentTarget.style.transform = "scale(1.05)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
                         }}
                         onMouseLeave={(e) => {
-                          if (fontFamily !== font.value) {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                          }
+                          e.currentTarget.style.transform = "scale(1)";
+                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
                         }}
                       >
-                        {font.label}
+                        <img
+                          src={imageSrc}
+                          alt={`アップロード画像 ${index + 1}`}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            </div>
+            )}
 
-            <hr style={dividerStyle} />
+            {/* AI画像生成タブの内容 */}
+            {activeTab === "ai" && (
+              <div>
+                {/* スタイル選択エリア */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
+                    スタイル
+                  </label>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "9px",
+                      overflowX: "auto",
+                      overflowY: "hidden",
+                      paddingBottom: "5px",
+                    }}
+                  >
+                    {[
+                      { name: "カップル", image: "couples.jpg" },
+                      { name: "結婚式", image: "weddings.jpg" },
+                      { name: "家族", image: "families.jpg" },
+                      { name: "記念日", image: "anniversaries.jpg" },
+                      { name: "スポーツ", image: "sports.jpg" },
+                      { name: "チーム", image: "teams.jpg" },
+                      { name: "ビジネス", image: "business.jpg" },
+                      { name: "イベント", image: "events.jpg" },
+                      { name: "ペット", image: "pets.jpg" },
+                      { name: "動物", image: "animals.jpg" },
+                      { name: "趣味", image: "hobbies.jpg" },
+                      { name: "ファン", image: "fans.jpg" },
+                      { name: "季節", image: "seasons.jpg" },
+                      { name: "ホリデー", image: "holidays.jpg" },
+                      { name: "旅行", image: "travel.jpg" },
+                      { name: "冒険", image: "adventure.jpg" },
+                      { name: "芸術", image: "art.jpg" },
+                      { name: "クリエイティブ", image: "creative.jpg" },
+                      { name: "キッズ", image: "kids.jpg" },
+                      { name: "教育", image: "education.jpg" }
+                    ].map((style, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          minWidth: "107.5px",
+                          width: "107.5px",
+                          height: "107.5px",
+                          backgroundImage: `url(/images/style/${style.image})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          borderRadius: "13px",
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          border: "1px solid transparent",
+                          flexShrink: 0,
+                          position: "relative",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.border = "1px solid #303030";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.border = "1px solid transparent";
+                        }}
+                        onClick={async () => {
+                          setSelectedStyle(style.name);
+                          setIsPanel2Open(true);
+                          // スタイル画像を取得
+                          const images = await getStyleImages(style.name);
+                          setStyleImages(images);
+                        }}
+                      >
+                        {/* 半透明オーバーレイ */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0, 0, 0, 0.3)",
+                            borderRadius: "13px",
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            textAlign: "center",
+                            position: "relative",
+                            zIndex: 1,
+                            textShadow: "0 1px 3px rgba(0, 0, 0, 0.8)",
+                          }}
+                        >
+                          {style.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-            {/* 操作ボタン */}
-            <button 
-              onClick={handleClearCanvas} 
-              style={{
-                ...buttonStyle("#ff8c42", true),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px"
-              }}
-            >
-              <Icon type="refresh" size={18} color="white" /> すべてクリア
-            </button>
-            <button 
-              onClick={handleSaveDesign} 
-              style={{
-                ...buttonStyle("#00b894", true),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px"
-              }}
-            >
-              <Icon type="save" size={18} color="white" /> 画像として保存
-            </button>
+                {/* プロンプト入力エリア */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
+                    プロンプト
+                  </label>
+                  <textarea
+                    value={promptText}
+                    onChange={(e) => setPromptText(e.target.value)}
+                    placeholder="画像生成のためのテキストプロンプトを入力してください..."
+                    style={{
+                      width: "100%",
+                      minHeight: "120px",
+                      padding: "12px",
+                      fontSize: "12px",
+                      color: "#303030",
+                      backgroundColor: "#f8f8f8",
+                      border: "1px solid #ddd",
+                      borderRadius: "13px",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      resize: "vertical",
+                      fontFamily: "inherit",
+                      lineHeight: "1.6",
+                    }}
+                  />
+                </div>
+
+                {/* 画像入力エリア */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
+                    画像アップロード<span style={{ fontWeight: 400, color: "#666" }}>（最大14枚）</span>
+                  </label>
+                  
+                  {/* 隠しファイル入力 */}
+                  <input
+                    ref={referenceFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                    onChange={handleReferenceFileSelect}
+                  />
+
+                  {/* アップロードエリア */}
+                  <div
+                    style={{
+                      width: "100%",
+                      minHeight: "120px",
+                      backgroundColor: "#f8f8f8",
+                      borderRadius: "13px",
+                      boxShadow: isReferenceDragging ? "inset 0 2px 8px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      border: isReferenceDragging ? "2px dashed #303030" : "2px dashed transparent",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      padding: "20px",
+                    }}
+                    onClick={() => referenceFileInputRef.current?.click()}
+                    onDragOver={handleReferenceDragOver}
+                    onDragLeave={handleReferenceDragLeave}
+                    onDrop={handleReferenceDrop}
+                  >
+                    {getImageIcon(24)}
+                    <span style={{ fontSize: "12px", color: "#666", marginTop: "8px", textAlign: "center" }}>
+                      クリックまたはドラッグ&ドロップで画像を追加
+                    </span>
+                  </div>
+
+                  {/* アップロード済み参照画像 */}
+                  {referenceImages.length > 0 && (
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(107.5px, 1fr))",
+                        gap: "9px",
+                        marginTop: "12px",
+                      }}
+                    >
+                      {referenceImages.map((imageSrc, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            width: "100%",
+                            aspectRatio: "1 / 1",
+                            backgroundColor: "#f8f8f8",
+                            borderRadius: "13px",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                            overflow: "hidden",
+                            position: "relative",
+                          }}
+                        >
+                          <img
+                            src={imageSrc}
+                            alt={`参照画像 ${index + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                          {/* 削除ボタン（オプション） */}
+                          <button
+                            style={{
+                              position: "absolute",
+                              top: "5px",
+                              right: "5px",
+                              width: "24px",
+                              height: "24px",
+                              backgroundColor: "rgba(0, 0, 0, 0.6)",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "50%",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setReferenceImages((prev) => prev.filter((_, i) => i !== index));
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* アスペクト比選択 */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
+                    アスペクト比
+                  </label>
+                  <select
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      fontSize: "12px",
+                      color: "#303030",
+                      backgroundColor: "#f8f8f8",
+                      border: "1px solid #ddd",
+                      borderRadius: "13px",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    <option value="1:1">1:1</option>
+                    <option value="4:3">4:3</option>
+                    <option value="3:4">3:4</option>
+                    <option value="16:9">16:9</option>
+                    <option value="9:16">9:16</option>
+                    <option value="3:2">3:2</option>
+                    <option value="2:3">2:3</option>
+                    <option value="21:9">21:9</option>
+                  </select>
+                </div>
+
+                {/* 生成ボタン */}
+                <button
+                  style={{
+                    width: "100%",
+                    padding: "16px",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#ffffff",
+                    backgroundColor: "#303030",
+                    border: "none",
+                    borderRadius: "13px",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    marginBottom: "20px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#404040";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#303030";
+                  }}
+                  onClick={() => {
+                    console.log("画像生成開始");
+                    // テスト用：ダミー画像を生成画像として設定
+                    setGeneratedImage("https://via.placeholder.com/800x450/4a90e2/ffffff?text=AI+Generated+Image");
+                    // コンパネ2を閉じる
+                    setIsPanel2Open(false);
+                    setSelectedStyle(null);
+                  }}
+                >
+                  画像を生成
+                </button>
+
+                {/* 生成された画像表示エリア */}
+                <div
+                  style={{
+                    width: "100%",
+                    aspectRatio: "16 / 9",
+                    backgroundColor: "#f8f8f8",
+                    borderRadius: "13px",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <img
+                    src={generatedImage || "https://via.placeholder.com/800x450/cccccc/666666?text=Generated+Image"}
+                    alt="生成された画像"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+
+                {/* 画像管理に保存ボタン */}
+                <button
+                  style={{
+                    width: "100%",
+                    padding: "16px",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: generatedImage ? "#ffffff" : "#999",
+                    backgroundColor: generatedImage ? "#303030" : "#e0e0e0",
+                    border: "none",
+                    borderRadius: "13px",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                    cursor: generatedImage ? "pointer" : "not-allowed",
+                    transition: "all 0.2s ease",
+                  }}
+                  disabled={!generatedImage}
+                  onMouseEnter={(e) => {
+                    if (generatedImage) {
+                      e.currentTarget.style.backgroundColor = "#404040";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (generatedImage) {
+                      e.currentTarget.style.backgroundColor = "#303030";
+                    }
+                  }}
+                  onClick={handleSaveToGallery}
+                >
+                  画像管理に保存
+                </button>
+              </div>
+            )}
+
+            {/* 他のタブの内容 */}
+            {activeTab !== "item" && activeTab !== "image" && activeTab !== "ai" && (
+              <div>
+                <p style={{ fontSize: "12px", color: "#666", lineHeight: "1.6" }}>
+                  このメニューの内容は別途実装されます。
+                </p>
+              </div>
+            )}
           </div>
-        </div>
-        </motion.div>
         )}
       </div>
-      
-      {/* 著作権モーダル */}
-      {showCopyrightModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
+
+      {/* サイドバー */}
+      <aside
+        style={{
+          position: "absolute",
           left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 10000,
-          padding: "20px"
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "16px",
-            padding: isMobile ? "24px" : "40px",
-            maxWidth: "600px",
-            width: "100%",
-            maxHeight: "80vh",
-            overflowY: "auto",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)"
-          }}>
-            <h2 style={{ 
-              fontSize: isMobile ? "20px" : "24px", 
-              marginBottom: "20px",
-              color: "#333",
-              fontWeight: "bold",
+          top: 0,
+          width: isCollapsed ? "80px" : "339px",
+          height: "100%",
+          backgroundColor: "#f8f8f8",
+          paddingLeft: "17.5px",
+          paddingRight: "17.5px",
+          boxShadow: "5px 0 15px rgba(0, 0, 0, 0.1)",
+          zIndex: 10,
+          transition: "width 0.3s ease-in-out",
+          overflow: isCollapsed ? "visible" : "hidden",
+        }}
+      >
+        {/* PrintAize ロゴ */}
+        <h1
+          style={{
+            fontSize: "16px",
+            fontWeight: 700,
+            color: "#303030",
+            marginLeft: "10.5px",
+            marginTop: "35px",
+            marginBottom: "35px",
+            letterSpacing: "0",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {isCollapsed ? "PAI" : "PrintAize"}
+        </h1>
+
+        {/* メニューボタン */}
+        <nav style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+          {menuItems.map((item) => {
+            const isHovered = hoveredTab === item.id && !isCollapsed;
+            const isActive = activeTab === item.id;
+            const showBorder = isHovered || isActive;
+            const isCollapsedHovered = isCollapsed && hoveredTab === item.id;
+
+            return (
+              <div
+                key={item.id}
+                onMouseEnter={() => setHoveredTab(item.id)}
+                onMouseLeave={() => setHoveredTab(null)}
+                style={{
+                  position: "relative",
+                }}
+              >
+                <button
+                  onClick={() => handleMenuClick(item.id)}
+                  style={{
+                    height: "45px",
+                    display: "flex",
+                    alignItems: "center",
+                    paddingLeft: "10.5px",
+                    paddingRight: isCollapsed ? "10.5px" : "16px",
+                    backgroundColor: showBorder ? "transparent" : "#f8f8f8",
+                    border: showBorder ? "1px solid #303030" : "1px solid transparent",
+                    borderRadius: isCollapsed && isActive ? "50%" : "17.16px",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease-in-out",
+                    width: isCollapsed ? "auto" : "fit-content",
+                    justifyContent: "flex-start",
+                    boxShadow: isActive ? "0 2px 8px rgba(0, 0, 0, 0.1)" : "none",
+                    position: "relative",
+                    opacity: isCollapsedHovered ? 0 : 1,
+                    marginLeft: "0",
+                  }}
+                >
+                  {/* アイコン */}
+                  {getIcon(item.id)}
+                  {/* テキスト（展開時のみ） */}
+                  {!isCollapsed && (
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        color: "#303030",
+                        lineHeight: "35px",
+                        marginLeft: "8px",
+                        whiteSpace: "nowrap",
+                        opacity: isCollapsed ? 0 : 1,
+                        transition: "opacity 0.2s ease-in-out",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                </button>
+
+                {/* 縮小時のホバーボタン（コンパネの上にレイヤー表示） */}
+                {isCollapsedHovered && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: "0",
+                      top: "0",
+                      height: "45px",
+                      backgroundColor: "#818181",
+                      border: "1px solid #303030",
+                      borderRadius: "17.16px",
+                      paddingLeft: "10.5px",
+                      paddingRight: "16px",
+                      display: "flex",
+                      alignItems: "center",
+                      whiteSpace: "nowrap",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      zIndex: 1000,
+                      cursor: "pointer",
+                      pointerEvents: "auto",
+                    }}
+                    onClick={() => handleMenuClick(item.id)}
+                  >
+                    {getIcon(item.id, "#ffffff")}
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        color: "#ffffff",
+                        lineHeight: "45px",
+                        marginLeft: "8px",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* 展開ボタン（縮小時のみ表示） */}
+        {isCollapsed && (
+          <button
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              padding: "0",
               display: "flex",
               alignItems: "center",
-              gap: "8px"
-            }}>
-              <Icon type="clipboard" size={24} color="#333" /> 画像アップロード前のご確認
-            </h2>
-            
-            <div style={{ 
-              marginBottom: "24px",
-              fontSize: isMobile ? "14px" : "15px",
-              lineHeight: "1.8",
-              color: "#555"
-            }}>
-              <h3 style={{ fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Icon type="check" size={18} color="#28a745" /> 推奨画像サイズ
-              </h3>
-              <p style={{ marginBottom: "16px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "8px" }}>
-                <strong>300 DPI以上</strong>の高解像度画像を推奨します。<br/>
-                プリント範囲: 250mm × 312mm
-              </p>
+              justifyContent: "center",
+            }}
+            onClick={() => {
+              setActiveTab(null);
+              setIsCollapsed(false);
+            }}
+          >
+            {getExpandIcon()}
+          </button>
+        )}
+
+        {/* カートに追加ボタン */}
+        <button
+          style={{
+            position: "absolute",
+            bottom: "35px",
+            left: isCollapsed ? "50%" : "17.5px",
+            right: isCollapsed ? "auto" : "17.5px",
+            transform: isCollapsed ? "translateX(-50%)" : "none",
+            width: isCollapsed ? "auto" : "auto",
+            height: isCollapsed ? "auto" : "70px",
+            backgroundColor: isCollapsed ? "transparent" : "#818181",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: isCollapsed ? "0" : "13px",
+            fontSize: "18px",
+            fontWeight: 700,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: isCollapsed ? "center" : "flex-start",
+            paddingLeft: isCollapsed ? "0" : "70px",
+            gap: "10px",
+            transition: "all 0.3s ease-in-out",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+          }}
+          onClick={() => {
+            // 機能は別途実装
+            console.log("カートに追加");
+          }}
+        >
+          {getCartIcon(isCollapsed ? "#303030" : "#ffffff")}
+          {!isCollapsed && <span>カートに追加</span>}
+        </button>
+      </aside>
+
+      {/* メインエリア（Tシャツ表示） */}
+      <main
+        style={{
+          position: "absolute",
+          left: "339px",
+          top: 0,
+          right: 0,
+          height: "100%",
+          backgroundColor: "#f8f8f8",
+          padding: "17.5px",
+          overflow: "auto",
+        }}
+      >
+        {/* 商品画像コンテナ */}
+        <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "2252px" }}>
+          {/* コントロールメニュー（プリント範囲に画像がある場合のみ表示） */}
+          {isMounted && printedImages.length > 0 && (
+            <div
+              style={{
+                position: "absolute",
+                top: "17.5px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 100,
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e5e5",
+                borderRadius: "17.16px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                padding: "10.5px 16px",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                height: "70px",
+              }}
+            >
+              {/* 元に戻す */}
+              <button
+                onClick={handleUndo}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px" }}>
+                  <path d="M32.0066283,20 C36.4214054,20 40,23.5806679 40,28 C40,32.4151984 36.4153529,36 32.0066283,36 L8,36 C6.8954305,36 6,36.8954305 6,38 C6,39.1045695 6.8954305,40 8,40 L32.0066283,40 C38.6245304,40 44,34.6242988 44,28 C44,21.3720473 38.6310631,16 32.0066283,16 L12.8284271,16 L17.4142136,11.4142136 C18.1952621,10.633165 18.1952621,9.36683502 17.4142136,8.58578644 C16.633165,7.80473785 15.366835,7.80473785 14.5857864,8.58578644 L6.58578644,16.5857864 C5.80473785,17.366835 5.80473785,18.633165 6.58578644,19.4142136 L14.5857864,27.4142136 C15.366835,28.1952621 16.633165,28.1952621 17.4142136,27.4142136 C18.1952621,26.633165 18.1952621,25.366835 17.4142136,24.5857864 L12.8284271,20 L32.0066283,20 Z" fill="#303030" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  元に戻す
+                </span>
+              </button>
+
+              {/* やり直し（アイコン左右反転） */}
+              <button
+                onClick={handleRedo}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px", transform: "scaleX(-1)" }}>
+                  <path d="M32.0066283,20 C36.4214054,20 40,23.5806679 40,28 C40,32.4151984 36.4153529,36 32.0066283,36 L8,36 C6.8954305,36 6,36.8954305 6,38 C6,39.1045695 6.8954305,40 8,40 L32.0066283,40 C38.6245304,40 44,34.6242988 44,28 C44,21.3720473 38.6310631,16 32.0066283,16 L12.8284271,16 L17.4142136,11.4142136 C18.1952621,10.633165 18.1952621,9.36683502 17.4142136,8.58578644 C16.633165,7.80473785 15.366835,7.80473785 14.5857864,8.58578644 L6.58578644,16.5857864 C5.80473785,17.366835 5.80473785,18.633165 6.58578644,19.4142136 L14.5857864,27.4142136 C15.366835,28.1952621 16.633165,28.1952621 17.4142136,27.4142136 C18.1952621,26.633165 18.1952621,25.366835 17.4142136,24.5857864 L12.8284271,20 L32.0066283,20 Z" fill="#303030" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  やり直し
+                </span>
+              </button>
+
+              {/* 上下中央 */}
+              <button
+                onClick={handleAlignVerticalCenter}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px" }}>
+                  <path d="M22,6.99961498 C22,5.89525812 22.8877296,5 24,5 C25.1045695,5 26,5.88743329 26,6.99961498 L26,13.000385 C26,14.1047419 25.1122704,15 24,15 C22.8954305,15 22,14.1125667 22,13.000385 L22,6.99961498 Z M22,20.999615 C22,19.8952581 22.8877296,19 24,19 C25.1045695,19 26,19.8874333 26,20.999615 L26,27.000385 C26,28.1047419 25.1122704,29 24,29 C22.8954305,29 22,28.1125667 22,27.000385 L22,20.999615 Z M22,34.999615 C22,33.8952581 22.8877296,33 24,33 C25.1045695,33 26,33.8874333 26,34.999615 L26,41.000385 C26,42.1047419 25.1122704,43 24,43 C22.8954305,43 22,42.1125667 22,41.000385 L22,34.999615 Z M33.4547978,26.0152987 C31.5467657,24.90228 31.5442237,23.0992028 33.4547978,21.9847013 L38.5452022,19.0152987 C40.4532343,17.90228 42,18.7873299 42,20.9931023 L42,27.0068977 C42,29.2122272 40.4557763,30.0992028 38.5452022,28.9847013 L33.4547978,26.0152987 Z M14.5452022,26.0152987 L9.4547978,28.9847013 C7.54422373,30.0992028 6,29.2122272 6,27.0068977 L6,20.9931023 C6,18.7873299 7.54676566,17.90228 9.4547978,19.0152987 L14.5452022,21.9847013 C16.4557763,23.0992028 16.4532343,24.90228 14.5452022,26.0152987 Z" fill="#303030" transform="translate(24, 24) rotate(-270) translate(-24, -24)" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  上下中央
+                </span>
+              </button>
+
+              {/* 左右中央 */}
+              <button
+                onClick={handleAlignHorizontalCenter}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px" }}>
+                  <path d="M22,6.99961498 C22,5.89525812 22.8877296,5 24,5 C25.1045695,5 26,5.88743329 26,6.99961498 L26,13.000385 C26,14.1047419 25.1122704,15 24,15 C22.8954305,15 22,14.1125667 22,13.000385 L22,6.99961498 Z M22,20.999615 C22,19.8952581 22.8877296,19 24,19 C25.1045695,19 26,19.8874333 26,20.999615 L26,27.000385 C26,28.1047419 25.1122704,29 24,29 C22.8954305,29 22,28.1125667 22,27.000385 L22,20.999615 Z M22,34.999615 C22,33.8952581 22.8877296,33 24,33 C25.1045695,33 26,33.8874333 26,34.999615 L26,41.000385 C26,42.1047419 25.1122704,43 24,43 C22.8954305,43 22,42.1125667 22,41.000385 L22,34.999615 Z M33.4547978,26.0152987 C31.5467657,24.90228 31.5442237,23.0992028 33.4547978,21.9847013 L38.5452022,19.0152987 C40.4532343,17.90228 42,18.7873299 42,20.9931023 L42,27.0068977 C42,29.2122272 40.4557763,30.0992028 38.5452022,28.9847013 L33.4547978,26.0152987 Z M14.5452022,26.0152987 L9.4547978,28.9847013 C7.54422373,30.0992028 6,29.2122272 6,27.0068977 L6,20.9931023 C6,18.7873299 7.54676566,17.90228 9.4547978,19.0152987 L14.5452022,21.9847013 C16.4557763,23.0992028 16.4532343,24.90228 14.5452022,26.0152987 Z" fill="#303030" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  左右中央
+                </span>
+              </button>
+
+              {/* 手前へ */}
+              <button
+                onClick={handleBringForward}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px" }}>
+                  <path d="M18,18 L18,7.99700887 C18,6.89409133 18.8970262,6 20.0049466,6 L39.9950534,6 C41.1023548,6 42,6.89702623 42,8.00494659 L42,27.9950534 C42,29.1023548 41.1092129,30 40.0081681,30 L30,30 L30,39.9950534 C30,41.1023548 29.1029738,42 27.9950534,42 L8.00494659,42 C6.89764516,42 6,41.1029738 6,39.9950534 L6,20.0049466 C6,18.8976452 6.89702623,18 8.00494659,18 L18,18 Z M22.0104037,18 L27.9950534,18 C29.1023548,18 30,18.8970262 30,20.0049466 L30,26 L38.0070801,26 L38,10 L22.0533447,10 L22.0104037,18 Z M9.98694588,38.0018557 L26.0012614,38.0168495 L26.0114746,22 L10.0250244,22 L9.98694588,38.0018557 Z" fill="#303030" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  手前へ
+                </span>
+              </button>
+
+              {/* 奥へ */}
+              <button
+                onClick={handleSendBackward}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px" }}>
+                  <path d="M42,7.99961498 L42,14.000385 C42,15.1047419 41.1122704,16 40,16 C38.8954305,16 38,15.1125667 38,14.000385 L38,10 L33.999615,10 C32.8952581,10 32,9.11227036 32,8 C32,6.8954305 32.8874333,6 33.999615,6 L40.000385,6 C40.5524997,6 41.0523518,6.2218812 41.4142011,6.58277368 C41.7761944,6.94373656 42,7.44358875 42,7.99961498 Z M42,28.000385 L42,21.999615 C42,20.8874333 41.1045695,20 40,20 C38.8877296,20 38,20.8952581 38,21.999615 L38,26 L33.999615,26 C32.8874333,26 32,26.8954305 32,28 C32,29.1122704 32.8952581,30 33.999615,30 L40.000385,30 C40.5564113,30 41.0562634,29.7761944 41.4171349,29.4143397 C41.7781188,29.0523518 42,28.5524997 42,28.000385 Z M18,7.99961498 L18,14.000385 C18,15.1125667 18.8954305,16 20,16 C21.1122704,16 22,15.1047419 22,14.000385 L22,10 L26.000385,10 C27.1125667,10 28,9.1045695 28,8 C28,6.88772964 27.1047419,6 26.000385,6 L19.999615,6 C19.4435887,6 18.9437366,6.22380561 18.5828651,6.58566029 C18.2218812,6.94764817 18,7.44750027 18,7.99961498 Z M6,20.0049466 C6,18.8976452 6.89702623,18 8.00494659,18 L27.9950534,18 C29.1023548,18 30,18.8970262 30,20.0049466 L30,39.9950534 C30,41.1023548 29.1029738,42 27.9950534,42 L8.00494659,42 C6.89764516,42 6,41.1029738 6,39.9950534 L6,20.0049466 Z M9.98694588,38.0018557 L26.0012614,38.0168495 L26.0114746,22 L10.0250244,22 L9.98694588,38.0018557 Z" fill="#303030" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  奥へ
+                </span>
+              </button>
+
+              {/* 範囲内最大 */}
+              <button
+                onClick={handleFitToArea}
+                style={{
+                  height: "45px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 12px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  borderRadius: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f8f8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 48 48" style={{ marginBottom: "4px" }}>
+                  <path d="M16,24 C16,19.581722 19.581722,16 24,16 C25.4836172,16 26.8729082,16.4038588 28.0639347,17.1076382 L35.1715729,10 L32.0085302,10 C30.8992496,10 30,9.11227036 30,8 C30,6.8954305 30.9019504,6 32.0085302,6 L39.9914698,6 C40.5508656,6 41.0497149,6.22433028 41.4114209,6.58649593 C41.7763372,6.94642533 42,7.44528861 42,8 L42,15.9914698 C42,17.1007504 41.1122704,18 40,18 C38.8954305,18 38,17.0980496 38,15.9914698 L38,12.8284271 L30.8923618,19.9360653 C31.5961412,21.1270918 32,22.5163828 32,24 C32,28.418278 28.418278,32 24,32 C22.5163828,32 21.1270918,31.5961412 19.9360653,30.8923618 L12.8284271,38 L15.9914698,38 C17.1007504,38 18,38.8877296 18,40 C18,41.1045695 17.0980496,42 15.9914698,42 L8.0085302,42 C7.44913437,42 6.95028513,41.7756697 6.58857914,41.4135041 C6.22366277,41.0535747 6,40.5547114 6,40 L6,32.0085302 C6,30.8992496 6.88772964,30 8,30 C9.1045695,30 10,30.9019504 10,32.0085302 L10,35.1715729 L17.1076382,28.0639347 C16.4038588,26.8729082 16,25.4836172 16,24 Z M24,28 C26.209139,28 28,26.209139 28,24 C28,21.790861 26.209139,20 24,20 C21.790861,20 20,21.790861 20,24 C20,26.209139 21.790861,28 24,28 Z" fill="#303030" />
+                </svg>
+                <span style={{ fontSize: "10px", fontWeight: 400, color: "#303030", lineHeight: "1" }}>
+                  範囲内最大
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* 商品画像 */}
+          <img
+            ref={mainImageRef}
+            src={selectedProductImage}
+            alt={selectedProductName}
+            onLoad={updatePrintArea}
+            style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
+              backgroundColor: "#ffffff",
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+            }}
+          />
+          
+          {/* プリント範囲の点線 */}
+          {isMounted && (
+            <div
+              style={{
+                position: "absolute",
+                ...printAreaStyle,
+                zIndex: 0,
+              }}
+            />
+          )}
+          
+          {/* プリント範囲の画像表示 */}
+          {isMounted && printedImages.length > 0 && printAreaStyle.width && (
+            <div
+              style={{
+                position: "absolute",
+                width: printAreaStyle.width as string,
+                height: printAreaStyle.height as string,
+                left: printAreaStyle.left as string,
+                top: printAreaStyle.top as string,
+                zIndex: 5,
+                overflow: "visible",
+              }}
+              onClick={() => setSelectedImageId(null)}
+            >
+              {printedImages.map((imageObj) => {
+                const isSelected = selectedImageId === imageObj.id;
+                
+                return (
+                  <div
+                    key={imageObj.id}
+                    style={{
+                      position: "absolute",
+                      left: `${imageObj.x}%`,
+                      top: `${imageObj.y}%`,
+                      transform: `translate(-50%, -50%) rotate(${imageObj.rotation}deg) scale(${imageObj.scale})`,
+                      cursor: isSelected ? "move" : "pointer",
+                      zIndex: imageObj.zIndex,
+                      width: "60%",
+                      height: "60%",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImageId(imageObj.id);
+                    }}
+                    onMouseDown={(e) => {
+                      if (!isSelected) return;
+                      e.preventDefault();
+                      setIsDraggingImage(true);
+                      setDragStart({ x: e.clientX, y: e.clientY });
+                    }}
+                    onTouchStart={(e) => {
+                      if (!isSelected) return;
+                      e.preventDefault();
+                      setIsDraggingImage(true);
+                      const touch = e.touches[0];
+                      setDragStart({ x: touch.clientX, y: touch.clientY });
+                    }}
+                  >
+                    <img
+                      src={imageObj.src}
+                      alt={`Printed image ${imageObj.id}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                        pointerEvents: "none",
+                        userSelect: "none",
+                      }}
+                      draggable={false}
+                    />
+                    
+                    {/* 選択枠とハンドル（Photoshopスタイル） */}
+                    {isSelected && (
+                      <>
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            border: "1px solid #000000",
+                            pointerEvents: "none",
+                          }}
+                        />
+                        
+                        {/* 8つのリサイズハンドル */}
+                        {/* 左上（回転エリア + リサイズハンドル） */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-12px",
+                            left: "-12px",
+                            width: "24px",
+                            height: "24px",
+                            cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 5V1L7 6l5 5V7c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z\" fill=\"black\"/></svg>') 12 12, crosshair",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                        >
+                          {/* リサイズ用の内側ハンドル */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              left: "8px",
+                              width: "8px",
+                              height: "8px",
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #000000",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        </div>
+                        
+                        {/* 上中央（リサイズ用） */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-4px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            width: "8px",
+                            height: "8px",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #000000",
+                            cursor: "ns-resize",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: e.clientX,
+                              y: e.clientY,
+                              direction: "top",
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            const touch = e.touches[0];
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: touch.clientX,
+                              y: touch.clientY,
+                              direction: "top",
+                            });
+                          }}
+                        />
+                        
+                        {/* 右上（回転エリア + リサイズハンドル） */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-12px",
+                            right: "-12px",
+                            width: "24px",
+                            height: "24px",
+                            cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 5V1L7 6l5 5V7c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z\" fill=\"black\"/></svg>') 12 12, crosshair",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                        >
+                          {/* リサイズ用の内側ハンドル */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              right: "8px",
+                              width: "8px",
+                              height: "8px",
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #000000",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        </div>
+                        
+                        {/* 右中央 */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            right: "-4px",
+                            transform: "translateY(-50%)",
+                            width: "8px",
+                            height: "8px",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #000000",
+                            cursor: "ew-resize",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: e.clientX,
+                              y: e.clientY,
+                              direction: "right",
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            const touch = e.touches[0];
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: touch.clientX,
+                              y: touch.clientY,
+                              direction: "right",
+                            });
+                          }}
+                        />
+                        
+                        {/* 右下（回転エリア + リサイズハンドル） */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "-12px",
+                            right: "-12px",
+                            width: "24px",
+                            height: "24px",
+                            cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 5V1L7 6l5 5V7c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z\" fill=\"black\"/></svg>') 12 12, crosshair",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                        >
+                          {/* リサイズ用の内側ハンドル */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "8px",
+                              right: "8px",
+                              width: "8px",
+                              height: "8px",
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #000000",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        </div>
+                        
+                        {/* 下中央 */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "-4px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            width: "8px",
+                            height: "8px",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #000000",
+                            cursor: "ns-resize",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: e.clientX,
+                              y: e.clientY,
+                              direction: "bottom",
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            const touch = e.touches[0];
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: touch.clientX,
+                              y: touch.clientY,
+                              direction: "bottom",
+                            });
+                          }}
+                        />
+                        
+                        {/* 左下（回転エリア + リサイズハンドル） */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "-12px",
+                            left: "-12px",
+                            width: "24px",
+                            height: "24px",
+                            cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 5V1L7 6l5 5V7c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z\" fill=\"black\"/></svg>') 12 12, crosshair",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            if (!mainImageRef.current || !printAreaStyle.width) return;
+                            
+                            const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
+                            if (!printArea) return;
+                            
+                            const rect = printArea.getBoundingClientRect();
+                            const centerX = rect.left + (rect.width * imageObj.x / 100);
+                            const centerY = rect.top + (rect.height * imageObj.y / 100);
+                            
+                            setIsRotating(true);
+                            setRotateStart({
+                              rotation: imageObj.rotation,
+                              centerX,
+                              centerY,
+                            });
+                          }}
+                        >
+                          {/* リサイズ用の内側ハンドル */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "8px",
+                              left: "8px",
+                              width: "8px",
+                              height: "8px",
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #000000",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        </div>
+                        
+                        {/* 左中央 */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "-4px",
+                            transform: "translateY(-50%)",
+                            width: "8px",
+                            height: "8px",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #000000",
+                            cursor: "ew-resize",
+                            zIndex: 1001,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: e.clientX,
+                              y: e.clientY,
+                              direction: "left",
+                            });
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            const touch = e.touches[0];
+                            setIsResizing(true);
+                            setResizeStart({
+                              scale: imageObj.scale,
+                              rotation: imageObj.rotation,
+                              x: touch.clientX,
+                              y: touch.clientY,
+                              direction: "left",
+                            });
+                          }}
+                        />
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          
+          {/* 画像を追加ボタン（プリント範囲に画像がない場合のみ表示） */}
+          {isMounted && printedImages.length === 0 && printAreaStyle.width && (
+            <button
+              type="button"
+              onDragOver={handlePrintAreaDragOver}
+              onDragLeave={handlePrintAreaDragLeave}
+              onDrop={handlePrintAreaDrop}
+              onClick={() => {
+                printAreaFileInputRef.current?.click();
+              }}
+              style={{
+                position: "absolute",
+                width: printAreaStyle.width as string,
+                height: printAreaStyle.height as string,
+                left: printAreaStyle.left as string,
+                top: printAreaStyle.top as string,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                backgroundColor: isPrintAreaDragging ? "rgba(0, 0, 0, 0.05)" : "transparent",
+                transition: "background-color 0.2s ease",
+                pointerEvents: "auto",
+                zIndex: 10,
+                border: "none",
+                padding: "0",
+              }}
+            >
+              {/* 画像アイコン */}
+              <svg width="32" height="32" viewBox="0 0 48 48" style={{ marginBottom: "8px" }}>
+                <path d="M2,9.99017859 C2,7.7864638 3.79975948,6 5.99029394,6 L18.0767644,6 C19.1835685,6 20.5701975,6.7477726 21.1746315,7.67133451 L24.0075684,12 L41.9918214,12 C44.2054773,12 46,13.7867947 46,15.9992748 L46,38.0007252 C46,40.2094637 44.2069088,42 41.99819,42 L6.00180999,42 C3.79167136,42 2,40.2147544 2,38.0098214 L2,9.99017859 Z M6,38.0098214 L41.99819,38 L42,15.9992748 L24.0075684,16 C22.658105,16 21.3996088,15.3195781 20.6606307,14.1904356 L18,10.0097802 L5.99029394,10 L6,38.0098214 Z M17.862928,23.9448407 C18.3178041,22.9335006 19.2364493,22.8239147 19.9084014,23.6918355 L22.7905122,27.4144876 C23.4653199,28.2860968 24.7285203,28.4701867 25.6270803,27.8146248 L26.205134,27.3928946 C27.0969196,26.7422751 28.2985638,26.9754922 28.8829814,27.9041067 L31.6562655,32.3107367 C32.2434141,33.2436908 31.8235673,33.9999996 30.718486,33.9999996 L15.3412689,33.9999999 C14.236199,33.9999999 13.7078282,33.1830028 14.1639889,32.1688067 L17.862928,23.9448407 Z M30.9342877,26 C29.2774335,26 27.9342877,24.6568542 27.9342877,23 C27.9342877,21.3431458 29.2774335,20 30.9342877,20 C32.591142,20 33.9342877,21.3431458 33.9342877,23 C33.9342877,24.6568542 32.591142,26 30.9342877,26 Z" fill="#303030" />
+              </svg>
               
-              <h3 style={{ fontSize: isMobile ? "16px" : "18px", marginBottom: "12px", color: "#444", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Icon type="warning" size={18} color="#ffc107" /> 著作権・利用規約
+              {/* テキスト */}
+              <span style={{ fontSize: "14px", fontWeight: 700, color: "#303030", marginBottom: "12px" }}>
+                画像を追加
+              </span>
+              
+              {/* 注意書き */}
+              <div style={{ fontSize: "10px", color: "#666", textAlign: "center", lineHeight: "1.5", maxWidth: "85%" }}>
+                <p style={{ margin: "0 0 2px 0", fontWeight: 600 }}>推奨: 2953×3685px以上</p>
+                <p style={{ margin: "0 0 6px 0", fontWeight: 600 }}>RGB、300dpi</p>
+                <p style={{ margin: "0 0 4px 0" }}>対応形式: JPG, PNG (最大15MB)</p>
+                <p style={{ margin: "0", fontSize: "9px" }}>著作権を侵害する画像の使用は禁止です</p>
+              </div>
+            </button>
+          )}
+          
+          {/* 隠しファイル入力（プリント範囲用） */}
+          <input
+            ref={printAreaFileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            style={{ display: "none" }}
+            onChange={(e) => {
+              handlePrintAreaFileUpload(e.target.files);
+              e.target.value = ""; // ファイル入力をリセット
+            }}
+          />
+        </div>
+      </main>
+
+      {/* アップロード済み画像の原寸大ポップアップ */}
+      {showFullSizeImage && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            zIndex: 2002,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={() => {
+            setShowFullSizeImage(false);
+            setFullSizeImageSrc("");
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 閉じるボタン */}
+            <button
+              onClick={() => {
+                setShowFullSizeImage(false);
+                setFullSizeImageSrc("");
+              }}
+              style={{
+                position: "absolute",
+                top: "-50px",
+                right: "0",
+                width: "40px",
+                height: "40px",
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                border: "2px solid #ffffff",
+                borderRadius: "50%",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background-color 0.2s ease",
+                zIndex: 1,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ width: "20px", height: "20px" }}>
+                <path d="M18 6L6 18M6 6L18 18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
+            {/* 原寸大画像 */}
+            <img
+              src={fullSizeImageSrc}
+              alt="原寸大画像"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "90vh",
+                objectFit: "contain",
+                borderRadius: "10px",
+                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 画像サイズチェックポップアップ */}
+      {showImageSizeCheck && imageSizeInfo && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            zIndex: 2001,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => {
+            if (imageSizeInfo.isGoodQuality) {
+              setShowImageSizeCheck(false);
+              setImageSizeInfo(null);
+              // 高品質な画像の場合は自動的にアップロード
+              if (uploadSource === "printArea") {
+                confirmPrintAreaFileUpload(pendingFiles);
+              } else if (uploadSource === "imageManagement") {
+                confirmImageManagementUpload(pendingFiles);
+              }
+              setPendingFiles([]);
+              setUploadSource(null);
+            } else {
+              // サイズが小さい場合はキャンセル
+              setShowImageSizeCheck(false);
+              setImageSizeInfo(null);
+              setPendingFiles([]);
+              setUploadSource(null);
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "20px",
+              padding: "0",
+              maxWidth: "480px",
+              width: "90%",
+              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
+              overflow: "hidden",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 高品質な画像 */}
+            {imageSizeInfo.isGoodQuality && (
+              <>
+                <div style={{
+                  backgroundColor: "#d1fae5",
+                  border: "3px solid #10b981",
+                  borderRadius: "20px",
+                  padding: "30px",
+                  margin: "20px",
+                }}>
+                  <h2 style={{
+                    fontSize: "20px",
+                    fontWeight: 700,
+                    color: "#10b981",
+                    marginTop: "0",
+                    marginBottom: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px"
+                  }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ width: "24px", height: "24px" }}>
+                      <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    高品質な画像です！
+                  </h2>
+                  <p style={{ fontSize: "18px", fontWeight: 700, color: "#303030", margin: "0 0 5px 0" }}>
+                    {imageSizeInfo.width} × {imageSizeInfo.height}px
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#666", margin: "0" }}>
+                    印刷に最適なサイズです。
+                  </p>
+                </div>
+                <div style={{ padding: "0 20px 20px 20px" }}>
+                  <button
+                    onClick={() => {
+                      setShowImageSizeCheck(false);
+                      setImageSizeInfo(null);
+                      // アップロード処理
+                      if (uploadSource === "printArea") {
+                        confirmPrintAreaFileUpload(pendingFiles);
+                      } else if (uploadSource === "imageManagement") {
+                        confirmImageManagementUpload(pendingFiles);
+                      }
+                      setPendingFiles([]);
+                      setUploadSource(null);
+                    }}
+                    style={{
+                      width: "100%",
+                      height: "50px",
+                      backgroundColor: "#6b7280",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "13px",
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      transition: "background-color 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#4b5563";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#6b7280";
+                    }}
+                  >
+                    閉じる
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* サイズが小さい警告 */}
+            {imageSizeInfo.isTooSmall && !imageSizeInfo.isGoodQuality && (
+              <>
+                <div style={{
+                  backgroundColor: "#fef3c7",
+                  border: "3px solid #f59e0b",
+                  borderRadius: "20px",
+                  padding: "30px",
+                  margin: "20px",
+                }}>
+                  <h2 style={{
+                    fontSize: "20px",
+                    fontWeight: 700,
+                    color: "#f59e0b",
+                    marginTop: "0",
+                    marginBottom: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px"
+                  }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ width: "24px", height: "24px" }}>
+                      <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0377 2.66667 10.2679 4L3.33975 16C2.56995 17.3333 3.53223 19 5.07183 19Z" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    画像サイズが小さすぎます
+                  </h2>
+                  <p style={{ fontSize: "14px", color: "#303030", margin: "0 0 10px 0" }}>
+                    現在: <strong>{imageSizeInfo.width} × {imageSizeInfo.height}px</strong>
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#303030", margin: "0 0 10px 0" }}>
+                    最低: <strong>1182 × 1475px (150 DPI)</strong>
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#303030", margin: "0 0 15px 0" }}>
+                    推奨: <strong>2953 × 3685px (300 DPI)</strong>
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#666", margin: "0" }}>
+                    印刷時に画質が粗くなる可能性があります。
+                  </p>
+                </div>
+                <div style={{ padding: "0 20px 20px 20px" }}>
+                  <p style={{ fontSize: "14px", color: "#303030", margin: "0 0 15px 0", textAlign: "center" }}>
+                    それでもこの画像を使用しますか？
+                  </p>
+                  <div style={{ display: "flex", gap: "12px" }}>
+                    <button
+                      onClick={() => {
+                        setShowImageSizeCheck(false);
+                        setImageSizeInfo(null);
+                        setPendingFiles([]);
+                        setUploadSource(null);
+                      }}
+                      style={{
+                        flex: 1,
+                        height: "50px",
+                        backgroundColor: "#e5e7eb",
+                        color: "#303030",
+                        border: "none",
+                        borderRadius: "13px",
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        transition: "background-color 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#d1d5db";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#e5e7eb";
+                      }}
+                    >
+                      キャンセル
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowImageSizeCheck(false);
+                        setImageSizeInfo(null);
+                        // アップロード処理
+                        if (uploadSource === "printArea") {
+                          confirmPrintAreaFileUpload(pendingFiles);
+                        } else if (uploadSource === "imageManagement") {
+                          confirmImageManagementUpload(pendingFiles);
+                        }
+                        setPendingFiles([]);
+                        setUploadSource(null);
+                      }}
+                      style={{
+                        flex: 1,
+                        height: "50px",
+                        backgroundColor: "#3b82f6",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "13px",
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        transition: "background-color 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#2563eb";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#3b82f6";
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* 通常サイズ（警告なし） */}
+            {!imageSizeInfo.isGoodQuality && !imageSizeInfo.isTooSmall && (
+              <>
+                <div style={{ padding: "30px" }}>
+                  <p style={{ fontSize: "14px", color: "#303030", margin: "0 0 5px 0" }}>
+                    画像サイズ: <strong>{imageSizeInfo.width} × {imageSizeInfo.height}px</strong>
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#666", margin: "0" }}>
+                    印刷可能なサイズです。
+                  </p>
+                </div>
+                <div style={{ padding: "0 20px 20px 20px" }}>
+                  <button
+                    onClick={() => {
+                      setShowImageSizeCheck(false);
+                      setImageSizeInfo(null);
+                      // アップロード処理
+                      if (uploadSource === "printArea") {
+                        confirmPrintAreaFileUpload(pendingFiles);
+                      } else if (uploadSource === "imageManagement") {
+                        confirmImageManagementUpload(pendingFiles);
+                      }
+                      setPendingFiles([]);
+                      setUploadSource(null);
+                    }}
+                    style={{
+                      width: "100%",
+                      height: "50px",
+                      backgroundColor: "#6366f1",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "13px",
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      transition: "background-color 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#4f46e5";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#6366f1";
+                    }}
+                  >
+                    閉じる
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 画像アップロード確認ポップアップ */}
+      {showUploadConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            zIndex: 2000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => {
+            setShowUploadConfirm(false);
+            setPendingFiles([]);
+            setUploadSource(null);
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "20px",
+              padding: "40px",
+              maxWidth: "600px",
+              width: "90%",
+              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* タイトル */}
+            <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#303030", marginTop: "0", marginBottom: "30px", display: "flex", alignItems: "center", gap: "12px" }}>
+              <svg width="28" height="28" viewBox="0 0 48 48" style={{ width: "28px", height: "28px" }}>
+                <path d="M2,9.99017859 C2,7.7864638 3.79975948,6 5.99029394,6 L18.0767644,6 C19.1835685,6 20.5701975,6.7477726 21.1746315,7.67133451 L24.0075684,12 L41.9918214,12 C44.2054773,12 46,13.7867947 46,15.9992748 L46,38.0007252 C46,40.2094637 44.2069088,42 41.99819,42 L6.00180999,42 C3.79167136,42 2,40.2147544 2,38.0098214 L2,9.99017859 Z M6,38.0098214 L41.99819,38 L42,15.9992748 L24.0075684,16 C22.658105,16 21.3996088,15.3195781 20.6606307,14.1904356 L18,10.0097802 L5.99029394,10 L6,38.0098214 Z M17.862928,23.9448407 C18.3178041,22.9335006 19.2364493,22.8239147 19.9084014,23.6918355 L22.7905122,27.4144876 C23.4653199,28.2860968 24.7285203,28.4701867 25.6270803,27.8146248 L26.205134,27.3928946 C27.0969196,26.7422751 28.2985638,26.9754922 28.8829814,27.9041067 L31.6562655,32.3107367 C32.2434141,33.2436908 31.8235673,33.9999996 30.718486,33.9999996 L15.3412689,33.9999999 C14.236199,33.9999999 13.7078282,33.1830028 14.1639889,32.1688067 L17.862928,23.9448407 Z M30.9342877,26 C29.2774335,26 27.9342877,24.6568542 27.9342877,23 C27.9342877,21.3431458 29.2774335,20 30.9342877,20 C32.591142,20 33.9342877,21.3431458 33.9342877,23 C33.9342877,24.6568542 32.591142,26 30.9342877,26 Z" fill="#303030" />
+              </svg>
+              画像アップロード前のご確認
+            </h2>
+
+            {/* 推奨画像サイズ */}
+            <div style={{ marginBottom: "30px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#22c55e", marginTop: "0", marginBottom: "15px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ width: "20px", height: "20px" }}>
+                  <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                推奨画像サイズ
               </h3>
-              <ul style={{ paddingLeft: "20px", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>第三者の著作権を侵害する画像</strong>をアップロードしないでください
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>肖像権</strong>や<strong>プライバシー権</strong>を侵害する画像は使用できません
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>商標権</strong>を侵害する画像（企業ロゴなど）は使用できません
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  アップロードされた画像は<strong>お客様の責任</strong>で管理されます
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  不適切な画像が発見された場合、<strong>予告なく削除</strong>することがあります
-                </li>
+              <div style={{ backgroundColor: "#f8f8f8", padding: "20px", borderRadius: "13px", fontSize: "14px", color: "#303030", lineHeight: "1.8" }}>
+                <p style={{ margin: "0 0 8px 0" }}>300 DPI以上の高解像度画像を推奨します。</p>
+                <p style={{ margin: "0", color: "#666" }}>プリント範囲: 250mm × 312mm</p>
+              </div>
+            </div>
+
+            {/* 著作権・利用規約 */}
+            <div style={{ marginBottom: "30px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#f59e0b", marginTop: "0", marginBottom: "15px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ width: "20px", height: "20px" }}>
+                  <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0377 2.66667 10.2679 4L3.33975 16C2.56995 17.3333 3.53223 19 5.07183 19Z" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                著作権・利用規約
+              </h3>
+              <ul style={{ margin: "0", paddingLeft: "20px", fontSize: "14px", color: "#303030", lineHeight: "2" }}>
+                <li>第三者の著作権を侵害する画像をアップロードしないでください</li>
+                <li>肖像権やプライバシー権を侵害する画像は使用できません</li>
+                <li>商標権を侵害する画像（企業ロゴなど）は使用できません</li>
+                <li>アップロードされた画像はお客様の責任で管理されます</li>
+                <li>不適切な画像が発見された場合、<strong>予告なく削除</strong>することがあります</li>
               </ul>
             </div>
-            
-            <div style={{ display: "flex", gap: "12px", flexDirection: isMobile ? "column" : "row" }}>
-              <button 
+
+            {/* ボタン */}
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
                 onClick={() => {
-                  setShowCopyrightModal(false);
-                  pendingImageRef.current = null;
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                  }
+                  setShowUploadConfirm(false);
+                  setPendingFiles([]);
+                  setUploadSource(null);
                 }}
                 style={{
                   flex: 1,
-                  padding: "14px 24px",
-                  backgroundColor: "#6c757d",
-                  color: "white",
+                  height: "50px",
+                  backgroundColor: "#6b7280",
+                  color: "#ffffff",
                   border: "none",
-                  borderRadius: "8px",
+                  borderRadius: "13px",
                   fontSize: "16px",
-                  fontWeight: "600",
-                  cursor: "pointer"
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#4b5563";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#6b7280";
                 }}
               >
                 キャンセル
               </button>
-              <button 
-                onClick={handleCopyrightAgree}
+              <button
+                onClick={() => {
+                  // 利用規約に同意したことをlocalStorageに保存
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("hasAgreedToImageUploadTerms", "true");
+                    setHasAgreedToTerms(true);
+                  }
+                  
+                  // 利用規約ポップアップを閉じる
+                  setShowUploadConfirm(false);
+                  
+                  // 画像サイズをチェック
+                  if (pendingFiles.length > 0) {
+                    checkImageSize(pendingFiles);
+                  }
+                }}
                 style={{
                   flex: 1,
-                  padding: "14px 24px",
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  color: "white",
+                  height: "50px",
+                  backgroundColor: "#6366f1",
+                  color: "#ffffff",
                   border: "none",
-                  borderRadius: "8px",
+                  borderRadius: "13px",
                   fontSize: "16px",
-                  fontWeight: "600",
-                  cursor: "pointer"
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#4f46e5";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#6366f1";
                 }}
               >
                 同意してアップロード
@@ -5432,430 +3660,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           </div>
         </div>
       )}
-      
-      {/* 画質警告 */}
-      {imageQualityWarning && (() => {
-        const isWarning = imageQualityWarning.includes("[WARNING]");
-        const isInfo = imageQualityWarning.includes("[INFO]");
-        const isSuccess = imageQualityWarning.includes("[SUCCESS]");
-        const message = imageQualityWarning.replace("[WARNING]", "").replace("[INFO]", "").replace("[SUCCESS]", "").trim();
-        const iconType = isWarning ? "warning" : isInfo ? "info" : "check";
-        const iconColor = isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745";
-        const bgColor = isWarning ? "#fff3cd" : isInfo ? "#d1ecf1" : "#d4edda";
-        const borderColor = isWarning ? "#ffc107" : isInfo ? "#17a2b8" : "#28a745";
-        
-        return (
-          <div style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            backgroundColor: bgColor,
-            border: `1px solid ${borderColor}`,
-            borderRadius: "8px",
-            padding: "16px 20px",
-            maxWidth: "400px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            zIndex: 9999,
-            fontSize: "13px",
-            whiteSpace: "pre-line",
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px"
-          }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-              <Icon type={iconType} size={20} color={iconColor} />
-              <div style={{ flex: 1 }}>{message}</div>
-            </div>
-            <button 
-              onClick={() => setImageQualityWarning(null)}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: "#6c757d",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontSize: "12px",
-                fontWeight: "600"
-              }}
-            >
-              閉じる
-            </button>
-          </div>
-        );
-      })()}
-
-      {/* カート追加モーダル */}
-      {isModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 10000,
-            padding: "20px",
-          }}
-          onClick={closeCartModal}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: isMobile ? "24px" : "32px",
-              maxWidth: "500px",
-              width: "100%",
-              maxHeight: "90vh",
-              overflow: "auto",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* モーダルヘッダー */}
-            <div style={{ marginBottom: "24px" }}>
-              <h2 style={{ margin: 0, fontSize: "24px", color: "#333" }}>
-                🛒 カートに追加
-              </h2>
-              <p style={{ margin: "8px 0 0 0", fontSize: "14px", color: "#666" }}>
-                サイズと個数を選択してください
-              </p>
-            </div>
-
-            {/* カラー選択 */}
-            <div style={{ marginBottom: "24px" }}>
-              <label style={{ display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }}>
-                カラー
-              </label>
-              <div style={{ display: "flex", gap: "12px" }}>
-                {product.colors.map((color) => (
-                  <button
-                    key={color.name}
-                    onClick={() => setModalColor(color.name)}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      border: modalColor === color.name ? "2px solid #5c6ac4" : "2px solid #ddd",
-                      borderRadius: "8px",
-                      backgroundColor: modalColor === color.name ? "#f0f2ff" : "white",
-                      color: modalColor === color.name ? "#5c6ac4" : "#333",
-                      fontWeight: modalColor === color.name ? "bold" : "normal",
-                      cursor: "pointer",
-                      fontSize: "15px",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {color.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* サイズと個数選択 */}
-            <div style={{ marginBottom: "24px" }}>
-              <label style={{ display: "block", fontWeight: "bold", marginBottom: "12px", color: "#333" }}>
-                サイズと個数
-              </label>
-              {["S", "M", "L", "XL", "XXL"].map((size) => {
-                const currentQuantity = modalQuantities[modalColor]?.[size] || 0;
-                return (
-                  <div
-                    key={size}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "12px 16px",
-                      marginBottom: "8px",
-                      backgroundColor: currentQuantity > 0 ? "#f0f2ff" : "#f8f9fa",
-                      borderRadius: "8px",
-                      border: currentQuantity > 0 ? "2px solid #5c6ac4" : "2px solid transparent",
-                    }}
-                  >
-                    <span style={{ fontWeight: "500", fontSize: "16px", color: "#333" }}>
-                      {size}
-                    </span>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                      <button
-                        onClick={() => {
-                          setModalQuantities((prev) => ({
-                            ...prev,
-                            [modalColor]: {
-                              ...prev[modalColor],
-                              [size]: Math.max(0, (prev[modalColor]?.[size] || 0) - 1),
-                            }
-                          }));
-                        }}
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                          border: "1px solid #ddd",
-                          borderRadius: "6px",
-                          backgroundColor: "white",
-                          cursor: "pointer",
-                          fontSize: "18px",
-                          fontWeight: "bold",
-                          color: "#666",
-                        }}
-                      >
-                        -
-                      </button>
-                      <span style={{ 
-                        minWidth: "24px", 
-                        textAlign: "center", 
-                        fontSize: "16px", 
-                        fontWeight: "bold",
-                        color: currentQuantity > 0 ? "#5c6ac4" : "#999"
-                      }}>
-                        {currentQuantity}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setModalQuantities((prev) => ({
-                            ...prev,
-                            [modalColor]: {
-                              ...prev[modalColor],
-                              [size]: Math.min(99, (prev[modalColor]?.[size] || 0) + 1),
-                            }
-                          }));
-                        }}
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                          border: "1px solid #ddd",
-                          borderRadius: "6px",
-                          backgroundColor: "white",
-                          cursor: "pointer",
-                          fontSize: "18px",
-                          fontWeight: "bold",
-                          color: "#666",
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* 合計表示 */}
-            <div
-              style={{
-                padding: "16px",
-                backgroundColor: "#f0f2ff",
-                borderRadius: "8px",
-                marginBottom: "24px",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontWeight: "bold", fontSize: "16px", color: "#333" }}>
-                  合計
-                </span>
-                <span style={{ fontWeight: "bold", fontSize: "20px", color: "#5c6ac4" }}>
-                  {Object.values(modalQuantities).reduce((colorQty, sizes) => {
-                    return colorQty + Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
-                  }, 0)} 点
-                </span>
-              </div>
-            </div>
-
-            {/* ボタン */}
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button
-                onClick={closeCartModal}
-                style={{
-                  flex: 1,
-                  padding: "14px",
-                  border: "2px solid #ddd",
-                  borderRadius: "8px",
-                  backgroundColor: "white",
-                  color: "#666",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleAddToCartMultiple}
-                disabled={Object.values(modalQuantities).reduce((colorQty, sizes) => {
-                  return colorQty + Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
-                }, 0) === 0}
-                style={{
-                  flex: 1,
-                  padding: "14px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: Object.values(modalQuantities).reduce((colorQty, sizes) => {
-                    return colorQty + Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
-                  }, 0) === 0 ? "#ccc" : "#5c6ac4",
-                  color: "white",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  cursor: Object.values(modalQuantities).reduce((colorQty, sizes) => {
-                    return colorQty + Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
-                  }, 0) === 0 ? "not-allowed" : "pointer",
-                }}
-              >
-                カートに追加
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </motion.div>
+    </div>
   );
 }
-
-// ========== スタイル定義 ==========
-const panelStyle: React.CSSProperties = {
-  padding: "24px",
-  backgroundColor: "#fff",
-  borderRadius: "0",
-  boxShadow: "none",
-  height: "100%",
-};
-
-const sectionStyle: React.CSSProperties = {
-  marginBottom: "30px",
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "11px",
-  marginBottom: "16px",
-  color: "#666",
-  fontWeight: "400",
-  letterSpacing: "0.15em",
-  textTransform: "uppercase",
-};
-
-const dividerStyle: React.CSSProperties = {
-  margin: "30px 0",
-  border: "none",
-  borderTop: "1px solid #e5e5e5",
-};
-
-const buttonStyle = (bgColor: string, enabled: boolean): React.CSSProperties => ({
-  width: "100%",
-  padding: "14px 20px",
-  marginBottom: "10px",
-  backgroundColor: enabled ? "#1a1a1a" : "#e0e0e0",
-  color: enabled ? "white" : "#999",
-  border: "none",
-  borderRadius: "0",
-  fontSize: "12px",
-  letterSpacing: "0.1em",
-  textTransform: "uppercase",
-  cursor: enabled ? "pointer" : "not-allowed",
-  fontWeight: "400",
-  transition: "all 0.3s ease",
-});
-
-const primaryButtonStyle = (disabled: boolean): React.CSSProperties => ({
-  width: "100%",
-  padding: "16px 20px",
-  backgroundColor: disabled ? "#e0e0e0" : "#1a1a1a",
-  color: disabled ? "#999" : "white",
-  border: "none",
-  borderRadius: "0",
-  fontSize: "13px",
-  letterSpacing: "0.15em",
-  textTransform: "uppercase",
-  cursor: disabled ? "not-allowed" : "pointer",
-  fontWeight: "400",
-  transition: "all 0.3s ease",
-});
-
-const smallButtonStyle = (bgColor: string, enabled: boolean): React.CSSProperties => ({
-  padding: "12px 16px",
-  backgroundColor: enabled ? "#1a1a1a" : "#e0e0e0",
-  color: enabled ? "white" : "#999",
-  border: "none",
-  borderRadius: "0",
-  fontSize: "11px",
-  letterSpacing: "0.08em",
-  textTransform: "uppercase",
-  cursor: enabled ? "pointer" : "not-allowed",
-  width: "100%",
-  fontWeight: "400",
-  transition: "all 0.3s ease",
-});
-
-const historyButtonStyle = (enabled: boolean): React.CSSProperties => ({
-  flex: 1,
-  padding: "12px",
-  backgroundColor: enabled ? "#4a4a4a" : "#e0e0e0",
-  color: enabled ? "white" : "#999",
-  border: "none",
-  borderRadius: "0",
-  fontSize: "11px",
-  letterSpacing: "0.05em",
-  cursor: enabled ? "pointer" : "not-allowed",
-  fontWeight: "400",
-  transition: "all 0.3s ease",
-});
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px 16px",
-  marginBottom: "10px",
-  border: "1px solid #d0d0d0",
-  borderRadius: "0",
-  fontSize: "13px",
-  letterSpacing: "0.02em",
-  boxSizing: "border-box",
-  transition: "border-color 0.2s ease",
-};
-
-const textareaStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "12px",
-  border: "2px solid #ddd",
-  borderRadius: "8px",
-  fontSize: "14px",
-  boxSizing: "border-box",
-  fontFamily: "inherit",
-  resize: "vertical",
-};
-
-const selectStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "10px",
-  border: "1px solid #ddd",
-  borderRadius: "6px",
-  fontSize: "14px",
-  boxSizing: "border-box",
-};
-
-const colorInputStyle: React.CSSProperties = {
-  width: "100%",
-  height: "40px",
-  border: "1px solid #ddd",
-  borderRadius: "6px",
-  cursor: "pointer",
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: "12px",
-  display: "block",
-  marginBottom: "5px",
-  color: "#666",
-  fontWeight: "500",
-};
-
-const infoBoxStyle: React.CSSProperties = {
-  marginTop: "20px",
-  padding: "20px",
-  backgroundColor: "#ffffff",
-  borderRadius: "8px",
-  fontSize: "13px",
-  border: "1px solid #e0e0e0",
-};

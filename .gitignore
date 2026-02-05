@@ -26,3 +26,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# 大きな画像ファイル（10MB以上）
+public/images/style/**/*.png
+!public/images/style/*/*.png
