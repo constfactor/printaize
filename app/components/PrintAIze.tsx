@@ -1374,7 +1374,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             position: fixed !important;
             left: 0 !important;
             top: auto !important;
-            bottom: 0 !important;
+            bottom: 80px !important;
             width: 100% !important;
             height: 80px !important;
             padding: 10px 15px !important;
@@ -1454,7 +1454,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             position: fixed !important;
             left: 0 !important;
             top: auto !important;
-            bottom: 80px !important;
+            bottom: 160px !important;
             width: 100% !important;
             height: 240px !important;
             padding: 15px 15px 15px 15px !important;
@@ -1480,7 +1480,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             position: fixed !important;
             left: 0 !important;
             top: auto !important;
-            bottom: 80px !important;
+            bottom: 160px !important;
             width: 100% !important;
             height: 50vh !important;
             padding: 20px 15px !important;
@@ -1494,7 +1494,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             left: 0 !important;
             top: 0 !important;
             right: 0 !important;
-            bottom: 320px !important;
+            bottom: 400px !important;
             padding: 10px !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
@@ -1518,6 +1518,26 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           /* モバイル用：カートに追加ボタンを非表示 */
           .desktop-cart-button {
             display: none !important;
+          }
+          
+          /* モバイル用：カートに追加ボタンを表示 */
+          .mobile-cart-button {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 80px !important;
+            background-color: #303030 !important;
+            color: #ffffff !important;
+            border: none !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            z-index: 100 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
           }
           
           /* モバイル用：アイテムメニューのレイアウト */
@@ -1624,6 +1644,10 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           }
           
           .mobile-show {
+            display: none !important;
+          }
+          
+          .mobile-cart-button {
             display: none !important;
           }
         }
@@ -2651,6 +2675,21 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           {!isCollapsed && <span>カートに追加</span>}
         </button>
       </aside>
+
+      {/* モバイル用カートに追加ボタン */}
+      <button
+        className="mobile-cart-button"
+        style={{
+          display: "none",
+        }}
+        onClick={() => {
+          // 機能は別途実装
+          console.log("カートに追加");
+        }}
+      >
+        {getCartIcon("#ffffff")}
+        <span>カートに追加</span>
+      </button>
 
       {/* メインエリア（Tシャツ表示） */}
       <main
