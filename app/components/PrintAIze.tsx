@@ -1457,7 +1457,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             bottom: 80px !important;
             width: 100% !important;
             height: 240px !important;
-            padding: 15px !important;
+            padding: 15px 15px 15px 15px !important;
             overflow-x: hidden !important;
             overflow-y: auto !important;
             z-index: 90 !important;
@@ -1468,6 +1468,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           
           .mobile-panel.hidden {
             transform: translateY(100%) !important;
+          }
+          
+          /* モバイル用：アイテムコンパネは縦スクロール無効 */
+          .mobile-panel:has(.mobile-item-layout) {
+            overflow-y: hidden !important;
           }
           
           /* モバイル用：コンパネ2をタブで切り替え */
@@ -1541,25 +1546,49 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           .mobile-item-card {
             flex: 0 0 140px !important;
             max-width: 140px !important;
+            position: relative !important;
+            overflow: visible !important;
           }
           
-          /* モバイル用：商品情報を小さく */
+          /* モバイル用：商品画像を正方形コンテナに（画像は3:4維持、横に余白） */
+          .mobile-item-card > div:first-child {
+            padding-bottom: 100% !important;
+            margin-bottom: 60px !important;
+          }
+          
+          .mobile-item-card > div:first-child img {
+            object-fit: contain !important;
+            width: 100% !important;
+            height: 100% !important;
+          }
+          
+          /* モバイル用：商品情報を下端固定 */
           .mobile-item-card .product-info {
-            padding: 8px !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            padding: 8px 8px 8px 8px !important;
+            background: linear-gradient(to top, rgba(248, 248, 248, 1) 0%, rgba(248, 248, 248, 1) 70%, rgba(248, 248, 248, 0) 100%) !important;
+            border-radius: 0 0 13px 13px !important;
           }
           
           .mobile-item-card h3 {
             font-size: 11px !important;
-            margin: 0 0 4px 0 !important;
+            margin: 0 0 3px 0 !important;
+            line-height: 1.2 !important;
           }
           
           .mobile-item-card p {
             font-size: 10px !important;
-            margin: 0 0 4px 0 !important;
+            margin: 0 0 3px 0 !important;
+            line-height: 1.2 !important;
           }
           
           .mobile-item-card .color-swatches {
             gap: 3px !important;
+            margin-bottom: 0 !important;
+            margin-top: 3px !important;
           }
           
           .mobile-item-card .color-swatch {
