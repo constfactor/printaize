@@ -54,6 +54,8 @@ function handleBotRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set("Content-Type", "text/html");
+          responseHeaders.delete("X-Frame-Options");
+          responseHeaders.set("Content-Security-Policy", "frame-ancestors *");
 
           resolve(
             new Response(stream, {
@@ -101,6 +103,8 @@ function handleBrowserRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set("Content-Type", "text/html");
+          responseHeaders.delete("X-Frame-Options");
+          responseHeaders.set("Content-Security-Policy", "frame-ancestors *");
 
           resolve(
             new Response(stream, {
