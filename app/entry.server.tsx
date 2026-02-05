@@ -55,7 +55,7 @@ function handleBotRequest(
 
           responseHeaders.set("Content-Type", "text/html");
           responseHeaders.delete("X-Frame-Options");
-          responseHeaders.set("Content-Security-Policy", "frame-ancestors 'self' https://*.myshopify.com https://shop.qpp");
+          responseHeaders.set("Content-Security-Policy", "frame-ancestors https://*.myshopify.com https://shop.qpp");
 
           resolve(
             new Response(stream, {
@@ -104,7 +104,7 @@ function handleBrowserRequest(
 
           responseHeaders.set("Content-Type", "text/html");
           responseHeaders.delete("X-Frame-Options");
-          responseHeaders.set("Content-Security-Policy", "frame-ancestors 'self' https://*.myshopify.com https://shop.qpp");
+          responseHeaders.set("Content-Security-Policy", "frame-ancestors https://*.myshopify.com https://shop.qpp");
 
           resolve(
             new Response(stream, {
