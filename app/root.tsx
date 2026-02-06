@@ -58,6 +58,53 @@ export default function App() {
             display: block;
           }
         `}</style>
+        
+        {/* iframe高さ自動調整 - head内で早期に実行 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                let lastHeight = 0;
+                
+                function sendHeight() {
+                  const isMobile = window.innerWidth <= 768;
+                  let height;
+                  
+                  if (isMobile) {
+                    height = Math.max(
+                      document.body.scrollHeight || 0,
+                      document.documentElement.scrollHeight || 0
+                    );
+                  } else {
+                    height = window.innerHeight || document.documentElement.clientHeight;
+                  }
+                  
+                  if (height !== lastHeight && height > 0) {
+                    try {
+                      window.parent.postMessage({ height: height }, '*');
+                      lastHeight = height;
+                    } catch (e) {}
+                  }
+                }
+                
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(sendHeight, 500);
+                    setInterval(sendHeight, 2000);
+                  });
+                } else {
+                  setTimeout(sendHeight, 500);
+                  setInterval(sendHeight, 2000);
+                }
+                
+                window.addEventListener('resize', function() {
+                  lastHeight = 0;
+                  sendHeight();
+                });
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         {/* Fabric.jsを最初に読み込む */}
@@ -85,51 +132,6 @@ export default function App() {
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
-          }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // iframe高さ自動調整
-              (function() {
-                let lastHeight = 0;
-                
-                function sendHeight() {
-                  // デスクトップでは100vhを送信、モバイルでは実際の高さを送信
-                  const isMobile = window.innerWidth <= 768;
-                  let height;
-                  
-                  if (isMobile) {
-                    height = Math.max(
-                      document.body.scrollHeight,
-                      document.documentElement.scrollHeight
-                    );
-                  } else {
-                    // デスクトップでは画面の高さ（100vh相当のピクセル値）
-                    height = window.innerHeight;
-                  }
-                  
-                  // 高さが変わった時だけ送信
-                  if (height !== lastHeight) {
-                    console.log('PrintAIze: 高さを送信', height, isMobile ? '(モバイル)' : '(デスクトップ)');
-                    window.parent.postMessage({ height: height }, '*');
-                    lastHeight = height;
-                  }
-                }
-                
-                // 初回送信
-                setTimeout(sendHeight, 500);
-                
-                // 定期チェック
-                setInterval(sendHeight, 2000);
-                
-                // リサイズ時も送信
-                window.addEventListener('resize', function() {
-                  lastHeight = 0; // リセット
-                  sendHeight();
-                });
-              })();
-            `,
           }}
         />
         <Scripts />
