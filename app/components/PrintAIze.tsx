@@ -1507,6 +1507,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             overflow-y: auto !important;
             overflow-x: hidden !important;
             box-sizing: border-box !important;
+            display: block !important;
+            justify-content: flex-start !important;
           }
           
           /* モバイル用：コンパネの項目を横スクロール */
@@ -2711,6 +2713,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           backgroundColor: "#f8f8f8",
           padding: "17.5px",
           overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
         }}
       >
         {/* 商品画像コンテナ */}
