@@ -77,29 +77,12 @@ export default function App() {
                       document.documentElement.scrollHeight || 0
                     );
                   } else {
-                    // デスクトップ：ルートdivの高さを測定
-                    // 100vhのレイアウトなので、画面の高さ
-                    height = window.innerHeight || document.documentElement.clientHeight || 900;
-                    
-                    // または、実際のルートdivの高さを測定
-                    setTimeout(function() {
-                      const rootDiv = document.querySelector('[style*="height: 100vh"]');
-                      if (rootDiv) {
-                        const rect = rootDiv.getBoundingClientRect();
-                        const computedHeight = Math.ceil(rect.height);
-                        if (computedHeight > height) {
-                          height = computedHeight;
-                        }
-                      }
-                      
-                      if (height !== lastHeight && height > 0) {
-                        try {
-                          window.parent.postMessage({ height: height }, '*');
-                          lastHeight = height;
-                        } catch (e) {}
-                      }
-                    }, 100);
-                    return;
+                    // デスクトップ：bodyの実際の高さ
+                    height = Math.max(
+                      document.body.scrollHeight || 0,
+                      document.documentElement.scrollHeight || 0,
+                      document.body.offsetHeight || 0
+                    );
                   }
                   
                   if (height !== lastHeight && height > 0) {
@@ -113,10 +96,12 @@ export default function App() {
                 if (document.readyState === 'loading') {
                   document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(sendHeight, 500);
+                    setTimeout(sendHeight, 1000);
                     setInterval(sendHeight, 2000);
                   });
                 } else {
                   setTimeout(sendHeight, 500);
+                  setTimeout(sendHeight, 1000);
                   setInterval(sendHeight, 2000);
                 }
                 

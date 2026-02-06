@@ -1358,10 +1358,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     <div
       style={{
         width: "100vw",
-        height: "100vh",
+        minHeight: "100vh",
+        height: "auto",
         backgroundColor: "#f8f8f8",
         display: "flex",
-        overflow: "hidden",
+        overflow: "visible",
         fontFamily: '"Yu Gothic", "游ゴシック体", YuGothic, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", sans-serif',
         position: "relative",
       }}
@@ -1369,6 +1370,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* グローバルスタイル（モバイル対応） */}
       <style>{`
         @media (max-width: 768px) {
+          /* モバイル用：ルートdivを100vh固定に戻す */
+          body > div {
+            height: 100vh !important;
+            min-height: 100vh !important;
+            overflow: hidden !important;
+          }
+          
           /* モバイル用：サイドバーを下部固定タブバーに */
           .mobile-sidebar {
             position: fixed !important;
