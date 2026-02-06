@@ -87,6 +87,34 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // iframe高さ自動調整
+              (function() {
+                function sendHeight() {
+                  const height = document.body.scrollHeight;
+                  console.log('PrintAIze: 高さを送信', height);
+                  window.parent.postMessage({ height: height }, '*');
+                }
+                
+                // DOMContentLoaded後に実行
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(sendHeight, 1000);
+                    setInterval(sendHeight, 1000);
+                  });
+                } else {
+                  setTimeout(sendHeight, 1000);
+                  setInterval(sendHeight, 1000);
+                }
+                
+                // リサイズ時も送信
+                window.addEventListener('resize', sendHeight);
+              })();
+            `,
+          }}
+        />
         <Scripts />
         <LiveReload />
       </body>

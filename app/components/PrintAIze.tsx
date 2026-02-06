@@ -29,30 +29,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   const [hoveredTab, setHoveredTab] = useState<MenuTab | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   
-  // iframe高さ自動調整
-  useEffect(() => {
-    const sendHeight = () => {
-      const height = document.body.scrollHeight;
-      const message = { height: height };
-      console.log('PrintAIze: 高さを送信', message);
-      window.parent.postMessage(message, '*');
-    };
-    
-    // 初回送信
-    setTimeout(sendHeight, 1000);
-    
-    // リサイズ時に送信
-    window.addEventListener('resize', sendHeight);
-    
-    // 定期的に送信（コンテンツ変更を検知）
-    const interval = setInterval(sendHeight, 1000);
-    
-    return () => {
-      window.removeEventListener('resize', sendHeight);
-      clearInterval(interval);
-    };
-  }, []);
-  
   // Shopify商品データ
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
