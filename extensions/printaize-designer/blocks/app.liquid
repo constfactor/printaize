@@ -1,3 +1,12 @@
+<div class="printaize-block">
+  {% if block.settings.heading != blank %}
+    <h2>{{ block.settings.heading }}</h2>
+  {% endif %}
+  
+  <div id="printaize-app"></div>
+</div>
+
+{% schema %}
 {
   "name": "PrintAIze Designer",
   "target": "section",
@@ -10,3 +19,4 @@
     }
   ]
 }
+{% endschema %}
