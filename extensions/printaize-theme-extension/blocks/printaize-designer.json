@@ -1,0 +1,12 @@
+{
+  "name": "PrintAIze Designer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Design Your Custom Print"
+    }
+  ]
+}

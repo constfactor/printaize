@@ -7,7 +7,10 @@
     "prebuild": "node scripts/generate-style-images-index.js && node scripts/generate-image-metadata-index.js",
     "build": "remix build",
     "start": "remix-serve build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "shopify": "shopify",
+    "shopify:dev": "shopify app dev",
+    "shopify:deploy": "shopify app deploy"
   },
   "dependencies": {
     "@remix-run/node": "^2.5.0",
@@ -28,6 +31,8 @@
   "devDependencies": {
     "@remix-run/dev": "^2.5.0",
     "@remix-run/vercel": "^1.19.3",
+    "@shopify/app": "^3.58.2",
+    "@shopify/cli": "^3.90.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "supabase": "^2.72.8",

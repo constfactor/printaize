@@ -1,0 +1,11 @@
+type = "theme"
+name = "PrintAIze Designer"
+
+[extension_points]
+[[extension_points.entry]]
+target = "app_embed"
+metafields = []
+
+[[extension_points.entry]]
+target = "app_block"
+metafields = []
