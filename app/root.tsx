@@ -92,21 +92,28 @@ export default function App() {
             __html: `
               // iframe高さ自動調整
               (function() {
+                let lastHeight = 0;
+                
                 function sendHeight() {
                   const height = document.body.scrollHeight;
-                  console.log('PrintAIze: 高さを送信', height);
-                  window.parent.postMessage({ height: height }, '*');
+                  
+                  // 高さが変わった時だけ送信
+                  if (height !== lastHeight) {
+                    console.log('PrintAIze: 高さを送信', height);
+                    window.parent.postMessage({ height: height }, '*');
+                    lastHeight = height;
+                  }
                 }
                 
                 // DOMContentLoaded後に実行
                 if (document.readyState === 'loading') {
                   document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(sendHeight, 1000);
-                    setInterval(sendHeight, 1000);
+                    setInterval(sendHeight, 2000);
                   });
                 } else {
                   setTimeout(sendHeight, 1000);
-                  setInterval(sendHeight, 1000);
+                  setInterval(sendHeight, 2000);
                 }
                 
                 // リサイズ時も送信
