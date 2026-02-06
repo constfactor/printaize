@@ -54,11 +54,6 @@ function handleBotRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set("Content-Type", "text/html");
-          
-          // iframeを許可するためのヘッダー設定（既存のCSPを削除）
-          responseHeaders.delete("X-Frame-Options");
-          responseHeaders.delete("Content-Security-Policy");
-          responseHeaders.set("Content-Security-Policy", "frame-ancestors *");
 
           resolve(
             new Response(stream, {
@@ -106,11 +101,6 @@ function handleBrowserRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set("Content-Type", "text/html");
-          
-          // iframeを許可するためのヘッダー設定（既存のCSPを削除）
-          responseHeaders.delete("X-Frame-Options");
-          responseHeaders.delete("Content-Security-Policy");
-          responseHeaders.set("Content-Security-Policy", "frame-ancestors *");
 
           resolve(
             new Response(stream, {
