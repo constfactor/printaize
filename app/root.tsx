@@ -65,6 +65,7 @@ export default function App() {
             __html: `
               (function() {
                 let lastHeight = 0;
+                let resizeTimeout;
                 
                 function sendHeight() {
                   const isMobile = window.innerWidth <= 768;
@@ -77,38 +78,18 @@ export default function App() {
                       document.documentElement.scrollHeight || 0
                     );
                   } else {
-                    // デスクトップ：複数の方法で測定して最大値を使用
-                    const bodyHeight = document.body.scrollHeight || 0;
-                    const docHeight = document.documentElement.scrollHeight || 0;
-                    const bodyOffset = document.body.offsetHeight || 0;
-                    const docOffset = document.documentElement.offsetHeight || 0;
-                    const clientHeight = document.documentElement.clientHeight || 0;
-                    
-                    // 全ての子要素の最大の底辺位置を計算
-                    let maxBottom = 0;
-                    const allElements = document.body.getElementsByTagName('*');
-                    for (let i = 0; i < allElements.length; i++) {
-                      const rect = allElements[i].getBoundingClientRect();
-                      const bottom = rect.bottom + window.pageYOffset;
-                      if (bottom > maxBottom) {
-                        maxBottom = bottom;
-                      }
-                    }
-                    
+                    // デスクトップ：bodyとdocumentの高さを測定
                     height = Math.max(
-                      bodyHeight,
-                      docHeight,
-                      bodyOffset,
-                      docOffset,
-                      clientHeight,
-                      maxBottom,
-                      900 // 最低900px
+                      document.body.scrollHeight || 0,
+                      document.documentElement.scrollHeight || 0,
+                      document.body.offsetHeight || 0,
+                      document.documentElement.offsetHeight || 0,
+                      1000 // 最低1000px
                     );
                   }
                   
                   if (height !== lastHeight && height > 0) {
                     try {
-                      console.log('PrintAIze: 高さを送信', height + 'px', isMobile ? '(モバイル)' : '(デスクトップ)');
                       window.parent.postMessage({ height: height }, '*');
                       lastHeight = height;
                     } catch (e) {}
@@ -129,9 +110,13 @@ export default function App() {
                   setInterval(sendHeight, 3000);
                 }
                 
+                // リサイズイベントはデバウンス
                 window.addEventListener('resize', function() {
-                  lastHeight = 0;
-                  sendHeight();
+                  clearTimeout(resizeTimeout);
+                  resizeTimeout = setTimeout(function() {
+                    lastHeight = 0;
+                    sendHeight();
+                  }, 500);
                 });
                 
                 window.addEventListener('load', function() {
