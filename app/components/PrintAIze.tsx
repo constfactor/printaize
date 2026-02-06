@@ -1385,6 +1385,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             bottom: 80px !important;
             width: 100% !important;
             height: 80px !important;
+            min-height: 80px !important;
             padding: 10px 15px !important;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
             z-index: 100 !important;
@@ -2481,10 +2482,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           left: 0,
           top: 0,
           width: isCollapsed ? "80px" : "339px",
-          height: "100%",
+          minHeight: "100%",
           backgroundColor: "#f8f8f8",
           paddingLeft: "17.5px",
           paddingRight: "17.5px",
+          paddingTop: "17.5px",
+          paddingBottom: "17.5px",
           boxShadow: "5px 0 15px rgba(0, 0, 0, 0.1)",
           zIndex: 10,
           transition: "width 0.3s ease-in-out",
@@ -2498,7 +2501,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             fontWeight: 700,
             color: "#303030",
             marginLeft: "10.5px",
-            marginTop: "35px",
+            marginTop: "17.5px",
             marginBottom: "35px",
             letterSpacing: "0",
             whiteSpace: "nowrap",
@@ -2713,9 +2716,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           backgroundColor: "#f8f8f8",
           padding: "17.5px",
           overflow: "auto",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
         }}
       >
         {/* 商品画像コンテナ */}
