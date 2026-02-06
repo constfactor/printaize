@@ -95,29 +95,39 @@ export default function App() {
                 let lastHeight = 0;
                 
                 function sendHeight() {
-                  const height = document.body.scrollHeight;
+                  // デスクトップでは100vhを送信、モバイルでは実際の高さを送信
+                  const isMobile = window.innerWidth <= 768;
+                  let height;
+                  
+                  if (isMobile) {
+                    height = Math.max(
+                      document.body.scrollHeight,
+                      document.documentElement.scrollHeight
+                    );
+                  } else {
+                    // デスクトップでは画面の高さ（100vh相当のピクセル値）
+                    height = window.innerHeight;
+                  }
                   
                   // 高さが変わった時だけ送信
                   if (height !== lastHeight) {
-                    console.log('PrintAIze: 高さを送信', height);
+                    console.log('PrintAIze: 高さを送信', height, isMobile ? '(モバイル)' : '(デスクトップ)');
                     window.parent.postMessage({ height: height }, '*');
                     lastHeight = height;
                   }
                 }
                 
-                // DOMContentLoaded後に実行
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', function() {
-                    setTimeout(sendHeight, 1000);
-                    setInterval(sendHeight, 2000);
-                  });
-                } else {
-                  setTimeout(sendHeight, 1000);
-                  setInterval(sendHeight, 2000);
-                }
+                // 初回送信
+                setTimeout(sendHeight, 500);
+                
+                // 定期チェック
+                setInterval(sendHeight, 2000);
                 
                 // リサイズ時も送信
-                window.addEventListener('resize', sendHeight);
+                window.addEventListener('resize', function() {
+                  lastHeight = 0; // リセット
+                  sendHeight();
+                });
               })();
             `,
           }}
