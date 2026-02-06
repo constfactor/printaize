@@ -1,7 +1,7 @@
 # Shopify App Configuration
 
 name = "PrintAIze"
-client_id = ""
+client_id = "97a6a26f3c4ace1c2b7bd2df406f1f29"
 application_url = "https://printaize.vercel.app"
 embedded = true
 
@@ -10,7 +10,9 @@ scopes = "write_products,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://printaize.vercel.app/auth/callback"
+  "https://printaize.vercel.app/auth/callback",
+  "https://printaize.com/auth/callback",
+  "https://printaize.myshopify.com/auth/callback"
 ]
 
 [webhooks]
@@ -21,4 +23,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = ""
+dev_store_url = "printaize.myshopify.com"
