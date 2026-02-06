@@ -77,16 +77,38 @@ export default function App() {
                       document.documentElement.scrollHeight || 0
                     );
                   } else {
-                    // デスクトップ：bodyの実際の高さ
+                    // デスクトップ：複数の方法で測定して最大値を使用
+                    const bodyHeight = document.body.scrollHeight || 0;
+                    const docHeight = document.documentElement.scrollHeight || 0;
+                    const bodyOffset = document.body.offsetHeight || 0;
+                    const docOffset = document.documentElement.offsetHeight || 0;
+                    const clientHeight = document.documentElement.clientHeight || 0;
+                    
+                    // 全ての子要素の最大の底辺位置を計算
+                    let maxBottom = 0;
+                    const allElements = document.body.getElementsByTagName('*');
+                    for (let i = 0; i < allElements.length; i++) {
+                      const rect = allElements[i].getBoundingClientRect();
+                      const bottom = rect.bottom + window.pageYOffset;
+                      if (bottom > maxBottom) {
+                        maxBottom = bottom;
+                      }
+                    }
+                    
                     height = Math.max(
-                      document.body.scrollHeight || 0,
-                      document.documentElement.scrollHeight || 0,
-                      document.body.offsetHeight || 0
+                      bodyHeight,
+                      docHeight,
+                      bodyOffset,
+                      docOffset,
+                      clientHeight,
+                      maxBottom,
+                      900 // 最低900px
                     );
                   }
                   
                   if (height !== lastHeight && height > 0) {
                     try {
+                      console.log('PrintAIze: 高さを送信', height + 'px', isMobile ? '(モバイル)' : '(デスクトップ)');
                       window.parent.postMessage({ height: height }, '*');
                       lastHeight = height;
                     } catch (e) {}
@@ -97,17 +119,23 @@ export default function App() {
                   document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(sendHeight, 500);
                     setTimeout(sendHeight, 1000);
-                    setInterval(sendHeight, 2000);
+                    setTimeout(sendHeight, 2000);
+                    setInterval(sendHeight, 3000);
                   });
                 } else {
                   setTimeout(sendHeight, 500);
                   setTimeout(sendHeight, 1000);
-                  setInterval(sendHeight, 2000);
+                  setTimeout(sendHeight, 2000);
+                  setInterval(sendHeight, 3000);
                 }
                 
                 window.addEventListener('resize', function() {
                   lastHeight = 0;
                   sendHeight();
+                });
+                
+                window.addEventListener('load', function() {
+                  setTimeout(sendHeight, 500);
                 });
               })();
             `,
