@@ -71,12 +71,35 @@ export default function App() {
                   let height;
                   
                   if (isMobile) {
+                    // モバイル：実際のコンテンツ高さ
                     height = Math.max(
                       document.body.scrollHeight || 0,
                       document.documentElement.scrollHeight || 0
                     );
                   } else {
-                    height = window.innerHeight || document.documentElement.clientHeight;
+                    // デスクトップ：ルートdivの高さを測定
+                    // 100vhのレイアウトなので、画面の高さ
+                    height = window.innerHeight || document.documentElement.clientHeight || 900;
+                    
+                    // または、実際のルートdivの高さを測定
+                    setTimeout(function() {
+                      const rootDiv = document.querySelector('[style*="height: 100vh"]');
+                      if (rootDiv) {
+                        const rect = rootDiv.getBoundingClientRect();
+                        const computedHeight = Math.ceil(rect.height);
+                        if (computedHeight > height) {
+                          height = computedHeight;
+                        }
+                      }
+                      
+                      if (height !== lastHeight && height > 0) {
+                        try {
+                          window.parent.postMessage({ height: height }, '*');
+                          lastHeight = height;
+                        } catch (e) {}
+                      }
+                    }, 100);
+                    return;
                   }
                   
                   if (height !== lastHeight && height > 0) {
