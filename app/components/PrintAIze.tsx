@@ -33,17 +33,19 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
   useEffect(() => {
     const sendHeight = () => {
       const height = document.body.scrollHeight;
-      window.parent.postMessage({ height }, '*');
+      const message = { height: height };
+      console.log('PrintAIze: 高さを送信', message);
+      window.parent.postMessage(message, '*');
     };
     
     // 初回送信
-    sendHeight();
+    setTimeout(sendHeight, 1000);
     
     // リサイズ時に送信
     window.addEventListener('resize', sendHeight);
     
     // 定期的に送信（コンテンツ変更を検知）
-    const interval = setInterval(sendHeight, 500);
+    const interval = setInterval(sendHeight, 1000);
     
     return () => {
       window.removeEventListener('resize', sendHeight);
