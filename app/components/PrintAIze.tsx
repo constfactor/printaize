@@ -178,7 +178,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       if (e.shiftKey) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           deltaY = 0; // 水平のみ
-        } else {
+    } else {
           deltaX = 0; // 垂直のみ
         }
       }
@@ -987,8 +987,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         // プリント範囲: 250mm × 312mm
         // 150 DPI最低: 1182 × 1475px
         // 300 DPI推奨: 2953 × 3685px
-        const minWidth = 1182;
-        const minHeight = 1475;
+    const minWidth = 1182;
+    const minHeight = 1475;
         const recommendedWidth = 2953;
         const recommendedHeight = 3685;
         
@@ -1120,7 +1120,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       setSelectedProductName(`${productName} - ${colorName}`);
       setSelectedProductId(productId);
       console.log("Updated selectedProductImage to:", colorImage);
-    } else {
+      } else {
       console.warn("No color image available for:", colorName);
     }
   };
@@ -1236,7 +1236,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       if (data.success && data.description) {
         return data.description;
       }
-    } catch (error) {
+            } catch (error) {
       console.error("メタデータの取得に失敗:", error);
     }
     return "メタデータがありません";
@@ -1299,7 +1299,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       // 横長
       width = scale;
       printHeight = scale / ratio;
-    } else {
+            } else {
       // 縦長
       printHeight = scale;
       width = scale * ratio;
@@ -1666,12 +1666,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* コンパネ2（スタイル詳細） */}
       <div
         className="mobile-panel2"
-        style={{
+      style={{ 
           position: "absolute",
           left: "339.5px",
           top: 0,
           width: "259.5px",
-          height: "100vh",
+        height: "100vh",
           backgroundColor: "rgba(238, 238, 238, 0.5)",
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
@@ -1694,18 +1694,18 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             </h2>
             
             {/* スタイル画像一覧 */}
-            <div style={{ 
+      <div style={{
               columnCount: 2,
               columnGap: "9px"
             }}>
               {styleImages.map((imageSrc, index) => (
                 <div
                   key={index}
-                  style={{
-                    width: "100%",
+            style={{
+              width: "100%",
                     borderRadius: "13px",
                     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                    overflow: "hidden",
+            overflow: "hidden",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                     marginBottom: "4.5px",
@@ -1728,7 +1728,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   <img
                     src={imageSrc}
                     alt={`${selectedStyle} ${index + 1}`}
-                    style={{
+                style={{
                       width: "100%",
                       height: "auto",
                       display: "block",
@@ -1744,7 +1744,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* 画像ポップアップ */}
       {isImagePopupOpen && selectedPopupImage && (
         <div
-          style={{
+            style={{
             position: "fixed",
             top: 0,
             left: 0,
@@ -1752,8 +1752,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             height: "100vh",
             backgroundColor: "rgba(0, 0, 0, 0.8)",
             zIndex: 1000,
-            display: "flex",
-            alignItems: "center",
+                  display: "flex",
+                  alignItems: "center",
             justifyContent: "center",
             padding: "40px",
           }}
@@ -1774,7 +1774,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             <img
               src={selectedPopupImage}
               alt="選択された画像"
-              style={{
+                  style={{
                 width: "100%",
                 height: "auto",
                 borderRadius: "13px",
@@ -1827,7 +1827,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       <div
         ref={scrollContainerRef}
         className={`mobile-panel ${!activeTab ? 'hidden' : ''}`}
-        style={{
+                style={{
           position: "absolute",
           left: 0,
           top: 0,
@@ -1857,7 +1857,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             </p>
 
             {/* アイテムタブの内容 */}
-            {activeTab === "item" && (
+                {activeTab === "item" && (
               <div className="mobile-item-layout">
                 {/* モバイル用：左側の情報エリア */}
                 <div className="mobile-item-info">
@@ -1880,13 +1880,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       <div
                         key={shopifyProduct.id}
                         className="mobile-item-card"
-                        style={{
+              style={{
                           backgroundColor: "#f8f8f8",
                           borderRadius: "13px",
                           marginBottom: "17.5px",
                           border: showBorder ? "1px solid #303030" : "1px solid transparent",
                           boxShadow: isSelected ? "0 5px 15px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
-                          cursor: "pointer",
+                  cursor: "pointer",
                           transition: "all 0.2s ease",
                         }}
                         onClick={() => handleProductClick(shopifyProduct.id, shopifyProduct.image, shopifyProduct.title)}
@@ -1895,7 +1895,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       >
                     {/* 商品画像 */}
                     {shopifyProduct.image && (
-                      <div style={{
+                  <div style={{
                         width: "100%",
                         paddingBottom: "133.33%", /* 3:4 = 4/3 * 100% = 133.33% */
                         position: "relative",
@@ -1938,7 +1938,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                               <div
                                 key={idx}
                                 className="color-swatch"
-                                style={{
+              style={{
                                   width: "15px",
                                   height: "15px",
                                   borderRadius: "50%",
@@ -1959,7 +1959,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                                 }}
                               />
                             ))}
-                          </div>
+                </div>
                         </div>
                       )}
                     </div>
@@ -1974,26 +1974,26 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             {activeTab === "image" && (
               <div>
                 {/* 隠しファイル入力 */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
                   onChange={handleFileSelect}
                 />
 
                 {/* 大きなアップロードカード */}
                 <div
-                  style={{
+                        style={{
                     width: "223.5px",
                     backgroundColor: "#f8f8f8",
                     borderRadius: "13px",
                     boxShadow: isDraggingUpload ? "inset 0 2px 8px rgba(0, 0, 0, 0.1)" : "0 2px 8px rgba(0, 0, 0, 0.1)",
-                    display: "flex",
+                          display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
+                          alignItems: "center",
+                          justifyContent: "center",
                     cursor: "pointer",
                     border: isDraggingUpload ? "2px dashed #303030" : "2px dashed transparent",
                     transition: "all 0.2s ease",
@@ -2018,28 +2018,28 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 </div>
 
                 {/* 小さな画像カード（グリッドレイアウト）*/}
-                {uploadedImages.length > 0 && (
+                      {uploadedImages.length > 0 && (
                   <div
                     style={{
-                      display: "grid",
+                            display: "grid",
                       gridTemplateColumns: "repeat(2, 107.5px)",
                       gap: "9px",
                     }}
                   >
                     {uploadedImages.map((imageSrc, index) => (
-                      <div
-                        key={index}
+                              <div
+                                key={index}
                         onClick={() => {
                           setFullSizeImageSrc(imageSrc);
                           setShowFullSizeImage(true);
                         }}
-                        style={{
+                                style={{
                           width: "107.5px",
                           height: "107.5px",
                           backgroundColor: "#f8f8f8",
                           borderRadius: "13px",
                           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                          overflow: "hidden",
+                                  overflow: "hidden",
                           cursor: "pointer",
                           transition: "transform 0.2s ease, box-shadow 0.2s ease",
                         }}
@@ -2050,22 +2050,22 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = "scale(1)";
                           e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
-                        }}
-                      >
-                        <img
+                                }}
+                              >
+                                <img
                           src={imageSrc}
                           alt={`アップロード画像 ${index + 1}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
             )}
 
             {/* AI画像生成タブの内容 */}
@@ -2077,7 +2077,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     スタイル
                   </label>
                   <div
-                    style={{
+              style={{
                       display: "flex",
                       gap: "9px",
                       overflowX: "auto",
@@ -2109,7 +2109,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     ].map((style, index) => (
                       <div
                         key={index}
-                        style={{
+                style={{
                           minWidth: "107.5px",
                           width: "107.5px",
                           height: "107.5px",
@@ -2118,13 +2118,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                           backgroundPosition: "center",
                           borderRadius: "13px",
                           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                          display: "flex",
-                          alignItems: "center",
+                  display: "flex",
+                  alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
                           transition: "all 0.2s ease",
                           border: "1px solid transparent",
-                          flexShrink: 0,
+                    flexShrink: 0,
                           position: "relative",
                         }}
                         onMouseEnter={(e) => {
@@ -2175,13 +2175,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <div style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
                     プロンプト
-                  </label>
+                          </label>
                   <textarea
                     value={promptText}
                     onChange={(e) => setPromptText(e.target.value)}
                     placeholder="画像生成のためのテキストプロンプトを入力してください..."
-                    style={{
-                      width: "100%",
+                            style={{
+                              width: "100%",
                       minHeight: "120px",
                       padding: "12px",
                       fontSize: "12px",
@@ -2193,18 +2193,18 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       resize: "vertical",
                       fontFamily: "inherit",
                       lineHeight: "1.6",
-                    }}
-                  />
-                </div>
+                            }}
+                          />
+                        </div>
 
                 {/* 画像入力エリア */}
                 <div style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
                     画像アップロード<span style={{ fontWeight: 400, color: "#666" }}>（最大14枚）</span>
-                  </label>
+                          </label>
                   
                   {/* 隠しファイル入力 */}
-                  <input
+                          <input
                     ref={referenceFileInputRef}
                     type="file"
                     accept="image/*"
@@ -2215,7 +2215,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
 
                   {/* アップロードエリア */}
                   <div
-                    style={{
+                        style={{
                       width: "100%",
                       minHeight: "120px",
                       backgroundColor: "#f8f8f8",
@@ -2239,12 +2239,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     <span style={{ fontSize: "12px", color: "#666", marginTop: "8px", textAlign: "center" }}>
                       クリックまたはドラッグ&ドロップで画像を追加
                     </span>
-                  </div>
+                    </div>
 
                   {/* アップロード済み参照画像 */}
                   {referenceImages.length > 0 && (
                     <div
-                      style={{
+                style={{
                         display: "grid",
                         gridTemplateColumns: "repeat(auto-fill, minmax(107.5px, 1fr))",
                         gap: "9px",
@@ -2254,7 +2254,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       {referenceImages.map((imageSrc, index) => (
                         <div
                           key={index}
-                          style={{
+                style={{
                             width: "100%",
                             aspectRatio: "1 / 1",
                             backgroundColor: "#f8f8f8",
@@ -2274,30 +2274,30 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                             }}
                           />
                           {/* 削除ボタン（オプション） */}
-                          <button
-                            style={{
-                              position: "absolute",
+                <button
+                  style={{
+                    position: "absolute",
                               top: "5px",
                               right: "5px",
                               width: "24px",
                               height: "24px",
                               backgroundColor: "rgba(0, 0, 0, 0.6)",
                               color: "#fff",
-                              border: "none",
+                    border: "none",
                               borderRadius: "50%",
                               cursor: "pointer",
                               fontSize: "14px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
                               setReferenceImages((prev) => prev.filter((_, i) => i !== index));
-                            }}
-                          >
-                            ×
-                          </button>
+                  }}
+                >
+                  ×
+                </button>
                         </div>
                       ))}
                     </div>
@@ -2308,7 +2308,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <div style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#303030", marginBottom: "8px" }}>
                     アスペクト比
-                  </label>
+                        </label>
                   <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(4, 1fr)",
@@ -2327,7 +2327,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       <button
                         key={aspect.value}
                         type="button"
-                        style={{
+                          style={{
                           padding: "12px 8px",
                           fontSize: "11px",
                           fontWeight: 600,
@@ -2366,19 +2366,19 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         <span style={{ lineHeight: 1 }}>{aspect.label}</span>
                       </button>
                     ))}
-                  </div>
+                    </div>
                 </div>
 
                 {/* 生成ボタン */}
-                <button
-                  style={{
+                      <button
+                        style={{
                     width: "100%",
                     padding: "16px",
                     fontSize: "14px",
                     fontWeight: 700,
                     color: "#ffffff",
                     backgroundColor: "#303030",
-                    border: "none",
+                          border: "none",
                     borderRadius: "13px",
                     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                     cursor: "pointer",
@@ -2401,38 +2401,38 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   }}
                 >
                   画像を生成
-                </button>
+                      </button>
 
                 {/* 生成された画像表示エリア */}
                 <div
-                  style={{
+                                style={{
                     width: "100%",
                     aspectRatio: "16 / 9",
                     backgroundColor: "#f8f8f8",
                     borderRadius: "13px",
                     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                    overflow: "hidden",
+                                  overflow: "hidden",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: "20px",
-                  }}
-                >
-                  <img
+                                }}
+                              >
+                                <img
                     src={generatedImage || "https://via.placeholder.com/800x450/cccccc/666666?text=Generated+Image"}
                     alt="生成された画像"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </div>
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              </div>
 
                 {/* 画像管理に保存ボタン */}
                 <button
-                  style={{
-                    width: "100%",
+                          style={{
+                            width: "100%",
                     padding: "16px",
                     fontSize: "14px",
                     fontWeight: 700,
@@ -2458,9 +2458,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   onClick={handleSaveToGallery}
                 >
                   画像管理に保存
-                </button>
-              </div>
-            )}
+                      </button>
+                    </div>
+                  )}
 
             {/* 他のタブの内容 */}
             {activeTab !== "item" && activeTab !== "image" && activeTab !== "ai" && (
@@ -2468,7 +2468,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <p style={{ fontSize: "12px", color: "#666", lineHeight: "1.6" }}>
                   このメニューの内容は別途実装されます。
                 </p>
-              </div>
+                </div>
             )}
           </div>
         )}
@@ -2477,7 +2477,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* サイドバー */}
       <aside
         className="mobile-sidebar"
-        style={{
+            style={{
           position: "absolute",
           left: 0,
           top: 0,
@@ -2496,7 +2496,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       >
         {/* PrintAize ロゴ */}
         <h1
-          style={{
+                  style={{
             fontSize: "16px",
             fontWeight: 700,
             color: "#303030",
@@ -2524,7 +2524,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 key={item.id}
                 onMouseEnter={() => setHoveredTab(item.id)}
                 onMouseLeave={() => setHoveredTab(null)}
-                style={{
+                  style={{
                   position: "relative",
                 }}
               >
@@ -2557,7 +2557,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   {/* テキスト（展開時のみ） */}
                   {!isCollapsed && (
                     <span
-                      style={{
+                    style={{
                         fontSize: "12px",
                         fontWeight: 700,
                         color: "#303030",
@@ -2574,7 +2574,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   {/* モバイル用：常にラベルを表示 */}
                   <span
                     className="mobile-menu-button-label"
-                    style={{
+            style={{
                       display: "none",
                       fontSize: "12px",
                       fontWeight: 700,
@@ -2588,7 +2588,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 {/* 縮小時のホバーボタン（コンパネの上にレイヤー表示） */}
                 {isCollapsedHovered && (
                   <div
-                    style={{
+            style={{
                       position: "absolute",
                       left: "0",
                       top: "0",
@@ -2598,8 +2598,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       borderRadius: "17.16px",
                       paddingLeft: "10.5px",
                       paddingRight: "16px",
-                      display: "flex",
-                      alignItems: "center",
+              display: "flex",
+              alignItems: "center",
                       whiteSpace: "nowrap",
                       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                       zIndex: 1000,
@@ -2610,7 +2610,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   >
                     {getIcon(item.id, "#ffffff")}
                     <span
-                      style={{
+          style={{
                         fontSize: "12px",
                         fontWeight: 700,
                         color: "#ffffff",
@@ -2630,20 +2630,20 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         {/* 展開ボタン（縮小時のみ表示） */}
         {isCollapsed && (
           <button
-            style={{
+              style={{
               position: "absolute",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
               backgroundColor: "transparent",
-              border: "none",
+                border: "none",
               cursor: "pointer",
               padding: "0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onClick={() => {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+                onClick={() => {
               setActiveTab(null);
               setIsCollapsed(false);
             }}
@@ -2655,8 +2655,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         {/* カートに追加ボタン */}
         <button
           className="desktop-cart-button"
-          style={{
-            position: "absolute",
+                style={{
+                  position: "absolute",
             bottom: "35px",
             left: isCollapsed ? "50%" : "17.5px",
             right: isCollapsed ? "auto" : "17.5px",
@@ -2665,13 +2665,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             height: isCollapsed ? "auto" : "70px",
             backgroundColor: isCollapsed ? "transparent" : "#818181",
             color: "#ffffff",
-            border: "none",
+                  border: "none",
             borderRadius: isCollapsed ? "0" : "13px",
             fontSize: "18px",
             fontWeight: 700,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
             justifyContent: isCollapsed ? "center" : "flex-start",
             paddingLeft: isCollapsed ? "0" : "70px",
             gap: "10px",
@@ -2686,13 +2686,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
         >
           {getCartIcon(isCollapsed ? "#303030" : "#ffffff")}
           {!isCollapsed && <span>カートに追加</span>}
-        </button>
+              </button>
       </aside>
-
+              
       {/* モバイル用カートに追加ボタン */}
       <button
         className="mobile-cart-button"
-        style={{
+                style={{ 
           display: "none",
         }}
         onClick={() => {
@@ -2707,12 +2707,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* メインエリア（Tシャツ表示） */}
       <main
         className="mobile-main"
-        style={{
-          position: "absolute",
+                  style={{
+                    position: "absolute",
           left: "339px",
-          top: 0,
+                    top: 0,
           right: 0,
-          height: "100%",
+                    height: "100%",
           backgroundColor: "#f8f8f8",
           padding: "17.5px",
           overflow: "auto",
@@ -2723,7 +2723,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           {/* コントロールメニュー（プリント範囲に画像がある場合のみ表示） */}
           {isMounted && printedImages.length > 0 && (
             <div
-              style={{
+                style={{
                 position: "absolute",
                 top: "17.5px",
                 left: "50%",
@@ -2734,14 +2734,14 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 borderRadius: "17.16px",
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                 padding: "10.5px 16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
                 height: "70px",
               }}
             >
               {/* 元に戻す */}
-              <button
+              <button 
                 onClick={handleUndo}
                 style={{
                   height: "45px",
@@ -2770,9 +2770,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   元に戻す
                 </span>
               </button>
-
+              
               {/* やり直し（アイコン左右反転） */}
-              <button
+              <button 
                 onClick={handleRedo}
                 style={{
                   height: "45px",
@@ -2803,7 +2803,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               </button>
 
               {/* 上下中央 */}
-              <button
+              <button 
                 onClick={handleAlignVerticalCenter}
                 style={{
                   height: "45px",
@@ -2832,9 +2832,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   上下中央
                 </span>
               </button>
-
+              
               {/* 左右中央 */}
-              <button
+              <button 
                 onClick={handleAlignHorizontalCenter}
                 style={{
                   height: "45px",
@@ -2865,7 +2865,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               </button>
 
               {/* 手前へ */}
-              <button
+              <button 
                 onClick={handleBringForward}
                 style={{
                   height: "45px",
@@ -2894,9 +2894,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   手前へ
                 </span>
               </button>
-
+              
               {/* 奥へ */}
-              <button
+              <button 
                 onClick={handleSendBackward}
                 style={{
                   height: "45px",
@@ -2927,7 +2927,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
               </button>
 
               {/* 範囲内最大 */}
-              <button
+              <button 
                 onClick={handleFitToArea}
                 style={{
                   height: "45px",
@@ -2960,16 +2960,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           )}
 
           {/* 商品画像 */}
-          <div style={{
-            width: "100%",
+            <div style={{ 
+              width: "100%", 
             maxWidth: "2252px",
             position: "relative",
           }}>
-            <div style={{
-              width: "100%",
+        <div style={{ 
+          width: "100%", 
               paddingBottom: "133.33%", /* 3:4 = 4/3 * 100% = 133.33% */
               position: "relative",
-              backgroundColor: "#ffffff",
+          backgroundColor: "#ffffff",
               boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
             }}>
               <img
@@ -2987,13 +2987,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   display: "block",
                 }}
               />
+              </div>
             </div>
-          </div>
-          
+
           {/* プリント範囲の点線 */}
           {isMounted && (
             <div
-              style={{
+                    style={{
                 position: "absolute",
                 ...printAreaStyle,
                 zIndex: 0,
@@ -3066,8 +3066,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     {/* 選択枠とハンドル（Photoshopスタイル） */}
                     {isSelected && (
                       <>
-                        <div
-                          style={{
+                    <div
+                      style={{
                             position: "absolute",
                             top: 0,
                             left: 0,
@@ -3081,7 +3081,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         {/* 8つのリサイズハンドル */}
                         {/* 左上（回転エリア + リサイズハンドル） */}
                         <div
-                          style={{
+                    style={{
                             position: "absolute",
                             top: "-12px",
                             left: "-12px",
@@ -3140,8 +3140,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                               pointerEvents: "none",
                             }}
                           />
-                        </div>
-                        
+            </div>
+
                         {/* 上中央（リサイズ用） */}
                         <div
                           style={{
@@ -3183,7 +3183,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         
                         {/* 右上（回転エリア + リサイズハンドル） */}
                         <div
-                          style={{
+              style={{
                             position: "absolute",
                             top: "-12px",
                             right: "-12px",
@@ -3242,8 +3242,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                               pointerEvents: "none",
                             }}
                           />
-                        </div>
-                        
+            </div>
+
                         {/* 右中央 */}
                         <div
                           style={{
@@ -3285,7 +3285,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         
                         {/* 右下（回転エリア + リサイズハンドル） */}
                         <div
-                          style={{
+                  style={{
                             position: "absolute",
                             bottom: "-12px",
                             right: "-12px",
@@ -3344,12 +3344,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                               pointerEvents: "none",
                             }}
                           />
-                        </div>
-                        
+                </div>
+                
                         {/* 下中央 */}
                         <div
                           style={{
-                            position: "absolute",
+                    position: "absolute",
                             bottom: "-4px",
                             left: "50%",
                             transform: "translateX(-50%)",
@@ -3361,7 +3361,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                             zIndex: 1001,
                           }}
                           onMouseDown={(e) => {
-                            e.stopPropagation();
+                          e.stopPropagation();
                             setIsResizing(true);
                             setResizeStart({
                               scale: imageObj.scale,
@@ -3387,7 +3387,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         
                         {/* 左下（回転エリア + リサイズハンドル） */}
                         <div
-                          style={{
+                        style={{
                             position: "absolute",
                             bottom: "-12px",
                             left: "-12px",
@@ -3397,7 +3397,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                             zIndex: 1001,
                           }}
                           onMouseDown={(e) => {
-                            e.stopPropagation();
+                          e.stopPropagation();
                             if (!mainImageRef.current || !printAreaStyle.width) return;
                             
                             const printArea = mainImageRef.current.parentElement?.querySelector('[style*="position: absolute"][style*="overflow: visible"]') as HTMLElement;
@@ -3446,11 +3446,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                               pointerEvents: "none",
                             }}
                           />
-                        </div>
-                        
+                    </div>
+                    
                         {/* 左中央 */}
-                        <div
-                          style={{
+                      <div
+                        style={{
                             position: "absolute",
                             top: "50%",
                             left: "-4px",
@@ -3487,16 +3487,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                           }}
                         />
                       </>
-                    )}
-                  </div>
+                )}
+              </div>
                 );
               })}
             </div>
           )}
-          
+
           {/* 画像を追加ボタン（プリント範囲に画像がない場合のみ表示） */}
           {isMounted && printedImages.length === 0 && printAreaStyle.width && (
-            <button
+            <button 
               type="button"
               onDragOver={handlePrintAreaDragOver}
               onDragLeave={handlePrintAreaDragLeave}
@@ -3591,7 +3591,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* 閉じるボタン */}
-            <button
+            <button 
               onClick={() => {
                 setShowFullSizeImage(false);
                 setFullSizeImageSrc("");
@@ -3644,15 +3644,15 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {showImageSizeCheck && imageSizeInfo && (
         <div
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
+          position: "fixed",
+          top: 0,
+          left: 0,
             width: "100vw",
             height: "100vh",
             backgroundColor: "rgba(0, 0, 0, 0.6)",
             zIndex: 2001,
-            display: "flex",
-            alignItems: "center",
+          display: "flex",
+          alignItems: "center",
             justifyContent: "center",
           }}
           onClick={() => {
@@ -3691,28 +3691,28 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             {/* 高品質な画像 */}
             {imageSizeInfo.isGoodQuality && (
               <>
-                <div style={{
+          <div style={{
                   backgroundColor: "#d1fae5",
                   border: "3px solid #10b981",
                   borderRadius: "20px",
                   padding: "30px",
                   margin: "20px",
-                }}>
-                  <h2 style={{
+          }}>
+            <h2 style={{ 
                     fontSize: "20px",
                     fontWeight: 700,
                     color: "#10b981",
                     marginTop: "0",
-                    marginBottom: "20px",
-                    display: "flex",
-                    alignItems: "center",
+              marginBottom: "20px",
+              display: "flex",
+              alignItems: "center",
                     gap: "10px"
-                  }}>
+            }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ width: "24px", height: "24px" }}>
                       <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                     高品質な画像です！
-                  </h2>
+            </h2>
                   <p style={{ fontSize: "18px", fontWeight: 700, color: "#303030", margin: "0 0 5px 0" }}>
                     {imageSizeInfo.width} × {imageSizeInfo.height}px
                   </p>
@@ -3762,7 +3762,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
             {/* サイズが小さい警告 */}
             {imageSizeInfo.isTooSmall && !imageSizeInfo.isGoodQuality && (
               <>
-                <div style={{
+            <div style={{ 
                   backgroundColor: "#fef3c7",
                   border: "3px solid #f59e0b",
                   borderRadius: "20px",
@@ -3796,27 +3796,27 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   <p style={{ fontSize: "14px", color: "#666", margin: "0" }}>
                     印刷時に画質が粗くなる可能性があります。
                   </p>
-                </div>
+            </div>
                 <div style={{ padding: "0 20px 20px 20px" }}>
                   <p style={{ fontSize: "14px", color: "#303030", margin: "0 0 15px 0", textAlign: "center" }}>
                     それでもこの画像を使用しますか？
                   </p>
                   <div style={{ display: "flex", gap: "12px" }}>
-                    <button
-                      onClick={() => {
+              <button 
+                onClick={() => {
                         setShowImageSizeCheck(false);
                         setImageSizeInfo(null);
                         setPendingFiles([]);
                         setUploadSource(null);
-                      }}
-                      style={{
-                        flex: 1,
+                }}
+                style={{
+                  flex: 1,
                         height: "50px",
                         backgroundColor: "#e5e7eb",
                         color: "#303030",
-                        border: "none",
+                  border: "none",
                         borderRadius: "13px",
-                        fontSize: "16px",
+                  fontSize: "16px",
                         fontWeight: 700,
                         cursor: "pointer",
                         transition: "background-color 0.2s ease",
@@ -3826,11 +3826,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = "#e5e7eb";
-                      }}
-                    >
-                      キャンセル
-                    </button>
-                    <button
+                }}
+              >
+                キャンセル
+              </button>
+              <button 
                       onClick={() => {
                         setShowImageSizeCheck(false);
                         setImageSizeInfo(null);
@@ -3843,14 +3843,14 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                         setPendingFiles([]);
                         setUploadSource(null);
                       }}
-                      style={{
-                        flex: 1,
+                style={{
+                  flex: 1,
                         height: "50px",
                         backgroundColor: "#3b82f6",
                         color: "#ffffff",
-                        border: "none",
+                  border: "none",
                         borderRadius: "13px",
-                        fontSize: "16px",
+                  fontSize: "16px",
                         fontWeight: 700,
                         cursor: "pointer",
                         transition: "background-color 0.2s ease",
@@ -3863,9 +3863,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       }}
                     >
                       OK
-                    </button>
-                  </div>
-                </div>
+              </button>
+            </div>
+          </div>
               </>
             )}
 
@@ -3879,9 +3879,9 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                   <p style={{ fontSize: "14px", color: "#666", margin: "0" }}>
                     印刷可能なサイズです。
                   </p>
-                </div>
+            </div>
                 <div style={{ padding: "0 20px 20px 20px" }}>
-                  <button
+            <button 
                     onClick={() => {
                       setShowImageSizeCheck(false);
                       setImageSizeInfo(null);
@@ -3894,16 +3894,16 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                       setPendingFiles([]);
                       setUploadSource(null);
                     }}
-                    style={{
+              style={{
                       width: "100%",
                       height: "50px",
                       backgroundColor: "#6366f1",
                       color: "#ffffff",
-                      border: "none",
+                border: "none",
                       borderRadius: "13px",
                       fontSize: "16px",
                       fontWeight: 700,
-                      cursor: "pointer",
+                cursor: "pointer",
                       transition: "background-color 0.2s ease",
                     }}
                     onMouseEnter={(e) => {
@@ -3911,11 +3911,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = "#6366f1";
-                    }}
-                  >
-                    閉じる
-                  </button>
-                </div>
+              }}
+            >
+              閉じる
+            </button>
+          </div>
               </>
             )}
           </div>
@@ -3960,7 +3960,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
                 <path d="M2,9.99017859 C2,7.7864638 3.79975948,6 5.99029394,6 L18.0767644,6 C19.1835685,6 20.5701975,6.7477726 21.1746315,7.67133451 L24.0075684,12 L41.9918214,12 C44.2054773,12 46,13.7867947 46,15.9992748 L46,38.0007252 C46,40.2094637 44.2069088,42 41.99819,42 L6.00180999,42 C3.79167136,42 2,40.2147544 2,38.0098214 L2,9.99017859 Z M6,38.0098214 L41.99819,38 L42,15.9992748 L24.0075684,16 C22.658105,16 21.3996088,15.3195781 20.6606307,14.1904356 L18,10.0097802 L5.99029394,10 L6,38.0098214 Z M17.862928,23.9448407 C18.3178041,22.9335006 19.2364493,22.8239147 19.9084014,23.6918355 L22.7905122,27.4144876 C23.4653199,28.2860968 24.7285203,28.4701867 25.6270803,27.8146248 L26.205134,27.3928946 C27.0969196,26.7422751 28.2985638,26.9754922 28.8829814,27.9041067 L31.6562655,32.3107367 C32.2434141,33.2436908 31.8235673,33.9999996 30.718486,33.9999996 L15.3412689,33.9999999 C14.236199,33.9999999 13.7078282,33.1830028 14.1639889,32.1688067 L17.862928,23.9448407 Z M30.9342877,26 C29.2774335,26 27.9342877,24.6568542 27.9342877,23 C27.9342877,21.3431458 29.2774335,20 30.9342877,20 C32.591142,20 33.9342877,21.3431458 33.9342877,23 C33.9342877,24.6568542 32.591142,26 30.9342877,26 Z" fill="#303030" />
               </svg>
               画像アップロード前のご確認
-            </h2>
+              </h2>
 
             {/* 推奨画像サイズ */}
             <div style={{ marginBottom: "30px" }}>
