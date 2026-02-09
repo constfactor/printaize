@@ -1662,17 +1662,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           }
         }
       `}</style>
-      
-      {/* デスクトップでモバイル用パネルを非表示 */}
-      <style>{`
-        @media (min-width: 769px) {
-          .mobile-panel,
-          .mobile-panel2 {
-            display: none !important;
-          }
-        }
-      `}</style>
-      
       {/* コンパネ2（スタイル詳細） */}
       <div
         className="mobile-panel2"
@@ -1837,11 +1826,12 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       <div
         ref={scrollContainerRef}
         className={`mobile-panel ${!activeTab ? 'hidden' : ''}`}
-        style={{
+                style={{
           position: "absolute",
           left: 0,
           top: 0,
           width: "339.5px",
+          height: "100vh",
           backgroundColor: "#eeeeee",
           zIndex: 5,
           boxShadow: isCollapsed ? "5px 0 15px rgba(0, 0, 0, 0.1)" : "none",
@@ -1851,7 +1841,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           paddingBottom: "35px",
           paddingLeft: "97.5px",
           paddingRight: "17.5px",
-          display: "none",
         }}
       >
         {/* パネルの内容（activeTabに応じて表示） */}
