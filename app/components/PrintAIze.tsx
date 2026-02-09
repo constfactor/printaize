@@ -1354,40 +1354,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     return () => window.removeEventListener('resize', updatePrintArea);
   }, [selectedProductImage]);
 
-  // メインコンテンツの高さに合わせてサイドバーの高さを調整
-  useEffect(() => {
-    const syncHeights = () => {
-      const main = document.querySelector('.mobile-main');
-      const sidebar = document.querySelector('.mobile-sidebar');
-      
-      if (main && sidebar && window.innerWidth > 768) {
-        const mainHeight = main.scrollHeight;
-        (sidebar as HTMLElement).style.minHeight = mainHeight + 'px';
-      }
-    };
-
-    syncHeights();
-    window.addEventListener('resize', syncHeights);
-    
-    // MutationObserverでコンテンツの変化を監視
-    const observer = new MutationObserver(syncHeights);
-    const main = document.querySelector('.mobile-main');
-    if (main) {
-      observer.observe(main, { childList: true, subtree: true });
-    }
-
-    return () => {
-      window.removeEventListener('resize', syncHeights);
-      observer.disconnect();
-    };
-  }, []);
-
   return (
     <div
       style={{
         width: "100vw",
-        minHeight: "100vh",
-        height: "auto",
+        minHeight: "auto",
         backgroundColor: "#f8f8f8",
         display: "flex",
         overflow: "visible",
@@ -2506,9 +2477,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       <aside
         className="mobile-sidebar"
         style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
+          position: "relative",
           width: isCollapsed ? "80px" : "339px",
           backgroundColor: "#f8f8f8",
           paddingLeft: "17.5px",
@@ -2519,6 +2488,7 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           zIndex: 10,
           transition: "width 0.3s ease-in-out",
           overflow: isCollapsed ? "visible" : "hidden",
+          flexShrink: 0,
         }}
       >
         {/* PrintAize ロゴ */}
@@ -2735,10 +2705,8 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       <main
         className="mobile-main"
         style={{
-          position: "absolute",
-          left: "339px",
-          top: 0,
-          right: 0,
+          position: "relative",
+          flex: 1,
           backgroundColor: "#f8f8f8",
           padding: "17.5px",
           overflow: "auto",
