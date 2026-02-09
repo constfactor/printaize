@@ -58,6 +58,53 @@ export default function App() {
             display: block;
           }
         `}</style>
+        
+        {/* iframe高さ自動調整 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                let lastHeight = 0;
+                
+                function sendHeight() {
+                  const height = Math.max(
+                    document.body.scrollHeight || 0,
+                    document.documentElement.scrollHeight || 0,
+                    1000
+                  );
+                  
+                  if (height !== lastHeight && height > 0) {
+                    try {
+                      window.parent.postMessage({ height: height }, '*');
+                      lastHeight = height;
+                    } catch (e) {}
+                  }
+                }
+                
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(sendHeight, 500);
+                    setTimeout(sendHeight, 1000);
+                    setInterval(sendHeight, 3000);
+                  });
+                } else {
+                  setTimeout(sendHeight, 500);
+                  setTimeout(sendHeight, 1000);
+                  setInterval(sendHeight, 3000);
+                }
+                
+                window.addEventListener('resize', function() {
+                  lastHeight = 0;
+                  sendHeight();
+                });
+                
+                window.addEventListener('load', function() {
+                  setTimeout(sendHeight, 500);
+                });
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         {/* Fabric.jsを最初に読み込む */}

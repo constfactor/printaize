@@ -1,9 +1,26 @@
-<div class="printaize-block">
+<div class="printaize-block" style="width: 100%; min-height: 800px;">
   {% if block.settings.heading != blank %}
-    <h2>{{ block.settings.heading }}</h2>
+    <h2 style="text-align: center; margin: 20px 0;">{{ block.settings.heading }}</h2>
   {% endif %}
   
-  <div id="printaize-app"></div>
+  <iframe 
+    id="printaize-iframe"
+    src="https://printaize.vercel.app"
+    style="width: 100%; min-height: 1000px; border: none; display: block;"
+    frameborder="0"
+  ></iframe>
+  
+  <script>
+    // iframe高さ自動調整
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data.height === 'number') {
+        var iframe = document.getElementById('printaize-iframe');
+        if (iframe) {
+          iframe.style.height = event.data.height + 'px';
+        }
+      }
+    });
+  </script>
 </div>
 
 {% schema %}
