@@ -2477,12 +2477,13 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* サイドバー */}
       <aside
         className="mobile-sidebar"
-            style={{
+        style={{
           position: "absolute",
           left: 0,
           top: 0,
           width: isCollapsed ? "80px" : "339px",
-          minHeight: "100%",
+          height: "auto",
+          minHeight: "100vh",
           backgroundColor: "#f8f8f8",
           paddingLeft: "17.5px",
           paddingRight: "17.5px",
