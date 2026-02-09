@@ -1354,6 +1354,34 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
     return () => window.removeEventListener('resize', updatePrintArea);
   }, [selectedProductImage]);
 
+  // メインコンテンツの高さに合わせてサイドバーの高さを調整
+  useEffect(() => {
+    const syncHeights = () => {
+      const main = document.querySelector('.mobile-main');
+      const sidebar = document.querySelector('.mobile-sidebar');
+      
+      if (main && sidebar && window.innerWidth > 768) {
+        const mainHeight = main.scrollHeight;
+        (sidebar as HTMLElement).style.minHeight = mainHeight + 'px';
+      }
+    };
+
+    syncHeights();
+    window.addEventListener('resize', syncHeights);
+    
+    // MutationObserverでコンテンツの変化を監視
+    const observer = new MutationObserver(syncHeights);
+    const main = document.querySelector('.mobile-main');
+    if (main) {
+      observer.observe(main, { childList: true, subtree: true });
+    }
+
+    return () => {
+      window.removeEventListener('resize', syncHeights);
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div
       style={{
@@ -2481,7 +2509,6 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
           position: "absolute",
           left: 0,
           top: 0,
-          bottom: 0,
           width: isCollapsed ? "80px" : "339px",
           backgroundColor: "#f8f8f8",
           paddingLeft: "17.5px",
@@ -2707,12 +2734,11 @@ export default function PrintAIze({ product }: PrintAIzeProps) {
       {/* メインエリア（Tシャツ表示） */}
       <main
         className="mobile-main"
-                  style={{
-                    position: "absolute",
+        style={{
+          position: "absolute",
           left: "339px",
-                    top: 0,
+          top: 0,
           right: 0,
-                    height: "100%",
           backgroundColor: "#f8f8f8",
           padding: "17.5px",
           overflow: "auto",
